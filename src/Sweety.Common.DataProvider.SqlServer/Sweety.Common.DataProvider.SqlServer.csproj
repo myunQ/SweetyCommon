@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+    <PackageVersion>0.0.2</PackageVersion>
+    <Authors>Mingyun Qin</Authors>
+    <Copyright>Mingyun Qin</Copyright>
+    <Owners>Mingyun Qin</Owners>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Description>- 更新了依赖项 Sweety.Common 的版本。</Description>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType></DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sweety.Common\Sweety.Common.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.1" />
+  </ItemGroup>
+</Project>

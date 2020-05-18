@@ -1,0 +1,157 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>2.0</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    
+    <data name="the stream does not support read operations" xml:space="preserve">
+        <value>流不支持讀取操作。</value>
+    </data>
+    
+    <data name="the stream does not support write operations" xml:space="preserve">
+        <value>流不支持寫操作。</value>
+    </data>
+    
+    <data name="the specified key size is invalid for this algorithm" xml:space="preserve">
+        <value>指定的密鑰大小對於此算法無效。</value>
+    </data>
+    
+    <data name="the specified initialization vector does not match the block size of this algorithm" xml:space="preserve">
+        <value>指定的初始化向量（IV）與此算法的塊大小不匹配。</value>
+    </data>
+    
+    <data name="unknown encryption cipher mode" xml:space="preserve">
+        <value>未知的加密密碼模式。</value>
+    </data>
+    
+    <data name="unknown data block padding mode" xml:space="preserve">
+        <value>未知的數據塊填充模式。</value>
+    </data>
+    
+    <data name="the plaintext cannot be empty" xml:space="preserve">
+        <value>要加密的內容不能為空。</value>
+    </data>
+    
+    <data name="the ciphertext cannot be empty" xml:space="preserve">
+        <value>密文不能為空。</value>
+    </data>
+    
+    <data name="please specify the main database connection string" xml:space="preserve">
+        <value>請指定主數據庫連接字符串。</value>
+    </data>
+    
+    <data name="the connection string of the slave database is not specified" xml:space="preserve">
+        <value>沒有指定從數據庫的連接字符串。</value>
+    </data>
+    
+    <data name="the byte length of the compared strings must not be less than zero" xml:space="preserve">
+        <value>被比較的字符串字節長度不得小於零。</value>
+    </data>
+    
+    <data name="the length of the string to be appended to the end exceeds the length to be intercepted or equal to the length to be intercepted" xml:space="preserve">
+        <value>要追加到末尾的字符串長度超過了要截取的長度或跟要截取長度相等。</value>
+    </data>
+    
+    <data name="the length of bytes after the intercepted string plus the appended string exceeds the expected length" xml:space="preserve">
+        <value>截取的字符串加上附加字符串之後的字節長度超出了預期的長度。</value>
+    </data>
+    
+    <data name="the length of the hexadecimal string should be an even number" xml:space="preserve">
+        <value>十六進製字符串的長度應為偶數。</value>
+    </data>
+    
+    <data name="the read-only collection cannot be modified" xml:space="preserve">
+        <value>不能修改只讀集合。</value>
+    </data>
+    
+    <data name="the starting index must be greater than or equal to zero" xml:space="preserve">
+        <value>起始索引必須大於等於零。</value>
+    </data>
+    
+    <data name="the length must be greater than zero" xml:space="preserve">
+        <value>長度必須大於零。</value>
+    </data>
+    
+    <data name="the starting index is not in the valid range" xml:space="preserve">
+        <value>起始索引不在有效範圍內。</value>
+    </data>
+    
+    <data name="the page number must be greater than zero" xml:space="preserve">
+        <value>頁碼必須大於零。</value>
+    </data>
+    
+    <data name="the page size must be greater than zero" xml:space="preserve">
+        <value>每頁記錄數必須大於零。</value>
+    </data>
+    
+    <data name="the database connection string cannot be null or empty" xml:space="preserve">
+        <value>數據庫連接字符串不能是null或空字符串。</value>
+    </data>
+    
+    <data name="the transaction was rollbacked or commited, please provide an open transaction" xml:space="preserve">
+        <value>事務已回滾或提交，請提供一個未完成的事務。</value>
+    </data>
+    
+    <data name="the database connection provided and the database connection used by the transaction must be the same instance" xml:space="preserve">
+        <value>提供的數據庫連接與事務使用的數據庫連接必須是同一個實例。</value>
+    </data>
+    
+    
+    
+    <data name="the value XXX of type XXXType cannot be converted to a value of type IPAddressType" xml:space="preserve">
+        <value>不能將{1}類型的值“{0}”轉換成{2}類型的值。</value>
+    </data>
+    
+    <data name="the XXX property of the encryption algorithm instance contains XXX elements, not just one element" xml:space="preserve">
+        <value>加密算法實例的 {0} 屬性含有 {1} 個元素，並非僅含有一個元素。</value>
+    </data>
+    
+    <data name="the element of the master database connection string index XXX is a null or empty string" xml:space="preserve">
+        <value>主數據庫連接字符串索引 [{0}] 的元素是 null 或空字符串。</value>
+    </data>
+    
+    <data name="the element of the slave database connection string index XXX is a null or empty string" xml:space="preserve">
+        <value>從數據庫連接字符串索引 [{0}] 的元素是 null 或空字符串。</value>
+    </data>
+    
+    <data name="please call the static method XXX to initialize before constructing the instance" xml:space="preserve">
+        <value>請先調用靜態方法 {0} 進行初始化在構造實例。</value>
+    </data>
+    
+    <data name="the value of the property XXX is invalid" xml:space="preserve">
+        <value>屬性 {0} 的值無效。</value>
+    </data>
+    
+    <data name="the value ranges from XXX to XXX" xml:space="preserve">
+        <value>取值範圍在 {0}~{1} 之間。</value>
+    </data>
+    
+    <data name="the value ranges from XXX to XXX milliseconds" xml:space="preserve">
+        <value>取值範圍在 {0}~{1} 毫秒之間。</value>
+    </data>
+    
+    <data name="invalid character XXX" xml:space="preserve">
+        <value>無效的字符 '{0}'。</value>
+    </data>
+    
+    <data name="at least XXX bytes" xml:space="preserve">
+        <value>至少 {0} 個字節。</value>
+    </data>
+    
+    <data name="this instance only accepts database connection objects of type XXX" xml:space="preserve">
+        <value>此實例僅接受類型為 {0} 的數據庫鏈接對象。</value>
+    </data>
+    
+    <data name="this instance only accepts transaction objects of type XXX" xml:space="preserve">
+        <value>此實例只接受 {0} 類型的事務對象。</value>
+    </data>
+</root>

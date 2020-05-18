@@ -1,0 +1,94 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sweety.Common", "src\Sweety.Common\Sweety.Common.csproj", "{C75CBED2-5364-49B0-A7FD-CEA2052CBA2F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sweety.Common.Tests", "test\Sweety.Common.Tests\Sweety.Common.Tests.csproj", "{747DA593-BB40-448E-9F28-1D9F527C95DA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{53A748E6-A275-4346-A6D5-989E9CFF102D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{46DC1CA2-1306-4064-AE8C-0F65199ED37F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sweety.Common.PerformanceTest", "test\Sweety.Common.PerformanceTest\Sweety.Common.PerformanceTest.csproj", "{467EE9D3-549E-4810-AFFF-754C84BF9A0C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sweety.Common.Caching.Memcached", "src\Sweety.Common.Caching.Memcached\Sweety.Common.Caching.Memcached.csproj", "{2BC27BDA-226C-4E86-893D-BC27E8307C52}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sweety.Common.Caching.Redis", "src\Sweety.Common.Caching.Redis\Sweety.Common.Caching.Redis.csproj", "{882A530F-5378-4E4F-9FE3-6E6B5F340FEB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sweety.Common.DataProvider.SqlServer", "src\Sweety.Common.DataProvider.SqlServer\Sweety.Common.DataProvider.SqlServer.csproj", "{D750E557-22BF-475F-B020-69D133246A89}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sweety.Common.DataProvider.PostgreSQL", "src\Sweety.Common.DataProvider.PostgreSQL\Sweety.Common.DataProvider.PostgreSQL.csproj", "{5046B4BB-3FA4-455B-8F0A-693AF02A9034}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sweety.Common.DataProvider.MongoDB", "src\Sweety.Common.DataProvider.MongoDB\Sweety.Common.DataProvider.MongoDB.csproj", "{36F42033-9E8F-4D52-9ADC-E45FC163E3C2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sweety.Common.DataProvider.MySql", "src\Sweety.Common.DataProvider.MySql\Sweety.Common.DataProvider.MySql.csproj", "{318678BD-2F55-446C-84B4-805673685C0C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sweety.Common.Caching.InProcessCache", "src\Sweety.Common.Caching.InProcessCache\Sweety.Common.Caching.InProcessCache.csproj", "{BF3D4DC7-E9EF-4F91-8049-4FE4355E7D28}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sweety.Common.Caching.Redis.Tests", "test\Sweety.Common.Caching.Redis.Tests\Sweety.Common.Caching.Redis.Tests.csproj", "{E6A733DD-80BF-445C-B777-DD59C678C885}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C75CBED2-5364-49B0-A7FD-CEA2052CBA2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C75CBED2-5364-49B0-A7FD-CEA2052CBA2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C75CBED2-5364-49B0-A7FD-CEA2052CBA2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C75CBED2-5364-49B0-A7FD-CEA2052CBA2F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{747DA593-BB40-448E-9F28-1D9F527C95DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{747DA593-BB40-448E-9F28-1D9F527C95DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{747DA593-BB40-448E-9F28-1D9F527C95DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{747DA593-BB40-448E-9F28-1D9F527C95DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{467EE9D3-549E-4810-AFFF-754C84BF9A0C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{467EE9D3-549E-4810-AFFF-754C84BF9A0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{467EE9D3-549E-4810-AFFF-754C84BF9A0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{467EE9D3-549E-4810-AFFF-754C84BF9A0C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2BC27BDA-226C-4E86-893D-BC27E8307C52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2BC27BDA-226C-4E86-893D-BC27E8307C52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2BC27BDA-226C-4E86-893D-BC27E8307C52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2BC27BDA-226C-4E86-893D-BC27E8307C52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{882A530F-5378-4E4F-9FE3-6E6B5F340FEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{882A530F-5378-4E4F-9FE3-6E6B5F340FEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{882A530F-5378-4E4F-9FE3-6E6B5F340FEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{882A530F-5378-4E4F-9FE3-6E6B5F340FEB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D750E557-22BF-475F-B020-69D133246A89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D750E557-22BF-475F-B020-69D133246A89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D750E557-22BF-475F-B020-69D133246A89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D750E557-22BF-475F-B020-69D133246A89}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5046B4BB-3FA4-455B-8F0A-693AF02A9034}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5046B4BB-3FA4-455B-8F0A-693AF02A9034}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5046B4BB-3FA4-455B-8F0A-693AF02A9034}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5046B4BB-3FA4-455B-8F0A-693AF02A9034}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36F42033-9E8F-4D52-9ADC-E45FC163E3C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36F42033-9E8F-4D52-9ADC-E45FC163E3C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36F42033-9E8F-4D52-9ADC-E45FC163E3C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36F42033-9E8F-4D52-9ADC-E45FC163E3C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{318678BD-2F55-446C-84B4-805673685C0C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{318678BD-2F55-446C-84B4-805673685C0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{318678BD-2F55-446C-84B4-805673685C0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{318678BD-2F55-446C-84B4-805673685C0C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF3D4DC7-E9EF-4F91-8049-4FE4355E7D28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF3D4DC7-E9EF-4F91-8049-4FE4355E7D28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF3D4DC7-E9EF-4F91-8049-4FE4355E7D28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF3D4DC7-E9EF-4F91-8049-4FE4355E7D28}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6A733DD-80BF-445C-B777-DD59C678C885}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6A733DD-80BF-445C-B777-DD59C678C885}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6A733DD-80BF-445C-B777-DD59C678C885}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6A733DD-80BF-445C-B777-DD59C678C885}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C75CBED2-5364-49B0-A7FD-CEA2052CBA2F} = {53A748E6-A275-4346-A6D5-989E9CFF102D}
+		{747DA593-BB40-448E-9F28-1D9F527C95DA} = {46DC1CA2-1306-4064-AE8C-0F65199ED37F}
+		{467EE9D3-549E-4810-AFFF-754C84BF9A0C} = {46DC1CA2-1306-4064-AE8C-0F65199ED37F}
+		{2BC27BDA-226C-4E86-893D-BC27E8307C52} = {53A748E6-A275-4346-A6D5-989E9CFF102D}
+		{882A530F-5378-4E4F-9FE3-6E6B5F340FEB} = {53A748E6-A275-4346-A6D5-989E9CFF102D}
+		{D750E557-22BF-475F-B020-69D133246A89} = {53A748E6-A275-4346-A6D5-989E9CFF102D}
+		{5046B4BB-3FA4-455B-8F0A-693AF02A9034} = {53A748E6-A275-4346-A6D5-989E9CFF102D}
+		{36F42033-9E8F-4D52-9ADC-E45FC163E3C2} = {53A748E6-A275-4346-A6D5-989E9CFF102D}
+		{318678BD-2F55-446C-84B4-805673685C0C} = {53A748E6-A275-4346-A6D5-989E9CFF102D}
+		{BF3D4DC7-E9EF-4F91-8049-4FE4355E7D28} = {53A748E6-A275-4346-A6D5-989E9CFF102D}
+		{E6A733DD-80BF-445C-B777-DD59C678C885} = {46DC1CA2-1306-4064-AE8C-0F65199ED37F}
+	EndGlobalSection
+EndGlobal

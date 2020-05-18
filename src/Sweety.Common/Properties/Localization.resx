@@ -1,0 +1,157 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>2.0</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    
+    <data name="the stream does not support read operations" xml:space="preserve">
+        <value>The stream does not support read operations.</value>
+    </data>
+    
+    <data name="the stream does not support write operations" xml:space="preserve">
+        <value>The stream does not support write operations.</value>
+    </data>
+    
+    <data name="the specified key size is invalid for this algorithm" xml:space="preserve">
+        <value>The specified key size is invalid for this algorithm.</value>
+    </data>
+    
+    <data name="the specified initialization vector does not match the block size of this algorithm" xml:space="preserve">
+        <value>The specified initialization vector does not match the block size of this algorithm.</value>
+    </data>
+    
+    <data name="unknown encryption cipher mode" xml:space="preserve">
+        <value>Unknown encryption cipher mode.</value>
+    </data>
+    
+    <data name="unknown data block padding mode" xml:space="preserve">
+        <value>Unknown data block padding mode.</value>
+    </data>
+    
+    <data name="the plaintext cannot be empty" xml:space="preserve">
+        <value>The plaintext cannot be empty.</value>
+    </data>
+    
+    <data name="the ciphertext cannot be empty" xml:space="preserve">
+        <value>The ciphertext cannot be empty.</value>
+    </data>
+    
+    <data name="please specify the main database connection string" xml:space="preserve">
+        <value>Please specify the main database connection string.</value>
+    </data>
+    
+    <data name="the connection string of the slave database is not specified" xml:space="preserve">
+        <value>The connection string of the slave database is not specified.</value>
+    </data>
+    
+    <data name="the byte length of the compared strings must not be less than zero" xml:space="preserve">
+        <value>The byte length of the compared strings must not be less than zero.</value>
+    </data>
+    
+    <data name="the length of the string to be appended to the end exceeds the length to be intercepted or equal to the length to be intercepted" xml:space="preserve">
+        <value>The length of the string to be appended to the end exceeds the length to be intercepted or equal to the length to be intercepted.</value>
+    </data>
+    
+    <data name="the length of bytes after the intercepted string plus the appended string exceeds the expected length" xml:space="preserve">
+        <value>The length of bytes after the intercepted string plus the appended string exceeds the expected length.</value>
+    </data>
+    
+    <data name="the length of the hexadecimal string should be an even number" xml:space="preserve">
+        <value>The length of the hexadecimal string should be an even number.</value>
+    </data>
+    
+    <data name="the read-only collection cannot be modified" xml:space="preserve">
+        <value>The read-only collection cannot be modified.</value>
+    </data>
+    
+    <data name="the starting index must be greater than or equal to zero" xml:space="preserve">
+        <value>The starting index must be greater than or equal to zero.</value>
+    </data>
+    
+    <data name="the length must be greater than zero" xml:space="preserve">
+        <value>The length must be greater than zero.</value>
+    </data>
+    
+    <data name="the starting index is not in the valid range" xml:space="preserve">
+        <value>The starting index is not in the valid range.</value>
+    </data>
+    
+    <data name="the page number must be greater than zero" xml:space="preserve">
+        <value>The page number must be greater than zero.</value>
+    </data>
+    
+    <data name="the page size must be greater than zero" xml:space="preserve">
+        <value>The page size must be greater than zero.</value>
+    </data>
+    
+    <data name="the database connection string cannot be null or empty" xml:space="preserve">
+        <value>The database connection string cannot be null or empty.</value>
+    </data>
+    
+    <data name="the transaction was rollbacked or commited, please provide an open transaction" xml:space="preserve">
+        <value>The transaction was rollbacked or commited, please provide an open transaction.</value>
+    </data>
+    
+    <data name="the database connection provided and the database connection used by the transaction must be the same instance" xml:space="preserve">
+        <value>The database connection provided and the database connection used by the transaction must be the same instance.</value>
+    </data>
+    
+    
+    
+    <data name="the value XXX of type XXXType cannot be converted to a value of type IPAddressType" xml:space="preserve">
+        <value>The value "{0}" of type {1} cannot be converted to a value of type {2}.</value>
+    </data>
+    
+    <data name="the XXX property of the encryption algorithm instance contains XXX elements, not just one element" xml:space="preserve">
+        <value>The {0} property of the encryption algorithm instance contains {1} elements, not just one element.</value>
+    </data>
+    
+    <data name="the element of the master database connection string index XXX is a null or empty string" xml:space="preserve">
+        <value>The element of the master database connection string index [{0}] is a null or empty string.</value>
+    </data>
+    
+    <data name="the element of the slave database connection string index XXX is a null or empty string" xml:space="preserve">
+        <value>The element of the slave database connection string index [{0}] is a null or empty string.</value>
+    </data>
+    
+    <data name="please call the static method XXX to initialize before constructing the instance" xml:space="preserve">
+        <value>Please call the static method {0} to initialize before constructing the instance.</value>
+    </data>
+    
+    <data name="the value of the property XXX is invalid" xml:space="preserve">
+        <value>The value of the property {0} is invalid.</value>
+    </data>
+    
+    <data name="the value ranges from XXX to XXX" xml:space="preserve">
+        <value>The value ranges from {0} to {1}.</value>
+    </data>
+    
+    <data name="the value ranges from XXX to XXX milliseconds" xml:space="preserve">
+        <value>The value ranges from {0} to {1} milliseconds.</value>
+    </data>
+    
+    <data name="invalid character XXX" xml:space="preserve">
+        <value>Invalid character '{0}'.</value>
+    </data>
+    
+    <data name="at least XXX bytes" xml:space="preserve">
+        <value>At least {0} bytes.</value>
+    </data>
+    
+    <data name="this instance only accepts database connection objects of type XXX" xml:space="preserve">
+        <value>This instance only accepts database connection objects of type {0}.</value>
+    </data>
+    
+    <data name="this instance only accepts transaction objects of type XXX" xml:space="preserve">
+        <value>This instance only accepts transaction objects of type {0}.</value>
+    </data>
+</root>
