@@ -36,7 +36,7 @@ namespace Sweety.Common.Caching
     /// <summary>
     /// 分布式缓存服务 <c>Redis</c> 的操作类。
     /// </summary>
-    public class RedisCache : ICache
+    public class RedisCache : ICache, IDisposable
     {
         const byte BOOLEAN_TYPE_INDEX = 1;
         const byte CHAR_TYPE_INDEX = 2;
@@ -95,6 +95,22 @@ namespace Sweety.Common.Caching
 
             _cache = RedisConn.GetDatabase();
         }
+
+        ~RedisCache()
+        {
+            Dispose();
+        }
+
+        public void Dispose()
+        {
+            if (_conn != null)
+            {
+                _conn.Close();
+                _conn.Dispose();
+                _conn = null;
+            }
+        }
+
 
         /// <summary>
         /// 压缩/解压缩工具
@@ -481,16 +497,10 @@ namespace Sweety.Common.Caching
                 case BYTE_TYPE_INDEX: return value[startIndex];
                 case SBYTE_TYPE_INDEX: return unchecked((SByte)value[startIndex]);
                 case DECIMAL_TYPE_INDEX: return value.ToDecimal(startIndex);
-
                 case TIMESPAN_TYPE_INDEX: return new TimeSpan(BitConverter.ToInt64(value, startIndex));
                 case DATETIMEOFFSET_TYPE_INDEX: return new DateTimeOffset(BitConverter.ToInt64(value, startIndex), new TimeSpan(BitConverter.ToInt64(value, startIndex + 8)));
-#if NETSTANDARD2_0
                 case GUID_TYPE_INDEX: return ToGuid(value, startIndex);
                 case IP_TYPE_INDEX: return ToIPAddress(value, startIndex);
-#else
-                case GUID_TYPE_INDEX: return new Guid(new ReadOnlySpan<byte>(value, startIndex, 16));
-                case IP_TYPE_INDEX: return new System.Net.IPAddress(new ReadOnlySpan<byte>(value, startIndex, value.Length - startIndex));
-#endif
                 case BYTEARRAY_TYPE_INDEX: return new Span<byte>(value, startIndex, value.Length - startIndex).ToArray();
                 case STRING_TYPE_INDEX: return Encoding.UTF8.GetString(value, startIndex, value.Length - startIndex);
                 case OBJECT_TYPE_INDEX: return DeserializeObject(value, startIndex);
@@ -502,7 +512,7 @@ namespace Sweety.Common.Caching
                 INT32_TYPE_INDEX => BitConverter.ToInt32(value, startIndex),
                 INT16_TYPE_INDEX => BitConverter.ToInt16(value, startIndex),
                 INT64_TYPE_INDEX => BitConverter.ToInt64(value, startIndex),
-                DATETIME_TYPE_INDEX => DateTime.FromBinary(BitConverter.ToInt64(value, startIndex)),
+                DATETIME_TYPE_INDEX => ToDateTime(value, startIndex),
                 UINT32_TYPE_INDEX => BitConverter.ToUInt32(value, startIndex),
                 UINT16_TYPE_INDEX => BitConverter.ToUInt16(value, startIndex),
                 UINT64_TYPE_INDEX => BitConverter.ToUInt64(value, startIndex),
@@ -549,13 +559,6 @@ namespace Sweety.Common.Caching
                 return new Guid(bits);
             }
 
-            DateTime ToDateTime(byte[] buffer, int sub_startIndex)
-            {
-                long dateData = BitConverter.ToInt64(value, startIndex);
-
-                return new DateTime(dateData & 0x3FFFFFFFFFFFFFFF, (DateTimeKind)(dateData >> 62));
-            }
-
             System.Net.IPAddress ToIPAddress(byte[] buffer, int sub_startIndex)
             {
                 byte[] bits = new byte[buffer.Length - sub_startIndex == 16 ? 16 : 4];
@@ -563,6 +566,13 @@ namespace Sweety.Common.Caching
                 return new System.Net.IPAddress(bits);
             }
 #endif
+
+            DateTime ToDateTime(byte[] buffer, int sub_startIndex)
+            {
+                long dateData = BitConverter.ToInt64(value, startIndex);
+
+                return new DateTime(dateData & 0x3FFFFFFFFFFFFFFF, (DateTimeKind)((ulong)dateData >> 62));
+            }
         }
 
         /// <summary>
@@ -1327,13 +1337,13 @@ namespace Sweety.Common.Caching
             {
                 result = new byte[21];
                 span = new Span<byte>(result, 5, 16);
-                BitConverter.TryWriteBytes(span.Slice(13), value.Offset.Ticks);
+                BitConverter.TryWriteBytes(span.Slice(8), value.Offset.Ticks);
             }
             else
             {
                 result = new byte[17];
                 span = new Span<byte>(result, 1, 16);
-                BitConverter.TryWriteBytes(span.Slice(9), value.Offset.Ticks);
+                BitConverter.TryWriteBytes(span.Slice(8), value.Offset.Ticks);
             }
             BitConverter.TryWriteBytes(span, value.Ticks);
 #endif
@@ -1483,7 +1493,7 @@ namespace Sweety.Common.Caching
                 if (slidingExpiration.HasValue)
                 {
                     result = new byte[21];
-                    span = new Span<byte>(result, 5, 20);
+                    span = new Span<byte>(result, 5, 16);
                 }
                 else
                 {
@@ -1496,7 +1506,7 @@ namespace Sweety.Common.Caching
                 if (slidingExpiration.HasValue)
                 {
                     result = new byte[9];
-                    span = new Span<byte>(result, 5, 8);
+                    span = new Span<byte>(result, 5, 4);
                 }
                 else
                 {
