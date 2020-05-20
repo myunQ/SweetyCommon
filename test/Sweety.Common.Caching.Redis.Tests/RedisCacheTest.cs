@@ -3027,6 +3027,30 @@ namespace Sweety.Common.Caching.Redis.Tests
             Assert.False(_cache.Contains(OBJECT_KEY));
         }
 
+        [Fact, Order(8)]
+        public void GetValues()
+        {
+            var keys = new string[] { "a", "b", "c" };
+            var values = _cache.GetValues(keys);
+            Assert.NotNull(values);
+            Assert.Equal(0, values.Count);
+
+            _cache.Add(keys[1], 11);
+            values = _cache.GetValues(keys);
+            Assert.NotNull(values);
+            Assert.Equal(1, values.Count);
+
+            _cache.Add(keys[2], 22);
+            values = _cache.GetValues(keys);
+            Assert.NotNull(values);
+            Assert.Equal(2, values.Count);
+
+            _cache.Remove(keys);
+            values = _cache.GetValues(keys);
+            Assert.NotNull(values);
+            Assert.Equal(0, values.Count);
+        }
+
 
 
         public void Dispose()

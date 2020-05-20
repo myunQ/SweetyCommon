@@ -307,8 +307,6 @@ namespace Sweety.Common.Caching
 
             RedisKey redisKey = new RedisKey(key);
             var redisValue = _cache.StringGet(redisKey);
-            //Lease<byte> lease = _cache.StringGetLease(redisKey);
-
             if (redisValue.HasValue)
             {
                 var raw = (byte[])redisValue;
@@ -338,20 +336,34 @@ namespace Sweety.Common.Caching
         {
             if (keys is null) throw new ArgumentNullException(nameof(keys));
 
+            int i = 0;
+            RedisKey[] redisKeys = new RedisKey[keys.Count()];
             foreach (var key in keys)
             {
                 if (String.IsNullOrEmpty(key)) throw new ArgumentException();
+                redisKeys[i++] = key;
             }
+            
+            IDictionary<string, object> result = new Dictionary<string, object>(redisKeys.Length);
 
-            IDictionary<string, object> result = new Dictionary<string, object>(keys.Count());
-
+            i = 0;
+            var redisValues = _cache.StringGet(redisKeys);
             foreach (var key in keys)
             {
-                object item = Get(key);
-                if (item != null)
+                ref RedisValue redisValue = ref redisValues[i];
+
+                if (redisValue.HasValue)
                 {
-                    result.Add(key, item);
+                    var raw = (byte[])redisValue;
+                    if ((raw[0] & ExpirationTypeMask) == ExpirationTypeMask)
+                    {
+                        ref RedisKey redisKey = ref redisKeys[i];
+                        _cache.KeyExpire(redisKey, TimeSpan.FromMilliseconds(BitConverter.ToUInt32(raw, 1)), CommandFlags.FireAndForget);
+                    }
+
+                    result.Add(key, BeforeReturningValueHandler(raw));
                 }
+                i++;
             }
 
             return result;
@@ -397,7 +409,7 @@ namespace Sweety.Common.Caching
 
                 string typeName = TypeNameHandler(type);
                 string valueJson = JsonConvert.SerializeObject(value, Formatting.None, __jsonSerSettings);
-
+                
                 int typeNameByteLength = Encoding.UTF8.GetByteCount(typeName);
                 int valueByteLength = Encoding.UTF8.GetByteCount(valueJson);
 
@@ -462,7 +474,7 @@ namespace Sweety.Common.Caching
 
             return RedisValue.CreateFrom(CompressHandler(buffer));
         }
-        
+
 
         /// <summary>
         /// 获取缓存内容时，在返回内容之前对内容进行处理
