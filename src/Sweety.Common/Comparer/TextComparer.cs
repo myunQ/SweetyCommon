@@ -50,7 +50,11 @@ namespace Sweety.Common.Comparer
         /// </summary>
         /// <param name="a">要进行比较的第一个字符串。</param>
         /// <param name="b">要进行比较的第二个字符串。</param>
-        /// <returns></returns>
+        /// <returns>
+        /// 返回相同文本在 <paramref name="a"/> 和 <paramref name="b"/> 中的位置信息。
+        /// <see cref="IList{T}"/> 的每个元素是按 <paramref name="a"/> 的顺序在 <paramref name="b"/> 中找到的相同文本的位置信息。
+        /// <see cref="LinkedList{T}"/> 的每个节点表示 <paramref name="a"/> 中的同一个位置与 <paramref name="b"/> 中不同位置的相同文本的位置信息。
+        /// </returns>
         public IList<LinkedList<SameTextPosition>> ExtractSameParts(string a, string b)
         {
             if (Object.ReferenceEquals(a, b))
@@ -95,16 +99,22 @@ namespace Sweety.Common.Comparer
                                  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
                                 bool isDiscard = false;
-                                var tmpLinked = result[result.Count - (linkedList == null ? 1 : 2)].First;
-                                while (tmpLinked != null)
+                                //var tmpNode = result[result.Count - (linkedList == null ? 1 : 2)].First;
+                                foreach (var tmpLinked in result)
                                 {
-                                    if (tmpLinked.Value.BIndex + tmpLinked.Value.Length == n)
+                                    var tmpNode = tmpLinked.First;
+                                    while (tmpNode != null)
                                     {
-                                        isDiscard = true;
-                                        break;
+                                        if (tmpNode.Value.BIndex + tmpNode.Value.Length == n)
+                                        {
+                                            isDiscard = true;
+                                            break;
+                                        }
+                                        tmpNode = tmpNode.Next;
                                     }
-                                    tmpLinked = tmpLinked.Next;
+                                    if (isDiscard) break;
                                 }
+                                
                                 if (isDiscard) continue;
                             }
 

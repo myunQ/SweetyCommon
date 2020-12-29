@@ -69,7 +69,7 @@ namespace Sweety.Common.Comparer
         /// <returns></returns>
         public override bool Equals(object obj)
         {
-            return base.Equals(obj);
+            return Equals(obj as TextDifference);
         }
         /// <summary>
         /// 比较结构体是否相等。
@@ -78,6 +78,9 @@ namespace Sweety.Common.Comparer
         /// <returns>如果相等则返回 <c>true</c>，否则返回 <c>false</c>。</returns>
         public bool Equals(TextDifference b)
         {
+            if (b == null) return false;
+            if (Object.ReferenceEquals(this, b)) return true;
+
             return AIndex == b.AIndex
                 && BIndex == b.BIndex
                 && ALength == b.ALength
