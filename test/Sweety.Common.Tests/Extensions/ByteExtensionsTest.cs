@@ -84,12 +84,12 @@ namespace Sweety.Common.Tests.Extensions
 
 
             a = new ArraySegment<byte>(bytes, 3, 3);
-            b = new ArraySegment<byte>( new byte[] { 13, 26, 98, 138, 176, 201, 233, 255 }, 3, 3);
+            b = new ArraySegment<byte>(new byte[] { 13, 26, 98, 138, 176, 201, 233, 255 }, 3, 3);
             Assert.True(a.FastEquals(b));
 
 
             a = new ArraySegment<byte>(bytes);
-            b = new ArraySegment<byte>( new byte[] { 13, 26, 98, 138, 176, 201, 233, 254 });
+            b = new ArraySegment<byte>(new byte[] { 13, 26, 98, 138, 176, 201, 233, 254 });
             Assert.False(a.FastEquals(b));
         }
 
@@ -143,6 +143,36 @@ namespace Sweety.Common.Tests.Extensions
             a = new ArraySegment<byte>(bytes);
             b = new ArraySegment<byte>(new byte[] { 13, 26, 98, 138, 176, 201, 233, 254 });
             Assert.False(a.SlowEquals(b));
+        }
+
+        [Fact]
+        public void SlowEquals_BY_a_Span_b_ReadOnlySpan()
+        {
+            Span<byte> a = stackalloc byte[5];
+            Span<byte> b = stackalloc byte[5];
+
+            Assert.True(a.SlowEquals(b));
+
+            a[3] = 35;
+            Assert.False(a.SlowEquals(b));
+
+            b[3] = 35;
+            Assert.True(a.SlowEquals(b));
+        }
+
+        [Fact]
+        public void SlowEquals_BY_a_ReadOnlySpan_b_ReadOnlySpan()
+        {
+            Span<byte> a = stackalloc byte[5];
+            Span<byte> b = stackalloc byte[5];
+
+            Assert.True(((ReadOnlySpan<byte>)a).SlowEquals(b));
+
+            a[3] = 35;
+            Assert.False(((ReadOnlySpan<byte>)a).SlowEquals(b));
+
+            b[3] = 35;
+            Assert.True(((ReadOnlySpan<byte>)a).SlowEquals(b));
         }
     }
 }

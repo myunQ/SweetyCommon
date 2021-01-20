@@ -102,6 +102,49 @@ namespace Sweety.Common.DataProvider.PostgreSQL
 
 
         /// <summary>
+        /// 使用默认数据库链接对象创建数据库事务对象实例。
+        /// </summary>
+        /// <returns><c>PostgreSQL</c> 数据库事务对象实例。</returns>
+        public NpgsqlTransaction BuildSqlTransaction()
+        {
+            return BuildSqlConnection().BeginTransaction();
+        }
+
+        /// <summary>
+        /// 使用默认数据库链接对象和指定的事务隔离级别创建数据库事务对象实例。
+        /// </summary>
+        /// <param name="level">事务隔离级别。</param>
+        /// <returns><c>PostgreSQL</c> 数据库事务对象实例。</returns>
+        public NpgsqlTransaction BuildSqlTransaction(IsolationLevel level)
+        {
+            return BuildSqlConnection().BeginTransaction(level);
+        }
+
+#if !NETSTANDARD2_0
+        /// <summary>
+        /// 使用默认数据库链接对象创建数据库事务对象实例。
+        /// </summary>
+        /// <param name="cancellationToken">表示异步任务是否取消的令牌。</param>
+        /// <returns><c>PostgreSQL</c> 数据库事务对象实例。</returns>
+        public ValueTask<NpgsqlTransaction> BuildSqlTransactionAsync(CancellationToken cancellationToken = default)
+        {
+            return BuildSqlConnection().BeginTransactionAsync(cancellationToken);
+        }
+
+        /// <summary>
+        /// 使用默认数据库链接对象和指定的事务隔离级别创建数据库事务对象实例。
+        /// </summary>
+        /// <param name="level">事务隔离级别。</param>
+        /// <param name="cancellationToken">表示异步任务是否取消的令牌。</param>
+        /// <returns><c>PostgreSQL</c> 数据库事务对象实例。</returns>
+        public ValueTask<NpgsqlTransaction> BuildSqlTransactionAsync(IsolationLevel level, CancellationToken cancellationToken = default)
+        {
+            return BuildSqlConnection().BeginTransactionAsync(level, cancellationToken);
+        }
+#endif //!NETSTANDARD2_0
+
+
+        /// <summary>
         /// 创建一个 <see cref="NpgsqlParameter"/> 对象实例。
         /// </summary>
         /// <returns>返回一个 <see cref="NpgsqlParameter"/> 对象实例。</returns>
@@ -183,6 +226,47 @@ namespace Sweety.Common.DataProvider.PostgreSQL
         {
             return BuildSqlCommand(ConvertToSqlConnection(conn));
         }
+
+
+        /// <summary>
+        /// 使用默认数据库链接对象创建数据库事务对象实例。
+        /// </summary>
+        /// <returns>数据库事务对象实例。</returns>
+        public override IDbTransaction BuildTransaction()
+        {
+            return BuildSqlTransaction();
+        }
+        /// <summary>
+        /// 使用默认数据库链接对象和指定的事务隔离级别创建数据库事务对象实例。
+        /// </summary>
+        /// <param name="level">事务隔离级别。</param>
+        /// <returns>数据库事务对象实例。</returns>
+        public override IDbTransaction BuildTransaction(IsolationLevel level)
+        {
+            return BuildSqlTransaction(level);
+        }
+
+#if !NETSTANDARD2_0
+        /// <summary>
+        /// 使用默认数据库链接对象创建数据库事务对象实例。
+        /// </summary>
+        /// <param name="cancellationToken">表示异步任务是否取消的令牌。</param>
+        /// <returns>数据库事务对象实例。</returns>
+        public override async Task<IDbTransaction> BuildTransactionAsync(CancellationToken cancellationToken = default)
+        {
+            return (IDbTransaction)await BuildSqlTransactionAsync(cancellationToken);
+        }
+        /// <summary>
+        /// 使用默认数据库链接对象和指定的事务隔离级别创建数据库事务对象实例。
+        /// </summary>
+        /// <param name="level">事务隔离级别。</param>
+        /// <param name="cancellationToken">表示异步任务是否取消的令牌。</param>
+        /// <returns>数据库事务对象实例。</returns>
+        public override async Task<IDbTransaction> BuildTransactionAsync(IsolationLevel level, CancellationToken cancellationToken = default)
+        {
+            return (IDbTransaction)await BuildSqlTransactionAsync(level, cancellationToken);
+        }
+#endif //!NETSTANDARD2_0
 
 
         /// <summary>

@@ -209,6 +209,35 @@ namespace Sweety.Common.DataProvider
 
 
         /// <summary>
+        /// 使用默认数据库链接对象创建数据库事务对象实例。
+        /// </summary>
+        /// <returns>数据库事务对象实例。</returns>
+        IDbTransaction BuildTransaction();
+        /// <summary>
+        /// 使用默认数据库链接对象和指定的事务隔离级别创建数据库事务对象实例。
+        /// </summary>
+        /// <param name="level">事务隔离级别。</param>
+        /// <returns>数据库事务对象实例。</returns>
+        IDbTransaction BuildTransaction(IsolationLevel level);
+
+#if !NETSTANDARD2_0
+        /// <summary>
+        /// 使用默认数据库链接对象创建数据库事务对象实例。
+        /// </summary>
+        /// <param name="cancellationToken">表示异步任务是否取消的令牌。</param>
+        /// <returns>数据库事务对象实例。</returns>
+        Task<IDbTransaction> BuildTransactionAsync(CancellationToken cancellationToken = default);
+        /// <summary>
+        /// 使用默认数据库链接对象和指定的事务隔离级别创建数据库事务对象实例。
+        /// </summary>
+        /// <param name="level">事务隔离级别。</param>
+        /// <param name="cancellationToken">表示异步任务是否取消的令牌。</param>
+        /// <returns>数据库事务对象实例。</returns>
+        Task<IDbTransaction> BuildTransactionAsync(IsolationLevel level, CancellationToken cancellationToken = default);
+#endif //!NETSTANDARD2_0
+
+
+        /// <summary>
         /// 创建一个参数对象实例。
         /// </summary>
         /// <returns>返回一个用于<see cref="IDbCommand"/>的参数对象实例。</returns>

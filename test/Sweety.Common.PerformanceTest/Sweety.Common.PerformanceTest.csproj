@@ -23,6 +23,7 @@
     <PackageReference Include="MigraDocCore.Rendering" Version="0.1.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Sweety.Common.DataProvider.PostgreSQL\Sweety.Common.DataProvider.PostgreSQL.csproj" />
     <ProjectReference Include="..\..\src\Sweety.Common\Sweety.Common.csproj" />
     <ProjectReference Include="..\..\src\Sweety.Common.Caching.InProcessCache\Sweety.Common.Caching.InProcessCache.csproj" />
     <ProjectReference Include="..\..\src\Sweety.Common.Caching.Memcached\Sweety.Common.Caching.Memcached.csproj" />

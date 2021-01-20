@@ -15,7 +15,10 @@
  *              public static bool FastEquals(this ArraySegment<byte> a, ArraySegment<byte> b)
  *              public static bool SlowEquals(this byte[] a, byte[] b)
  *              public static bool SlowEquals(this ArraySegment<byte> a, ArraySegment<byte> b)
- *              private static string ToHex(byte[] value, string format)
+ *              public static bool SlowEquals(this Span<byte> a, ReadOnlySpan<byte> b)
+ *              public static bool SlowEquals(this ReadOnlySpan<byte> a, ReadOnlySpan<byte> b)
+ *              
+ *              private static string ToHex(byte[] value, char[] hexChar)
  *              
  * * * * * * * * * * * * * * * * * * * * */
 
@@ -26,7 +29,7 @@ namespace Sweety.Common.Extensions
 
 
     /// <summary>
-    /// <see cref="Byte"/ >以及 <see cref="Byte[]"/> 类型的扩展方法。
+    /// <see cref="Byte" /> 以及 <see cref="Byte" />[] 类型的扩展方法。
     /// </summary>
     public static class ByteExtensions
     {
@@ -36,7 +39,7 @@ namespace Sweety.Common.Extensions
 
 
         /// <summary>
-        /// 将 <see cref="byte[]"/> 转换成 <see cref="Decimal"/> 类型的值。
+        /// 将 <see cref="byte"/>[] 转换成 <see cref="Decimal"/> 类型的值。
         /// </summary>
         /// <param name="bytes">字节数组。</param>
         /// <param name="startIndex">从 <paramref name="bytes"/> 的什么位置开始读。</param>
@@ -163,6 +166,44 @@ namespace Sweety.Common.Extensions
 
             return diff == 0;
         }
+
+#if !NETSTANDARD2_0
+        /// <summary>
+        /// 时间恒定的比较两个 <see cref="Span{T}"/> 是否相等。
+        /// </summary>
+        /// <remarks>
+        /// 使用时间恒定的方式比较两个 <see cref="Span{T}"/> 可以防止根据验证的时间长短来判断前几位是否正确，然后逐步修正最终得到正确的结果。
+        /// </remarks>
+        /// <param name="a">要进行比较的第一个 <see cref="ReadOnlySpan{T}"/>。</param>
+        /// <param name="b">要进行比较的第二个 <see cref="ReadOnlySpan{T}"/>。</param>
+        /// <returns>当两个 <see cref="ReadOnlySpan{T}.Array"/> 都不为 <c>null</c> 并且长度一致、每个元素的值也一致时返回 <c>true</c>，否则返回 <c>false</c>。</returns>
+        public static bool SlowEquals(this Span<byte> a, ReadOnlySpan<byte> b)
+        {
+            return SlowEquals(a, b);
+        }
+
+        /// <summary>
+        /// 时间恒定的比较两个 <see cref="ReadOnlySpan{T}"/> 是否相等。
+        /// </summary>
+        /// <remarks>
+        /// 使用时间恒定的方式比较两个 <see cref="ReadOnlySpan{T}"/> 可以防止根据验证的时间长短来判断前几位是否正确，然后逐步修正最终得到正确的结果。
+        /// </remarks>
+        /// <param name="a">要进行比较的第一个 <see cref="ReadOnlySpan{T}"/>。</param>
+        /// <param name="b">要进行比较的第二个 <see cref="ReadOnlySpan{T}"/>。</param>
+        /// <returns>当两个 <see cref="ReadOnlySpan{T}.Array"/> 都不为 <c>null</c> 并且长度一致、每个元素的值也一致时返回 <c>true</c>，否则返回 <c>false</c>。</returns>
+        public static bool SlowEquals(this ReadOnlySpan<byte> a, ReadOnlySpan<byte> b)
+        {
+            if (a.IsEmpty || b.IsEmpty) return false;
+
+            int diff = a.Length ^ b.Length;
+            for (int i = 0; i < a.Length && i < b.Length; i++)
+            {
+                diff |= a[i] ^ b[i];
+            }
+
+            return diff == 0;
+        }
+#endif
 
 
 

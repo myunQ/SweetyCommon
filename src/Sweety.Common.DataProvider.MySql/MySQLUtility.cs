@@ -47,7 +47,7 @@ namespace Sweety.Common.DataProvider.MySql
         /// <returns>返回一个 <see cref="MySqlConnection"/> 对象实例。</returns>
         public MySqlConnection BuildSqlConnection()
         {
-            
+
             if (TargetRole == DatabaseServerRole.Master)
             {
                 return new MySqlConnection(__masterConnStr[_masterConnStrIndex]);
@@ -97,6 +97,50 @@ namespace Sweety.Common.DataProvider.MySql
         {
             return new MySqlCommand(null, conn);
         }
+
+
+
+        /// <summary>
+        /// 使用默认数据库链接对象创建数据库事务对象实例。
+        /// </summary>
+        /// <returns><c>MySql</c> 数据库事务对象实例。</returns>
+        public MySqlTransaction BuildSqlTransaction()
+        {
+            return BuildSqlConnection().BeginTransaction();
+        }
+
+        /// <summary>
+        /// 使用默认数据库链接对象和指定的事务隔离级别创建数据库事务对象实例。
+        /// </summary>
+        /// <param name="level">事务隔离级别。</param>
+        /// <returns><c>MySql</c> 数据库事务对象实例。</returns>
+        public MySqlTransaction BuildSqlTransaction(IsolationLevel level)
+        {
+            return BuildSqlConnection().BeginTransaction(level);
+        }
+
+#if !NETSTANDARD2_0
+        /// <summary>
+        /// 使用默认数据库链接对象创建数据库事务对象实例。
+        /// </summary>
+        /// <param name="cancellationToken">表示异步任务是否取消的令牌。</param>
+        /// <returns><c>MySql</c> 数据库事务对象实例。</returns>
+        public Task<MySqlTransaction> BuildSqlTransactionAsync(CancellationToken cancellationToken = default)
+        {
+            return BuildSqlConnection().BeginTransactionAsync(cancellationToken);
+        }
+
+        /// <summary>
+        /// 使用默认数据库链接对象和指定的事务隔离级别创建数据库事务对象实例。
+        /// </summary>
+        /// <param name="level">事务隔离级别。</param>
+        /// <param name="cancellationToken">表示异步任务是否取消的令牌。</param>
+        /// <returns><c>MySql</c> 数据库事务对象实例。</returns>
+        public Task<MySqlTransaction> BuildSqlTransactionAsync(IsolationLevel level, CancellationToken cancellationToken = default)
+        {
+            return BuildSqlConnection().BeginTransactionAsync(level, cancellationToken);
+        }
+#endif //!NETSTANDARD2_0
 
 
 
@@ -182,6 +226,49 @@ namespace Sweety.Common.DataProvider.MySql
         {
             return BuildSqlCommand(ConvertToSqlConnection(conn));
         }
+
+
+        /// <summary>
+        /// 使用默认数据库链接对象创建数据库事务对象实例。
+        /// </summary>
+        /// <returns>数据库事务对象实例。</returns>
+        public override IDbTransaction BuildTransaction()
+        {
+            return BuildSqlTransaction();
+        }
+        /// <summary>
+        /// 使用默认数据库链接对象和指定的事务隔离级别创建数据库事务对象实例。
+        /// </summary>
+        /// <param name="level">事务隔离级别。</param>
+        /// <returns>数据库事务对象实例。</returns>
+        public override IDbTransaction BuildTransaction(IsolationLevel level)
+        {
+            return BuildSqlTransaction(level);
+        }
+
+#if !NETSTANDARD2_0
+        /// <summary>
+        /// 使用默认数据库链接对象创建数据库事务对象实例。
+        /// </summary>
+        /// <param name="cancellationToken">表示异步任务是否取消的令牌。</param>
+        /// <returns>数据库事务对象实例。</returns>
+        public override Task<IDbTransaction> BuildTransactionAsync(CancellationToken cancellationToken = default)
+        {
+            return BuildSqlTransactionAsync(cancellationToken)
+                .ContinueWith(o => (IDbTransaction)o.Result);
+        }
+        /// <summary>
+        /// 使用默认数据库链接对象和指定的事务隔离级别创建数据库事务对象实例。
+        /// </summary>
+        /// <param name="level">事务隔离级别。</param>
+        /// <param name="cancellationToken">表示异步任务是否取消的令牌。</param>
+        /// <returns>数据库事务对象实例。</returns>
+        public override Task<IDbTransaction> BuildTransactionAsync(IsolationLevel level, CancellationToken cancellationToken = default)
+        {
+            return BuildSqlTransactionAsync(level, cancellationToken)
+                .ContinueWith(o => (IDbTransaction)o.Result);
+        }
+#endif //!NETSTANDARD2_0
 
 
         /// <summary>
@@ -724,6 +811,6 @@ namespace Sweety.Common.DataProvider.MySql
                 command.Transaction = transaction;
             }
         }
-#endregion SqlHelper
+        #endregion SqlHelper
     }
 }

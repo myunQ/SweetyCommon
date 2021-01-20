@@ -1,23 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Globalization;
-using Microsoft.Extensions.Localization;
-
-
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Running;
-
 using Sweety.Common.Comparer;
 using Sweety.Common.Cryptography;
-using Sweety.Common.Extensions;
-using Sweety.Common.Verification;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading;
 
 namespace Sweety.Common.PerformanceTest
 {
@@ -40,7 +31,7 @@ namespace Sweety.Common.PerformanceTest
             if (Object.ReferenceEquals(this, obj)) return true;
             if (!(obj is CacheObjectModel model)) return false;
 
-            
+
             bool result = ID == model.ID
                 && Name == model.Name;
 
@@ -136,6 +127,26 @@ namespace Sweety.Common.PerformanceTest
 
         static void Main(string[] args)
         {
+            HashSet<long> set = new HashSet<long>(100);
+            for (int i = 0; i < 100; i++)
+            {
+                set.Add(DateTime.UtcNow.Ticks);
+            }
+
+            Console.WriteLine($"set.Count => {set.Count}");
+            long ticks = DateTime.UtcNow.Ticks;
+            Console.WriteLine($"{ticks},length:{ticks.ToString().Length}");
+
+            Console.ReadLine();
+
+            foreach (long longValue in set)
+            {
+                Console.WriteLine(longValue);
+            }
+
+            Console.ReadLine();
+            return;
+
             Sweety.Common.Cryptography.ISymmetricCryptography asc = Sweety.Common.Cryptography.SymmetricAlgorithmFactory.Create(SymmetricAlgorithmType.AES);
             string key = Convert.ToBase64String(asc.Key);
             string iv = Convert.ToBase64String(asc.IV);
@@ -146,7 +157,7 @@ namespace Sweety.Common.PerformanceTest
             string apptokenText = "AC304A1C-1C84-4D10-8373-8190CBC27EB6|41|1603780678000|41|2";
             asc.Key = Convert.FromBase64String("G/kbXx0s/KxGFm0zrQ1i9VeUcabJvX4HKGax4JXY0LM=");
             asc.IV = Convert.FromBase64String("YHdp1vRmM3lXY4SU4Ae7Mw==");
-            string apptoken = Convert.ToBase64String( asc.Encrypt(Encoding.UTF8.GetBytes(apptokenText)));
+            string apptoken = Convert.ToBase64String(asc.Encrypt(Encoding.UTF8.GetBytes(apptokenText)));
             Console.WriteLine(apptoken);
             return;
 
@@ -220,7 +231,7 @@ namespace Sweety.Common.PerformanceTest
             textComparer.AffirmSameMinLength = 7;
             //textComparer.ExtractSameParts(a, b);
             var zeze = textComparer.ExtractDifferenceParts(a, b);
-            differenceResult.TryMarkDifferences(zeze , a, b, out var aza, out var bza);
+            differenceResult.TryMarkDifferences(zeze, a, b, out var aza, out var bza);
             string zeResult = a + "\r\n" + b + "\r\n\r\n" + aza + "\r\n" + bza;
 
             a = "七七七八八八九九九十十十一一一二二二三三三四四四五五五六六六";
@@ -680,7 +691,7 @@ namespace Sweety.Common.PerformanceTest
             Console.WriteLine($"总共赋值了：{count}个元素。");
         }
 
-        
+
         //[Benchmark]
         public object NewObj()
         {
@@ -703,7 +714,7 @@ namespace Sweety.Common.PerformanceTest
         public bool IsKeyword()
         {
             bool result = false;
-            for(int i = 0; i < arr.Length; i++)
+            for (int i = 0; i < arr.Length; i++)
             {
                 result |= arr[i] is null;
             }
@@ -867,8 +878,8 @@ namespace Sweety.Common.PerformanceTest
         public byte[] ToSpan()
         {
             Span<byte> span = stackalloc byte[9];
-            
-            return BitConverter.TryWriteBytes(span.Slice(1,8), _long) ? span.ToArray() : null;
+
+            return BitConverter.TryWriteBytes(span.Slice(1, 8), _long) ? span.ToArray() : null;
         }
 
         //[Benchmark]
@@ -876,7 +887,7 @@ namespace Sweety.Common.PerformanceTest
         {
             Span<byte> span = stackalloc byte[9];
 
-            BitConverter.TryWriteBytes(span.Slice(1,8), _long);
+            BitConverter.TryWriteBytes(span.Slice(1, 8), _long);
         }
 
         [Benchmark]
@@ -913,14 +924,14 @@ namespace Sweety.Common.PerformanceTest
     public class TestIdentifyType
     {
         object _obj;
-        
+
         public TestIdentifyType()
         {
             _obj = 19850825L;
         }
 
         private byte[] ToBytes(object data)
-        { 
+        {
             switch (data)
             {
                 case bool v: return BitConverter.GetBytes(v);
@@ -954,7 +965,7 @@ namespace Sweety.Common.PerformanceTest
                 case TypeCode.Char: return BitConverter.GetBytes((char)data);
                 case TypeCode.Single: return BitConverter.GetBytes((float)data);
                 case TypeCode.Double: return BitConverter.GetBytes((double)data);
-                case TypeCode.Decimal: decimal dec= (decimal)data; return new byte[0];
+                case TypeCode.Decimal: decimal dec = (decimal)data; return new byte[0];
 
                 case TypeCode.Int64: return BitConverter.GetBytes((long)data);
 
@@ -983,7 +994,7 @@ namespace Sweety.Common.PerformanceTest
             if (Object.ReferenceEquals(t, ValueTypeConstants.SingleType)) return BitConverter.GetBytes((float)data);
 
             if (Object.ReferenceEquals(t, ValueTypeConstants.DoubleType)) return BitConverter.GetBytes((double)data);
-            
+
             if (Object.ReferenceEquals(t, ValueTypeConstants.DecimalType))
             {
                 decimal fef = (decimal)data;

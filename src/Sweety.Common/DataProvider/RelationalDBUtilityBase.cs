@@ -74,8 +74,17 @@ namespace Sweety.Common.DataProvider
         static int __masterConnStrIndex = 0;
         static int __slaveConnStrIndex = 0;
 
+        /// <summary>
+        /// 所有数据库链接（主数据库和从数据库）的连接字符串集合的索引。
+        /// </summary>
         protected int _allConnStrIndex = -1;
+        /// <summary>
+        /// 主数据库链接字符串集合的索引。
+        /// </summary>
         protected int _masterConnStrIndex = 0;
+        /// <summary>
+        /// 从数据库链接字符串集合的索引。
+        /// </summary>
         protected int _slaveConnStrIndex = -1;
 
 
@@ -246,7 +255,7 @@ namespace Sweety.Common.DataProvider
 
         public void BuildUseModelInstance<T>(Func<T> fun) where T : class => _funBuildModelInstance = fun;
 
-        public void BuildUseListInstance<T>(Func<IList<T>> fun) =>_funBuildListInstance = fun;
+        public void BuildUseListInstance<T>(Func<IList<T>> fun) => _funBuildListInstance = fun;
 
         public void BuildUseSetInstance<T>(Func<ISet<T>> fun) => _funBuildSetInstance = fun;
 
@@ -442,6 +451,36 @@ namespace Sweety.Common.DataProvider
         public abstract IDbCommand BuildCommand();
 
         public abstract IDbCommand BuildCommand(IDbConnection conn);
+
+
+
+        /// <summary>
+        /// 使用默认数据库链接对象创建数据库事务对象实例。
+        /// </summary>
+        /// <returns>数据库事务对象实例。</returns>
+        public abstract IDbTransaction BuildTransaction();
+        /// <summary>
+        /// 使用默认数据库链接对象和指定的事务隔离级别创建数据库事务对象实例。
+        /// </summary>
+        /// <param name="level">事务隔离级别。</param>
+        /// <returns>数据库事务对象实例。</returns>
+        public abstract IDbTransaction BuildTransaction(IsolationLevel level);
+
+#if !NETSTANDARD2_0
+        /// <summary>
+        /// 使用默认数据库链接对象创建数据库事务对象实例。
+        /// </summary>
+        /// <param name="cancellationToken">表示异步任务是否取消的令牌。</param>
+        /// <returns>数据库事务对象实例。</returns>
+        public abstract Task<IDbTransaction> BuildTransactionAsync(CancellationToken cancellationToken = default);
+        /// <summary>
+        /// 使用默认数据库链接对象和指定的事务隔离级别创建数据库事务对象实例。
+        /// </summary>
+        /// <param name="level">事务隔离级别。</param>
+        /// <param name="cancellationToken">表示异步任务是否取消的令牌。</param>
+        /// <returns>数据库事务对象实例。</returns>
+        public abstract Task<IDbTransaction> BuildTransactionAsync(IsolationLevel level, CancellationToken cancellationToken = default);
+#endif //!NETSTANDARD2_0
 
 
 
@@ -891,7 +930,7 @@ namespace Sweety.Common.DataProvider
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <returns>返回结果集中的第一行第一列的数据。</returns>
         protected abstract Task<object> ExecuteScalarAsync(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, CancellationToken? cancellationToken = null);
-        
+
         /// <summary> 
         /// 执行指定 T-SQL 命令，返回结果集的数据读取器。
         /// </summary> 
@@ -1075,7 +1114,7 @@ namespace Sweety.Common.DataProvider
             return reader.ToModel<T>();
         }
 
-        
+
 
         /// <summary>
         /// 将<paramref name="reader"/>里的数据读取到<paramref name="collection"/>对象实例中。
@@ -1342,7 +1381,7 @@ namespace Sweety.Common.DataProvider
         protected virtual ISet<T> ReadToSet<T>(IDataReader reader)
         {
             ISet<T> result = null;
-            
+
             if (reader.Read())
             {
                 if (_setInstance != null)

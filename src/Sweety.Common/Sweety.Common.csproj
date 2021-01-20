@@ -1,13 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
-    <PackageVersion>0.0.2</PackageVersion>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net5.0</TargetFrameworks>
+    <PackageVersion>0.0.3</PackageVersion>
     <Authors>Mingyun Qin</Authors>
     <Copyright>Mingyun Qin</Copyright>
     <Owners>Mingyun Qin</Owners>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>- 修复 Sweety.Common.Converter.ConvertToModel.ToCollectionAsync&lt;T&gt; 以及同步方法在缺失属性时导致 Action&lt;T, object&gt;[] actions 属性赋值方法数组的某个或某几个元素为 null 导致的 System.NullReferenceException。</Description>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
