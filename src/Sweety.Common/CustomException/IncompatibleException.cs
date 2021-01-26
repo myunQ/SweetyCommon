@@ -34,7 +34,7 @@ namespace Sweety.Common
         public IncompatibleException(T1 a, T2 b)
             : this(a, b, null, null) { }
         /// <summary>
-        /// 使用指定的错误消息初始化 <see cref="KindIncompatibleException"/> 类的新实例。
+        /// 使用指定的错误消息初始化 <see cref="IncompatibleException{T1, T2}"/> 类的新实例。
         /// </summary>
         /// <param name="a">不兼容的两个对象的其中一个。</param>
         /// <param name="b">不兼容的两个对象的另一个。</param>
@@ -42,7 +42,7 @@ namespace Sweety.Common
         public IncompatibleException(T1 a, T2 b, string message)
             : this(a, b, message, null) { }
         /// <summary>
-        /// 使用两个不兼容的对象和指定错误消息和对作为此异常原因的内部异常的引用来初始化 <see cref="KindIncompatibleException"/> 类的新实例。
+        /// 使用两个不兼容的对象和指定错误消息和对作为此异常原因的内部异常的引用来初始化 <see cref="IncompatibleException{T1, T2}"/> 类的新实例。
         /// </summary>
         /// <param name="a">不兼容的两个对象的其中一个。</param>
         /// <param name="b">不兼容的两个对象的另一个。</param>

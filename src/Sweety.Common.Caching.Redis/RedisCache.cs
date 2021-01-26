@@ -156,7 +156,7 @@ namespace Sweety.Common.Caching
             if (_cache.KeyExists(redisKey)) return false;
 
             var redisValue = BeforeStorageValueHandler(value);
-            
+
             return _cache.StringSet(redisKey, redisValue, when: When.NotExists);
         }
 
@@ -184,7 +184,7 @@ namespace Sweety.Common.Caching
             if (_cache.KeyExists(redisKey)) return false;
 
             var redisValue = BeforeStorageValueHandler(value, slidingExpiration);
-            
+
             return _cache.StringSet(redisKey, redisValue, slidingExpiration, when: When.NotExists);
         }
 
@@ -343,7 +343,7 @@ namespace Sweety.Common.Caching
                 if (String.IsNullOrEmpty(key)) throw new ArgumentException();
                 redisKeys[i++] = key;
             }
-            
+
             IDictionary<string, object> result = new Dictionary<string, object>(redisKeys.Length);
 
             i = 0;
@@ -397,7 +397,7 @@ namespace Sweety.Common.Caching
             Type type = value.GetType();
 
             byte[] buffer = FoundationToBytes(value, type, slidingExpiration);
-            
+
             if (buffer == null)
             {
                 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -409,7 +409,7 @@ namespace Sweety.Common.Caching
 
                 string typeName = TypeNameHandler(type);
                 string valueJson = JsonConvert.SerializeObject(value, Formatting.None, __jsonSerSettings);
-                
+
                 int typeNameByteLength = Encoding.UTF8.GetByteCount(typeName);
                 int valueByteLength = Encoding.UTF8.GetByteCount(valueJson);
 
@@ -464,7 +464,7 @@ namespace Sweety.Common.Caching
             if (slidingExpiration.HasValue)
             {
                 Array.Copy(buffer, 1, buffer, 5, 4);
-                
+
 #if NETSTANDARD2_0
                 BitConverter.GetBytes(buffer.Length).CopyTo(buffer, 1);
 #else
@@ -484,12 +484,12 @@ namespace Sweety.Common.Caching
         private object BeforeReturningValueHandler(byte[] value)
         {
             if (value == null) return null;
-            
+
             if ((value[0] & 0x80) == 0x80)
             {
                 value = DecompressHandler(value);
             }
-            
+
             int startIndex = ((value[0] & ExpirationTypeMask) == ExpirationTypeMask) ? 5 : 1;
 
 #if NETSTANDARD2_0
@@ -560,7 +560,7 @@ namespace Sweety.Common.Caching
                     , true);
 
                 sub_startIndex += 2 + typeNameLength;
-                return JsonConvert.DeserializeObject(Encoding.UTF8.GetString(buffer, sub_startIndex , buffer.Length - sub_startIndex), type, __jsonSerSettings);
+                return JsonConvert.DeserializeObject(Encoding.UTF8.GetString(buffer, sub_startIndex, buffer.Length - sub_startIndex), type, __jsonSerSettings);
             }
 
 #if NETSTANDARD2_0
@@ -674,7 +674,7 @@ namespace Sweety.Common.Caching
                         _ => null
                     };
 #endif
-                    }
+                }
                 else
                 {
 #if NETSTANDARD2_0
@@ -831,7 +831,7 @@ namespace Sweety.Common.Caching
         private byte[] ToBytes(bool value, TimeSpan? slidingExpiration)
         {
             byte[] result;
-            
+
 #if NETSTANDARD2_0
             if (slidingExpiration.HasValue)
             {
@@ -897,7 +897,7 @@ namespace Sweety.Common.Caching
         private byte[] ToBytes(char value, TimeSpan? slidingExpiration)
         {
             byte[] result;
-            
+
 #if NETSTANDARD2_0
             if (slidingExpiration.HasValue)
             {
@@ -930,7 +930,7 @@ namespace Sweety.Common.Caching
         private byte[] ToBytes(short value, TimeSpan? slidingExpiration)
         {
             byte[] result;
-            
+
 #if NETSTANDARD2_0
             if (slidingExpiration.HasValue)
             {
@@ -963,7 +963,7 @@ namespace Sweety.Common.Caching
         private byte[] ToBytes(ushort value, TimeSpan? slidingExpiration)
         {
             byte[] result;
-            
+
 #if NETSTANDARD2_0
             if (slidingExpiration.HasValue)
             {
@@ -996,7 +996,7 @@ namespace Sweety.Common.Caching
         private byte[] ToBytes(int value, TimeSpan? slidingExpiration)
         {
             byte[] result;
-            
+
 #if NETSTANDARD2_0
             if (slidingExpiration.HasValue)
             {
@@ -1029,7 +1029,7 @@ namespace Sweety.Common.Caching
         private byte[] ToBytes(uint value, TimeSpan? slidingExpiration)
         {
             byte[] result;
-            
+
 #if NETSTANDARD2_0
             if (slidingExpiration.HasValue)
             {
@@ -1062,7 +1062,7 @@ namespace Sweety.Common.Caching
         private byte[] ToBytes(long value, TimeSpan? slidingExpiration)
         {
             byte[] result;
-            
+
 #if NETSTANDARD2_0
             if (slidingExpiration.HasValue)
             {
@@ -1295,7 +1295,7 @@ namespace Sweety.Common.Caching
         private byte[] ToBytes(DateTime value, TimeSpan? slidingExpiration)
         {
             byte[] result;
-            
+
 #if NETSTANDARD2_0
             if (slidingExpiration.HasValue)
             {
@@ -1462,7 +1462,7 @@ namespace Sweety.Common.Caching
                     Encoding.UTF8.GetBytes(value, 0, value.Length, result, 5);
                 }
             }
-            
+
             SetDataTypeAndExpirationType(result, slidingExpiration, STRING_TYPE_INDEX);
             return result;
         }

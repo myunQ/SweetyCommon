@@ -20,7 +20,8 @@ namespace ConsoleApp1
                 Port = 15432,
                 Username = "postgres",
                 Password = "myundb",
-                Database = "oidc",
+                //Database = "oidc",
+                Database = "organization",
                 Pooling = true,
                 MinPoolSize = 0,
                 MaxPoolSize = 100,
@@ -39,6 +40,42 @@ namespace ConsoleApp1
             byte[] password = new byte[] { 0x00, 0xDE, 0xE0, 0xFB, 0xA3, 0x1D, 0x8C, 0x35, 0x30, 0xDE, 0x47, 0x70, 0x29, 0x92, 0xC4, 0x71, 0x1C, 0x74, 0xDB, 0x43, 0xD1, 0x56, 0x66, 0x6B, 0x79, 0x64, 0x77, 0x4A, 0x35, 0x62, 0xA1, 0x7C, 0xA1, 0xE7, 0xE4, 0x47, 0x05, 0x65, 0x35, 0x42, 0x4D, 0x35, 0x4B, 0x1A, 0xCF, 0x27, 0x0E, 0x52, 0x7A, 0x1B, 0x30, 0xBA, 0x9B, 0xB2, 0x6C, 0x8F, 0x80, 0x44, 0x01, 0x00, 0xEC, 0x06, 0x96, 0x8E, 0x60, 0xF5, 0x92, 0x91, 0xD5, 0xF3, 0xD5, 0x6C, 0x11, 0xE2, 0x6F, 0xDB, 0x11, 0x3E, 0xFA, 0x7E, 0xEF, 0xA6, 0x78, 0x52, 0xDB, 0xE7, 0x3E, 0x72, 0xE8, 0x58, 0x28, 0xAA, 0x36, 0x4D, 0xF9, 0x46, 0xC7 };
 
             RelationalDBUtilityBase dbUtility = new PostgreSQLUtility();
+
+            /*const string sql = "INSERT INTO public.\"UserExtension\" (\"UserId\", \"Item\", \"Value\", \"UpdatedAt\", \"CreatedAt\") VALUES (@UserId, @Item0, @Value0, @CreatedAt, @CreatedAt),(@UserId, @Item1, @Value1, @CreatedAt, @CreatedAt) ";
+
+            var paramArr = new IDbDataParameter[]
+            {
+                dbUtility.BuildParameter("UserId", new byte[]{ 1,2,3,4,5,6,7,8,9,10,11,12}),
+                dbUtility.BuildParameter("createdAt", DateTime.UtcNow),
+                dbUtility.BuildParameter("Item0", (short)1),
+                dbUtility.BuildParameter("value0", "this is #value0"),
+                dbUtility.BuildParameter("item1", (short)2),
+                dbUtility.BuildParameter("value1", "this is #value1"),
+                null,
+                null,
+                null
+            };
+
+            var tran = dbUtility.BuildTransaction();
+            var itemIndex = await dbUtility.ExecuteNonQueryAsync(tran, sql, parameters: paramArr);
+            var conn = tran.Connection!;
+            tran.Commit();
+            conn.Dispose();*/
+
+            var param1 = dbUtility.BuildParameter("@arg2", Array.Empty<byte>());
+            var param2 = dbUtility.BuildParameter("@arg3", String.Empty);
+            param1.Direction = param2.Direction = ParameterDirection.Output;
+            int iiii = await dbUtility.ExecuteNonQueryAsync("public.outArg", CommandType.StoredProcedure, parameters: new IDataParameter[] { param1, param2 });
+            if (iiii > 0)
+            {
+
+            }
+            if (param1.Value != DBNull.Value || param2.Value != DBNull.Value)
+            {
+
+            }
+
+
 
             int result = 0;
 
@@ -102,7 +139,7 @@ namespace ConsoleApp1
                 }
             }*/
 
-            await TestMore(dbUtility);
+            //await TestMore(dbUtility);
 
             Console.WriteLine("Hello World!");
             Console.Read();

@@ -34,14 +34,14 @@ namespace Sweety.Common
         public WrongPasswordException(string id, string password, string message, Exception innerException)
             : base(message, innerException)
         {
-            this.ID = id;
+            this.Id = id;
             this.Password = password;
         }
 
         public WrongPasswordException(string id, string password, byte canAttemptsTimes, string message, Exception innerException)
             : base(message, innerException)
         {
-            this.ID = id;
+            this.Id = id;
             this.Password = password;
             this.CanAttemptsTimes = canAttemptsTimes;
         }
@@ -49,7 +49,7 @@ namespace Sweety.Common
         /// <summary>
         /// 获取产生此异常的ID（ID可能是登录名、邮箱、手机号等等）。
         /// </summary>
-        public string ID { get; private set; }
+        public string Id { get; private set; }
         /// <summary>
         /// 获取产生此异常的明文密码。
         /// </summary>

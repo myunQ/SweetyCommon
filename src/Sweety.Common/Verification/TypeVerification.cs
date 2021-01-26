@@ -49,7 +49,7 @@ namespace Sweety.Common.Verification
         {
             if (type == null) return false;
 
-            
+
             return Object.ReferenceEquals(type, ValueTypeConstants.Int32Type)
                 || Object.ReferenceEquals(type, ValueTypeConstants.ByteType)
                 || Object.ReferenceEquals(type, ValueTypeConstants.Int16Type)

@@ -28,6 +28,10 @@ namespace Sweety.Common.DataProvider
     public interface IRelationalDBUtility
     {
         /// <summary>
+        /// 表示遍历参数集合时，当遇到某个元素为 <c>null</c> 时的处理行为。true：停止遍历；false：跳过当前元素继续遍历。
+        /// </summary>
+        bool BreakWhenParametersElementIsNull { get; set; }
+        /// <summary>
         /// 目标数据库服务器角色。
         /// 表示要在哪个角色的数据库服务器上执行操作。
         /// 默认值：<see cref="DatabaseServerRole.Master"/>，表示在数据库主服务器上执行操作。
@@ -191,8 +195,52 @@ namespace Sweety.Common.DataProvider
         /// <summary>
         /// 使用默认的数据库链接字符串创建一个数据库链接对象实例。
         /// </summary>
-        /// <returns>返回一个实现了<see cref="System.Data.IDbConnection"/>接口的对象实例。</returns>
+        /// <returns>返回一个实现了<see cref="IDbConnection"/>接口的对象实例。</returns>
         IDbConnection BuildConnection();
+        /// <summary>
+        /// 使用指定的数据库链接字符串创建一个数据库链接对象实例。
+        /// </summary>
+        /// <param name="connectionString">数据库连接字符串。</param>
+        /// <returns>返回一个实现了<see cref="IDbConnection"/>接口的对象实例。</returns>
+        IDbConnection BuildConnection(string connectionString);
+
+        /// <summary>
+        /// 使用默认的数据库链接字符串创建一个数据库链接对象实例，并将链接打开。
+        /// </summary>
+        /// <returns>返回一个实现了<see cref="IDbConnection"/>接口并且以开启的对象实例。</returns>
+        IDbConnection BuildConnectionAndOpen();
+        /// <summary>
+        /// 使用指定的数据库链接字符串创建一个数据库链接对象实例，并将链接打开。
+        /// </summary>
+        /// <param name="connectionString">数据库连接字符串。</param>
+        /// <returns>返回一个实现了<see cref="IDbConnection"/>接口并且以开启的对象实例。</returns>
+        IDbConnection BuildConnectionAndOpen(string connectionString);
+
+        /// <summary>
+        /// 使用默认的数据库链接字符串创建一个数据库链接对象实例，并将链接以异步方式打开。
+        /// </summary>
+        /// <returns>返回一个实现了<see cref="IDbConnection"/>接口并且以开启的对象实例。</returns>
+        Task<IDbConnection> BuildConnectionAndOpenAsync();
+        /// <summary>
+        /// 使用指定的数据库链接字符串创建一个数据库链接对象实例，并将链接以异步方式打开。
+        /// </summary>
+        /// <param name="connectionString">数据库连接字符串。</param>
+        /// <returns>返回一个实现了<see cref="IDbConnection"/>接口并且以开启的对象实例。</returns>
+        Task<IDbConnection> BuildConnectionAndOpenAsync(string connectionString);
+
+        /// <summary>
+        /// 使用默认的数据库链接字符串创建一个数据库链接对象实例，并将链接以异步方式打开。
+        /// </summary>
+        /// <param name="cancellationToken">表示异步任务是否取消的令牌。</param>
+        /// <returns>返回一个实现了<see cref="IDbConnection"/>接口并且以开启的对象实例。</returns>
+        Task<IDbConnection> BuildConnectionAndOpenAsync(CancellationToken cancellationToken = default);
+        /// <summary>
+        /// 使用指定的数据库链接字符串创建一个数据库链接对象实例，并将链接以异步方式打开。
+        /// </summary>
+        /// <param name="connectionString">数据库连接字符串。</param>
+        /// <param name="cancellationToken">表示异步任务是否取消的令牌。</param>
+        /// <returns>返回一个实现了<see cref="IDbConnection"/>接口并且以开启的对象实例。</returns>
+        Task<IDbConnection> BuildConnectionAndOpenAsync(string connectionString, CancellationToken cancellationToken = default);
 
 
         /// <summary>
@@ -203,7 +251,7 @@ namespace Sweety.Common.DataProvider
         /// <summary>
         /// 使用指定的数据库链接创建一个实现了<see cref="System.Data.IDbCommand"/>接口的对象实例。
         /// </summary>
-        /// <param name="conn">实现了<see cref="System.Data.IDbConnection"/>接口的数据库链接对象实例。</param>
+        /// <param name="conn">实现了<see cref="IDbConnection"/>接口的数据库链接对象实例。</param>
         /// <returns>返回一个实现了<see cref="System.Data.IDbCommand"/>接口的对象实例。</returns>
         IDbCommand BuildCommand(IDbConnection conn);
 

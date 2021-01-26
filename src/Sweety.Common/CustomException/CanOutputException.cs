@@ -32,7 +32,7 @@ namespace Sweety.Common
     [Serializable]
     public class CanOutputException : Exception
     {
-        readonly int _exceptionCode;
+        readonly int _errorCode;
 
         /// <summary>
         /// 默认实例。
@@ -47,9 +47,9 @@ namespace Sweety.Common
         /// <summary>
         /// 使用指定的异常码初始化 <see cref="CanOutputException"/> 类的新实例。
         /// </summary>
-        /// <param name="exceptionCode">表示异常的代码。</param>
-        public CanOutputException(int exceptionCode)
-            : this(exceptionCode, String.Empty) { }
+        /// <param name="errorCode">表示异常的代码。</param>
+        public CanOutputException(int errorCode)
+            : this(errorCode, String.Empty) { }
         /// <summary>
         /// 使用指定的错误消息初始化 <see cref="CanOutputException"/> 类的新实例。
         /// </summary>
@@ -59,12 +59,12 @@ namespace Sweety.Common
         /// <summary>
         /// 使用指定的异常码和错误消息初始化 <see cref="CanOutputException"/> 类的新实例。
         /// </summary>
-        /// <param name="exceptionCode">表示异常的代码。</param>
+        /// <param name="errorCode">表示异常的代码。</param>
         /// <param name="message">描述错误的消息。</param>
-        public CanOutputException(int exceptionCode, string message)
+        public CanOutputException(int errorCode, string message)
             : base(message ?? String.Empty)
         {
-            _exceptionCode = exceptionCode;
+            _errorCode = errorCode;
         }
         /// <summary>
         /// 使用两个不兼容的种类和指定错误消息和对作为此异常原因的内部异常的引用来初始化 <see cref="CanOutputException"/> 类的新实例。
@@ -76,21 +76,21 @@ namespace Sweety.Common
         /// <summary>
         /// 使用指定的异常码和错误消息初始化 <see cref="CanOutputException"/> 类的新实例。
         /// </summary>
-        /// <param name="exceptionCode">表示异常的代码。</param>
+        /// <param name="errorCode">表示异常的代码。</param>
         /// <param name="message">描述错误的消息。</param>
         /// <param name="innerException">导致当前异常的异常；如果未指定内部异常，则是一个 <c>null</c> 引用（在 <c>Visual Basic</c> 中为 <c>Nothing</c>）。</param>
-        public CanOutputException(int exceptionCode, string message, Exception innerException)
+        public CanOutputException(int errorCode, string message, Exception innerException)
             : base(message ?? String.Empty, innerException)
         {
-            _exceptionCode = exceptionCode;
+            _errorCode = errorCode;
         }
 
         /// <summary>
         /// 获取表示异常的代码。
         /// </summary>
-        public int ExceptionCode
+        public int ErrorCode
         {
-            get { return _exceptionCode; }
+            get { return _errorCode; }
         }
 
         /// <summary>

@@ -46,7 +46,7 @@ namespace Sweety.Common.DataProvider.PostgreSQL
         /// <summary>
         /// 创建一个 <c>PostgreSQL</c> 数据库连接对象实例。
         /// </summary>
-        /// <returns>返回一个 <see cref="NpgsqlConnection"/> 对象实例。</returns>
+        /// <returns>返回一个表示 <c>PostgreSQL</c> 数据库链接对象 <see cref="NpgsqlConnection"/> 对象实例。</returns>
         public NpgsqlConnection BuildSqlConnection()
         {
             if (TargetRole == DatabaseServerRole.Master)
@@ -67,7 +67,7 @@ namespace Sweety.Common.DataProvider.PostgreSQL
         /// 使用指定的 <c>PostgreSQL</c> 数据库连接字符串创建连接对象实例。
         /// </summary>
         /// <param name="connectionString"><c>PostgreSQL</c> 数据库连接字符。</param>
-        /// <returns>返回一个<see cref="NpgsqlConnection"/>对象实例。</returns>
+        /// <returns>返回一个表示 <c>PostgreSQL</c> 数据库链接对象 <see cref="NpgsqlConnection"/> 对象实例。</returns>
         /// <exception cref="ArgumentNullException">参数 <paramref name="connectionString"/> 的值为 <c>null</c>。</exception>
         /// <exception cref="ArgumentException">参数 <paramref name="connectionString"/> 的值为空白字符。</exception>
         public NpgsqlConnection BuildSqlConnection(string connectionString)
@@ -78,6 +78,83 @@ namespace Sweety.Common.DataProvider.PostgreSQL
             return new NpgsqlConnection(connectionString);
         }
 
+        /// <summary>
+        /// 使用默认的数据库链接字符串创建一个数据库链接对象实例，并将链接打开。
+        /// </summary>
+        /// <returns>返回一个表示 <c>PostgreSQL</c> 数据库链接对象 <see cref="NpgsqlConnection"/> 并且已与数据库连接的对象实例。</returns>
+        public NpgsqlConnection BuildSqlConnectionAndOpen()
+        {
+            var conn = BuildSqlConnection();
+
+            conn.Open();
+
+            return conn;
+        }
+        /// <summary>
+        /// 使用指定的数据库链接字符串创建一个数据库链接对象实例，并将链接打开。
+        /// </summary>
+        /// <param name="connectionString">数据库连接字符串。</param>
+        /// <returns>返回一个表示 <c>PostgreSQL</c> 数据库链接对象 <see cref="NpgsqlConnection"/> 并且已与数据库连接的对象实例。</returns>
+        public NpgsqlConnection BuildSqlConnectionAndOpen(string connectionString)
+        {
+            var conn = BuildSqlConnection(connectionString);
+
+            conn.Open();
+
+            return conn;
+        }
+        /// <summary>
+        /// 使用默认的数据库链接字符串创建一个数据库链接对象实例，并将链接以异步方式打开。
+        /// </summary>
+        /// <returns>返回一个表示 <c>PostgreSQL</c> 数据库链接对象 <see cref="NpgsqlConnection"/> 并且已与数据库连接的对象实例。</returns>
+        public async Task<NpgsqlConnection> BuildSqlConnectionAndOpenAsync()
+        {
+            var conn = BuildSqlConnection();
+
+            await conn.OpenAsync();
+
+            return conn;
+        }
+        /// <summary>
+        /// 使用指定的数据库链接字符串创建一个数据库链接对象实例，并将链接以异步方式打开。
+        /// </summary>
+        /// <param name="connectionString">数据库连接字符串。</param>
+        /// <returns>返回一个表示 <c>PostgreSQL</c> 数据库链接对象 <see cref="NpgsqlConnection"/> 并且已与数据库连接的对象实例。</returns>
+        public async Task<NpgsqlConnection> BuildSqlConnectionAndOpenAsync(string connectionString)
+        {
+            var conn = BuildSqlConnection(connectionString);
+
+            await conn.OpenAsync();
+
+            return conn;
+        }
+        /// <summary>
+        /// 使用默认的数据库链接字符串创建一个数据库链接对象实例，并将链接以异步方式打开。
+        /// </summary>
+        /// <param name="cancellationToken">表示异步任务是否取消的令牌。</param>
+        /// <returns>返回一个表示 <c>PostgreSQL</c> 数据库链接对象 <see cref="NpgsqlConnection"/> 并且已与数据库连接的对象实例。</returns>
+        public async Task<NpgsqlConnection> BuildSqlConnectionAndOpenAsync(CancellationToken cancellationToken = default)
+        {
+            var conn = BuildSqlConnection();
+
+            await conn.OpenAsync(cancellationToken);
+
+            return conn;
+        }
+        /// <summary>
+        /// 使用指定的数据库链接字符串创建一个数据库链接对象实例，并将链接以异步方式打开。
+        /// </summary>
+        /// <param name="connectionString">数据库连接字符串。</param>
+        /// <param name="cancellationToken">表示异步任务是否取消的令牌。</param>
+        /// <returns>返回一个表示 <c>PostgreSQL</c> 数据库链接对象 <see cref="NpgsqlConnection"/> 并且已与数据库连接的对象实例。</returns>
+        public async Task<NpgsqlConnection> BuildSqlConnectionAndOpenAsync(string connectionString, CancellationToken cancellationToken = default)
+        {
+            var conn = BuildSqlConnection(connectionString);
+
+            await conn.OpenAsync(cancellationToken);
+
+            return conn;
+        }
 
 
         /// <summary>
@@ -107,7 +184,7 @@ namespace Sweety.Common.DataProvider.PostgreSQL
         /// <returns><c>PostgreSQL</c> 数据库事务对象实例。</returns>
         public NpgsqlTransaction BuildSqlTransaction()
         {
-            return BuildSqlConnection().BeginTransaction();
+            return BuildSqlConnectionAndOpen().BeginTransaction();
         }
 
         /// <summary>
@@ -117,7 +194,7 @@ namespace Sweety.Common.DataProvider.PostgreSQL
         /// <returns><c>PostgreSQL</c> 数据库事务对象实例。</returns>
         public NpgsqlTransaction BuildSqlTransaction(IsolationLevel level)
         {
-            return BuildSqlConnection().BeginTransaction(level);
+            return BuildSqlConnectionAndOpen().BeginTransaction(level);
         }
 
 #if !NETSTANDARD2_0
@@ -126,9 +203,9 @@ namespace Sweety.Common.DataProvider.PostgreSQL
         /// </summary>
         /// <param name="cancellationToken">表示异步任务是否取消的令牌。</param>
         /// <returns><c>PostgreSQL</c> 数据库事务对象实例。</returns>
-        public ValueTask<NpgsqlTransaction> BuildSqlTransactionAsync(CancellationToken cancellationToken = default)
+        public async ValueTask<NpgsqlTransaction> BuildSqlTransactionAsync(CancellationToken cancellationToken = default)
         {
-            return BuildSqlConnection().BeginTransactionAsync(cancellationToken);
+            return await (await BuildSqlConnectionAndOpenAsync(cancellationToken)).BeginTransactionAsync(cancellationToken);
         }
 
         /// <summary>
@@ -137,9 +214,9 @@ namespace Sweety.Common.DataProvider.PostgreSQL
         /// <param name="level">事务隔离级别。</param>
         /// <param name="cancellationToken">表示异步任务是否取消的令牌。</param>
         /// <returns><c>PostgreSQL</c> 数据库事务对象实例。</returns>
-        public ValueTask<NpgsqlTransaction> BuildSqlTransactionAsync(IsolationLevel level, CancellationToken cancellationToken = default)
+        public async ValueTask<NpgsqlTransaction> BuildSqlTransactionAsync(IsolationLevel level, CancellationToken cancellationToken = default)
         {
-            return BuildSqlConnection().BeginTransactionAsync(level, cancellationToken);
+            return await (await BuildSqlConnectionAndOpenAsync(cancellationToken)).BeginTransactionAsync(level, cancellationToken);
         }
 #endif //!NETSTANDARD2_0
 
@@ -207,6 +284,41 @@ namespace Sweety.Common.DataProvider.PostgreSQL
             return BuildSqlConnection();
         }
 
+        public override IDbConnection BuildConnection(string connectionString)
+        {
+            return BuildSqlConnection(connectionString);
+        }
+
+        public override IDbConnection BuildConnectionAndOpen()
+        {
+            return BuildSqlConnectionAndOpen();
+        }
+
+        public override IDbConnection BuildConnectionAndOpen(string connectionString)
+        {
+            return BuildSqlConnectionAndOpen(connectionString);
+        }
+
+        public async override Task<IDbConnection> BuildConnectionAndOpenAsync()
+        {
+            return await BuildSqlConnectionAndOpenAsync();
+        }
+
+        public async override Task<IDbConnection> BuildConnectionAndOpenAsync(string connectionString)
+        {
+            return await BuildSqlConnectionAndOpenAsync(connectionString);
+        }
+
+        public async override Task<IDbConnection> BuildConnectionAndOpenAsync(CancellationToken cancellationToken = default)
+        {
+            return await BuildSqlConnectionAndOpenAsync(cancellationToken);
+        }
+
+        public async override Task<IDbConnection> BuildConnectionAndOpenAsync(string connectionString, CancellationToken cancellationToken = default)
+        {
+            return await BuildSqlConnectionAndOpenAsync(connectionString, cancellationToken);
+        }
+
 
         /// <summary>
         /// 使用默认数据库连接对象创建一个可在 <c>PostgreSQL</c> 数据库执行 <c>T-SQL</c> 命令的对象实例。
@@ -254,7 +366,7 @@ namespace Sweety.Common.DataProvider.PostgreSQL
         /// <returns>数据库事务对象实例。</returns>
         public override async Task<IDbTransaction> BuildTransactionAsync(CancellationToken cancellationToken = default)
         {
-            return (IDbTransaction)await BuildSqlTransactionAsync(cancellationToken);
+            return await BuildSqlTransactionAsync(cancellationToken);
         }
         /// <summary>
         /// 使用默认数据库链接对象和指定的事务隔离级别创建数据库事务对象实例。
@@ -264,7 +376,7 @@ namespace Sweety.Common.DataProvider.PostgreSQL
         /// <returns>数据库事务对象实例。</returns>
         public override async Task<IDbTransaction> BuildTransactionAsync(IsolationLevel level, CancellationToken cancellationToken = default)
         {
-            return (IDbTransaction)await BuildSqlTransactionAsync(level, cancellationToken);
+            return await BuildSqlTransactionAsync(level, cancellationToken);
         }
 #endif //!NETSTANDARD2_0
 
@@ -303,7 +415,6 @@ namespace Sweety.Common.DataProvider.PostgreSQL
         /// <returns>返回受影响的记录数。</returns>
         protected override int ExecuteNonQuery(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters)
         {
-            if (connection == null) throw new ArgumentNullException(nameof(connection));
             if (transaction != null)
             {
                 // PostgreSQL 要获取 SqlTransaction 对象实例的话连接必须是打开的，所以如果传入 transaction 就可以忽略 connection 参数了。
@@ -311,11 +422,12 @@ namespace Sweety.Common.DataProvider.PostgreSQL
                 if (transaction.Connection == null) throw new ArgumentException(Properties.LocalizationResources.the_transaction_was_rollbacked_or_commited__please_provide_an_open_transaction, nameof(transaction));
                 if (connection != null && !Object.ReferenceEquals(connection, transaction.Connection)) throw new ArgumentException(Properties.LocalizationResources.the_database_connection_provided_and_the_database_connection_used_by_the_transaction_must_be_the_same_instance);
             }
+            else if (connection == null) throw new ArgumentNullException(nameof(connection));
 
             bool mustCloseConnection = false;
+            NpgsqlCommand cmd = new NpgsqlCommand();
             try
             {
-                NpgsqlCommand cmd = new NpgsqlCommand();
                 if (transaction == null)
                 {
                     PrepareCommand(cmd, ConvertToSqlConnection(connection), null, commandType, commandText, ConvertToSqlParameterArrary(commandParameters), out mustCloseConnection);
@@ -326,15 +438,11 @@ namespace Sweety.Common.DataProvider.PostgreSQL
                     PrepareCommand(cmd, null, ConvertToSqlTransaction(transaction), commandType, commandText, ConvertToSqlParameterArrary(commandParameters), out _);
                 }
 
-                int retval = cmd.ExecuteNonQuery();
-
-                //TODO:myun:清除参数、关闭连接，会不会影响获取输出参数额值？
-                cmd.Parameters.Clear();
-
-                return retval;
+                return cmd.ExecuteNonQuery();
             }
             finally
             {
+                cmd.Parameters.Clear();
                 if (mustCloseConnection) connection.Close();
             }
         }
@@ -355,7 +463,6 @@ namespace Sweety.Common.DataProvider.PostgreSQL
         protected override async ValueTask<int> ExecuteNonQueryAsync(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, CancellationToken? cancellationToken = null)
 #endif
         {
-            if (connection == null) throw new ArgumentNullException(nameof(connection));
             if (transaction != null)
             {
                 // PostgreSQL 要获取 SqlTransaction 对象实例的话连接必须是打开的，所以如果传入 transaction 就可以忽略 connection 参数了。
@@ -363,11 +470,13 @@ namespace Sweety.Common.DataProvider.PostgreSQL
                 if (transaction.Connection == null) throw new ArgumentException(Properties.LocalizationResources.the_transaction_was_rollbacked_or_commited__please_provide_an_open_transaction, nameof(transaction));
                 if (connection != null && !Object.ReferenceEquals(connection, transaction.Connection)) throw new ArgumentException(Properties.LocalizationResources.the_database_connection_provided_and_the_database_connection_used_by_the_transaction_must_be_the_same_instance);
             }
+            else if (connection == null) throw new ArgumentNullException(nameof(connection));
 
             bool mustCloseConnection = false;
+
+            NpgsqlCommand cmd = new NpgsqlCommand();
             try
             {
-                NpgsqlCommand cmd = new NpgsqlCommand();
                 if (transaction == null)
                 {
                     mustCloseConnection = connection.State != ConnectionState.Open;
@@ -379,17 +488,13 @@ namespace Sweety.Common.DataProvider.PostgreSQL
                     await PrepareCommandAsync(cmd, null, ConvertToSqlTransaction(transaction), commandType, commandText, ConvertToSqlParameterArrary(commandParameters), cancellationToken);
                 }
 
-                int retval = cancellationToken.HasValue
+                return cancellationToken.HasValue
                     ? await cmd.ExecuteNonQueryAsync(cancellationToken.Value)
                     : await cmd.ExecuteNonQueryAsync();
-
-                //TODO:myun:清除参数、关闭连接，会不会影响获取输出参数额值？
-                cmd.Parameters.Clear();
-
-                return retval;
             }
             finally
             {
+                cmd.Parameters.Clear();
                 if (mustCloseConnection) connection.Close();
             }
         }
@@ -406,7 +511,6 @@ namespace Sweety.Common.DataProvider.PostgreSQL
         /// <returns>返回结果集中的第一行第一列的数据。</returns>
         protected override object ExecuteScalar(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters)
         {
-            if (connection == null) throw new ArgumentNullException(nameof(connection));
             if (transaction != null)
             {
                 // PostgreSQL 要获取 SqlTransaction 对象实例的话连接必须是打开的，所以如果传入 transaction 就可以忽略 connection 参数了。
@@ -414,11 +518,12 @@ namespace Sweety.Common.DataProvider.PostgreSQL
                 if (transaction.Connection == null) throw new ArgumentException(Properties.LocalizationResources.the_transaction_was_rollbacked_or_commited__please_provide_an_open_transaction, nameof(transaction));
                 if (connection != null && !Object.ReferenceEquals(connection, transaction.Connection)) throw new ArgumentException(Properties.LocalizationResources.the_database_connection_provided_and_the_database_connection_used_by_the_transaction_must_be_the_same_instance);
             }
+            else if (connection == null) throw new ArgumentNullException(nameof(connection));
 
             bool mustCloseConnection = false;
+            NpgsqlCommand cmd = new NpgsqlCommand();
             try
             {
-                NpgsqlCommand cmd = new NpgsqlCommand();
                 if (transaction == null)
                 {
                     PrepareCommand(cmd, ConvertToSqlConnection(connection), null, commandType, commandText, ConvertToSqlParameterArrary(commandParameters), out mustCloseConnection);
@@ -429,15 +534,11 @@ namespace Sweety.Common.DataProvider.PostgreSQL
                     PrepareCommand(cmd, null, ConvertToSqlTransaction(transaction), commandType, commandText, ConvertToSqlParameterArrary(commandParameters), out _);
                 }
 
-                object retval = cmd.ExecuteScalar();
-
-                //TODO:myun:清除参数、关闭连接，会不会影响获取输出参数额值？
-                cmd.Parameters.Clear();
-
-                return retval;
+                return cmd.ExecuteScalar();
             }
             finally
             {
+                cmd.Parameters.Clear();
                 if (mustCloseConnection) connection.Close();
             }
         }
@@ -454,7 +555,6 @@ namespace Sweety.Common.DataProvider.PostgreSQL
         /// <returns>返回结果集中的第一行第一列的数据。</returns>
         protected override async Task<object> ExecuteScalarAsync(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, CancellationToken? cancellationToken = null)
         {
-            if (connection == null) throw new ArgumentNullException(nameof(connection));
             if (transaction != null)
             {
                 // PostgreSQL 要获取 SqlTransaction 对象实例的话连接必须是打开的，所以如果传入 transaction 就可以忽略 connection 参数了。
@@ -462,11 +562,12 @@ namespace Sweety.Common.DataProvider.PostgreSQL
                 if (transaction.Connection == null) throw new ArgumentException(Properties.LocalizationResources.the_transaction_was_rollbacked_or_commited__please_provide_an_open_transaction, nameof(transaction));
                 if (connection != null && !Object.ReferenceEquals(connection, transaction.Connection)) throw new ArgumentException(Properties.LocalizationResources.the_database_connection_provided_and_the_database_connection_used_by_the_transaction_must_be_the_same_instance);
             }
+            else if (connection == null) throw new ArgumentNullException(nameof(connection));
 
             bool mustCloseConnection = false;
+            NpgsqlCommand cmd = new NpgsqlCommand();
             try
             {
-                NpgsqlCommand cmd = new NpgsqlCommand();
                 if (transaction == null)
                 {
                     mustCloseConnection = connection.State != ConnectionState.Open;
@@ -478,17 +579,13 @@ namespace Sweety.Common.DataProvider.PostgreSQL
                     await PrepareCommandAsync(cmd, null, ConvertToSqlTransaction(transaction), commandType, commandText, ConvertToSqlParameterArrary(commandParameters), cancellationToken);
                 }
 
-                object retval = cancellationToken.HasValue
+                return cancellationToken.HasValue
                     ? await cmd.ExecuteScalarAsync(cancellationToken.Value)
                     : await cmd.ExecuteScalarAsync();
-
-                //TODO:myun:清除参数、关闭连接，会不会影响获取输出参数额值？
-                cmd.Parameters.Clear();
-
-                return retval;
             }
             finally
             {
+                cmd.Parameters.Clear();
                 if (mustCloseConnection) connection.Close();
             }
         }
@@ -505,7 +602,6 @@ namespace Sweety.Common.DataProvider.PostgreSQL
         /// <returns>返回包含结果集的数据读取器。</returns> 
         protected override IDataReader ExecuteReader(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, SqlConnectionOwnership connectionOwnership)
         {
-            if (connection == null && transaction == null) throw new ArgumentNullException(nameof(connection));
             if (transaction != null)
             {
                 // PostgreSQL 要获取 SqlTransaction 对象实例的话连接必须是打开的，所以如果传入 transaction 就可以忽略 connection 参数了。
@@ -513,13 +609,12 @@ namespace Sweety.Common.DataProvider.PostgreSQL
                 if (transaction.Connection == null) throw new ArgumentException(Properties.LocalizationResources.the_transaction_was_rollbacked_or_commited__please_provide_an_open_transaction, nameof(transaction));
                 if (connection != null && !Object.ReferenceEquals(connection, transaction.Connection)) throw new ArgumentException(Properties.LocalizationResources.the_database_connection_provided_and_the_database_connection_used_by_the_transaction_must_be_the_same_instance);
             }
+            else if (connection == null) throw new ArgumentNullException(nameof(connection));
 
             bool mustCloseConnection = false;
-
+            NpgsqlCommand cmd = new NpgsqlCommand();
             try
             {
-                NpgsqlCommand cmd = new NpgsqlCommand();
-
                 if (transaction == null)
                 {
                     PrepareCommand(cmd, ConvertToSqlConnection(connection), null, commandType, commandText, ConvertToSqlParameterArrary(commandParameters), out mustCloseConnection);
@@ -532,31 +627,19 @@ namespace Sweety.Common.DataProvider.PostgreSQL
 
 
                 // 创建数据阅读器 
-                NpgsqlDataReader dataReader = (connectionOwnership == SqlConnectionOwnership.External)
+                return (connectionOwnership == SqlConnectionOwnership.External)
                     ? cmd.ExecuteReader()
                     : cmd.ExecuteReader(CommandBehavior.CloseConnection);
-
-                // 清除参数,以便再次使用.. 
-                // HACK: There is a problem here, the output parameter values are fletched 
-                // when the reader is closed, so if the parameters are detached from the command 
-                // then the SqlReader can磘 set its values. 
-                // When this happen, the parameters can磘 be used again in other command. 
-                bool canClear = true;
-                foreach (NpgsqlParameter commandParameter in cmd.Parameters)
-                {
-                    if (commandParameter.Direction != ParameterDirection.Input)
-                        canClear = false;
-                }
-
-                if (canClear) cmd.Parameters.Clear();
-
-                return dataReader;
             }
             catch
             {
                 if (mustCloseConnection) connection.Close();
 
                 throw;
+            }
+            finally
+            {
+                cmd.Parameters.Clear();
             }
         }
 
@@ -573,7 +656,6 @@ namespace Sweety.Common.DataProvider.PostgreSQL
         /// <returns>返回包含结果集的数据读取器。</returns>
         protected override async Task<IDataReader> ExecuteReaderAsync(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, SqlConnectionOwnership connectionOwnership, CancellationToken? cancellationToken = null)
         {
-            if (connection == null && transaction == null) throw new ArgumentNullException(nameof(connection));
             if (transaction != null)
             {
                 // PostgreSQL 要获取 SqlTransaction 对象实例的话连接必须是打开的，所以如果传入 transaction 就可以忽略 connection 参数了。
@@ -581,13 +663,12 @@ namespace Sweety.Common.DataProvider.PostgreSQL
                 if (transaction.Connection == null) throw new ArgumentException(Properties.LocalizationResources.the_transaction_was_rollbacked_or_commited__please_provide_an_open_transaction, nameof(transaction));
                 if (connection != null && !Object.ReferenceEquals(connection, transaction.Connection)) throw new ArgumentException(Properties.LocalizationResources.the_database_connection_provided_and_the_database_connection_used_by_the_transaction_must_be_the_same_instance);
             }
+            else if (connection == null) throw new ArgumentNullException(nameof(connection));
 
             bool mustCloseConnection = false;
-
+            NpgsqlCommand cmd = new NpgsqlCommand();
             try
             {
-                NpgsqlCommand cmd = new NpgsqlCommand();
-
                 if (transaction == null)
                 {
                     mustCloseConnection = connection.State != ConnectionState.Open;
@@ -601,36 +682,23 @@ namespace Sweety.Common.DataProvider.PostgreSQL
 
 
                 // 创建数据阅读器 
-                NpgsqlDataReader dataReader = await (connectionOwnership == SqlConnectionOwnership.External
+                return await (connectionOwnership == SqlConnectionOwnership.External
                     ? cancellationToken.HasValue
                         ? cmd.ExecuteReaderAsync(cancellationToken.Value)
                         : cmd.ExecuteReaderAsync()
                     : cancellationToken.HasValue
                         ? cmd.ExecuteReaderAsync(CommandBehavior.CloseConnection, cancellationToken.Value)
                         : cmd.ExecuteReaderAsync(CommandBehavior.CloseConnection));
-
-                // 清除参数,以便再次使用.. 
-                // HACK: There is a problem here, the output parameter values are fletched 
-                // when the reader is closed, so if the parameters are detached from the command 
-                // then the SqlReader can磘 set its values. 
-                // When this happen, the parameters can磘 be used again in other command. 
-                bool canClear = true;
-                foreach (NpgsqlParameter commandParameter in cmd.Parameters)
-                {
-                    if (commandParameter.Direction != ParameterDirection.Input)
-                        canClear = false;
-                }
-
-                if (canClear) cmd.Parameters.Clear();
-
-
-                return dataReader;
             }
             catch
             {
                 if (mustCloseConnection) connection.Close();
 
                 throw;
+            }
+            finally
+            {
+                cmd.Parameters.Clear();
             }
         }
         #endregion Override base class RelationalDBUtilityBase
@@ -650,8 +718,20 @@ namespace Sweety.Common.DataProvider.PostgreSQL
             if (parameters is NpgsqlParameter[] result) return result;
 
             result = new NpgsqlParameter[parameters.Length];
-            for (int i = parameters.Length - 1; i >= 0; i--)
+            for (int i = 0; i < parameters.Length; i++)
             {
+                if (parameters[i] == null)
+                {
+                    if (BreakWhenParametersElementIsNull)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+
                 result[i] = (NpgsqlParameter)parameters[i];
             }
 
@@ -709,6 +789,10 @@ namespace Sweety.Common.DataProvider.PostgreSQL
                             p.Value = DBNull.Value;
                         }
                         command.Parameters.Add(p);
+                    }
+                    else if (BreakWhenParametersElementIsNull)
+                    {
+                        break;
                     }
                 }
             }

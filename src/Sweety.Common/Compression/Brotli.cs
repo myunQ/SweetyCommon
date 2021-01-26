@@ -10,7 +10,7 @@
  *          Brotli
  * * * * * * * * * * * * * * * * * * * * */
 
- #if !NETSTANDARD2_0
+#if !NETSTANDARD2_0
 namespace Sweety.Common.Compression
 {
     using System;
@@ -52,4 +52,4 @@ namespace Sweety.Common.Compression
         #endregion ICompression interface implementation.
     }
 }
- #endif
+#endif

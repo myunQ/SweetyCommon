@@ -175,6 +175,11 @@ namespace Sweety.Common.DataProvider
 
 
         #region IRelationalDBUtility interface implementation.
+        /// <summary>
+        /// 表示遍历参数集合时，当遇到某个元素为 <c>null</c> 时的处理行为。true：停止遍历；false：跳过当前元素继续遍历。默认值：true。
+        /// </summary>
+        public bool BreakWhenParametersElementIsNull { get; set; } = true;
+
         public virtual DatabaseServerRole TargetRole
         {
             get => _targetRole;
@@ -446,6 +451,20 @@ namespace Sweety.Common.DataProvider
 
 
         public abstract IDbConnection BuildConnection();
+
+        public abstract IDbConnection BuildConnection(string connectionString);
+
+        public abstract IDbConnection BuildConnectionAndOpen();
+
+        public abstract IDbConnection BuildConnectionAndOpen(string connectionString);
+
+        public abstract Task<IDbConnection> BuildConnectionAndOpenAsync();
+
+        public abstract Task<IDbConnection> BuildConnectionAndOpenAsync(string connectionString);
+
+        public abstract Task<IDbConnection> BuildConnectionAndOpenAsync(CancellationToken cancellationToken = default);
+
+        public abstract Task<IDbConnection> BuildConnectionAndOpenAsync(string connectionString, CancellationToken cancellationToken = default);
 
 
         public abstract IDbCommand BuildCommand();
