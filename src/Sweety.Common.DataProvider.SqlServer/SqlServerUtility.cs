@@ -14,6 +14,7 @@
 namespace Sweety.Common.DataProvider.SqlServer
 {
     using System;
+    using System.Buffers;
     using System.Collections.Generic;
     using System.Data;
     using System.Data.Common;
@@ -30,10 +31,51 @@ namespace Sweety.Common.DataProvider.SqlServer
     public class SqlServerUtility : RelationalDBUtilityBase
     {
         /// <summary>
-        /// 构造函数，创建 <c>SQL Server</c> 数据库操作对象实例。
+        /// 创建 <c>SQL Server</c> 数据库操作对象实例。
         /// </summary>
-        public SqlServerUtility()
-            : base()
+        /// <param name="connStr">数据库连接字符串。</param>
+        public SqlServerUtility(string connStr)
+            : base(connStr)
+        { }
+
+        /// <summary>
+        /// 创建 <c>SQL Server</c> 数据库操作对象实例。
+        /// </summary>
+        /// <param name="polling">表示应使用的数据库连接字符串索引，辅助实现数据库服务器轮询。</param>
+        /// <param name="masterConnStr">主数据库服务器链接字符串集合。</param>
+        public SqlServerUtility(ServersPolling polling, string[] masterConnStr)
+            : base(polling, masterConnStr, null)
+        { }
+
+        /// <summary>
+        /// 创建 <c>SQL Server</c> 数据库操作对象实例。
+        /// </summary>
+        /// <param name="polling">表示应使用的数据库连接字符串索引，辅助实现数据库服务器轮询。</param>
+        /// <param name="masterConnStr">主数据库服务器链接字符串集合。</param>
+        /// <param name="slaveConnStr">从数据库服务器链接字符串集合。</param>
+        public SqlServerUtility(ServersPolling polling, string[] masterConnStr, string[] slaveConnStr)
+            : base(polling, masterConnStr, slaveConnStr)
+        { }
+
+        /// <summary>
+        /// 创建 <c>SQL Server</c> 数据库操作对象实例。
+        /// </summary>
+        /// <param name="polling">表示应使用的数据库连接字符串索引，辅助实现数据库服务器轮询。</param>
+        /// <param name="role">要使用什么角色的数据库服务器。</param>
+        /// <param name="masterConnStr">主数据库服务器链接字符串集合。</param>
+        public SqlServerUtility(ServersPolling polling, DatabaseServerRole role, string[] masterConnStr)
+            : base(polling, role, masterConnStr, null)
+        { }
+
+        /// <summary>
+        /// 创建 <c>SQL Server</c> 数据库操作对象实例。
+        /// </summary>
+        /// <param name="polling">表示应使用的数据库连接字符串索引，辅助实现数据库服务器轮询。</param>
+        /// <param name="role">要使用什么角色的数据库服务器。</param>
+        /// <param name="masterConnStr">主数据库服务器链接字符串集合。</param>
+        /// <param name="slaveConnStr">从数据库服务器链接字符串集合。</param>
+        public SqlServerUtility(ServersPolling polling, DatabaseServerRole role, string[] masterConnStr, string[] slaveConnStr)
+            : base(polling, role, masterConnStr, slaveConnStr)
         { }
 
 
@@ -47,15 +89,19 @@ namespace Sweety.Common.DataProvider.SqlServer
         {
             if (TargetRole == DatabaseServerRole.Master)
             {
-                return new SqlConnection(__masterConnStr[_masterConnStrIndex]);
+                return new SqlConnection(_masterConnStr[_masterConnStrIndex]);
             }
             else if (TargetRole == DatabaseServerRole.Slave)
             {
-                return new SqlConnection(__slaveConnStr[_slaveConnStrIndex]);
+#if NETSTANDARD2_0                    
+                return new SqlConnection(_slaveConnStr[_slaveConnStrIndex]);
+#else
+                return new SqlConnection(_slaveConnStr![_slaveConnStrIndex]);
+#endif
             }
             else
             {
-                return new SqlConnection(__allConnStr[_allConnStrIndex]);
+                return new SqlConnection(_allConnStr[_allConnStrIndex]);
             }
         }
 
@@ -195,7 +241,6 @@ namespace Sweety.Common.DataProvider.SqlServer
 
         /* SQL Server 客户端目前没有异步实现。目前 System.Data.SqlClient.SqlConnection 的 BeginTransactionAsync 方法的官方文档介绍是继承 System.Data.Common.DbConnection 的 BeginTransactionAsync 方法。而此方法是的实现是“将委托给其同步对应项，并返回已完成的 Task ，这可能会阻止调用线程。”
          */
-#if !NETSTANDARD2_0
         /// <summary>
         /// 使用默认数据库链接对象创建数据库事务对象实例。
         /// </summary>
@@ -216,7 +261,6 @@ namespace Sweety.Common.DataProvider.SqlServer
         {
             return (await BuildSqlConnectionAndOpenAsync(cancellationToken)).BeginTransaction(level);
         }
-#endif //!NETSTANDARD2_0
 
 
 
@@ -235,9 +279,45 @@ namespace Sweety.Common.DataProvider.SqlServer
         /// <param name="parameterName">参数名，即 <see cref="SqlParameter.ParameterName"/> 属性的值。</param>
         /// <param name="value">参数值，即 <see cref="SqlParameter.Value"/> 属性的值。</param>
         /// <returns>返回一个 <see cref="SqlParameter"/> 对象实例。</returns>
+#if NETSTANDARD2_0
         public SqlParameter BuildSqlParameter(string parameterName, object value)
+#else
+        public SqlParameter BuildSqlParameter(string parameterName, object? value)
+#endif //NETSTANDARD2_0
         {
             return new SqlParameter(parameterName, value);
+        }
+        /// <summary>
+        /// 创建一个 <see cref="SqlParameter"/> 对象实例。
+        /// </summary>
+        /// <param name="parameterName">参数名，即 <see cref="SqlParameter.ParameterName"/> 属性的值。</param>
+        /// <param name="parameterType">参数类型，即 <see cref="SqlParameter.SqlDbType"/> 属性的值。</param>
+        /// <param name="size">参数大小，即 <see cref="SqlParameter.Size"/> 属性的值。</param>
+        /// <param name="direction">参数方向，即 <see cref="SqlParameter.Direction"/> 属性的值。</param>
+        /// <param name="value">参数值，即 <see cref="SqlParameter.Value"/> 属性的值。</param>
+        /// <returns>返回一个 <see cref="SqlParameter"/> 对象实例。</returns>
+#if NETSTANDARD2_0
+        public SqlParameter BuildSqlParameter(string parameterName, SqlDbType parameterType, int? size = default, ParameterDirection direction = ParameterDirection.Input, object value = default)
+#else
+        public SqlParameter BuildSqlParameter(string parameterName, SqlDbType parameterType, int? size = default, ParameterDirection direction = ParameterDirection.Input, object? value = default)
+#endif //NETSTANDARD2_0
+        {
+            if (size.HasValue)
+            {
+                return new SqlParameter(parameterName, parameterType, size.Value)
+                {
+                    Direction = direction,
+                    Value = value
+                };
+            }
+            else
+            {
+                return new SqlParameter(parameterName, parameterType)
+                {
+                    Direction = direction,
+                    Value = value
+                };
+            }
         }
 
 
@@ -363,7 +443,6 @@ namespace Sweety.Common.DataProvider.SqlServer
             return BuildSqlTransaction(level);
         }
 
-#if !NETSTANDARD2_0
         /// <summary>
         /// 使用默认数据库链接对象创建数据库事务对象实例。
         /// </summary>
@@ -383,7 +462,6 @@ namespace Sweety.Common.DataProvider.SqlServer
         {
             return await BuildSqlTransactionAsync(level, cancellationToken);
         }
-#endif //!NETSTANDARD2_0
 
 
         /// <summary>
@@ -401,11 +479,70 @@ namespace Sweety.Common.DataProvider.SqlServer
         /// <param name="parameterName">参数名，即 <see cref="SqlParameter.ParameterName"/> 属性的值。</param>
         /// <param name="value">参数值，即 <see cref="SqlParameter.Value"/> 属性的值。</param>
         /// <returns>返回一个 <see cref="SqlParameter"/> 对象实例。</returns>
+#if NETSTANDARD2_0
         public override IDbDataParameter BuildParameter(string parameterName, object value)
+#else
+        public override IDbDataParameter BuildParameter(string parameterName, object? value)
+#endif //NETSTANDARD2_0
         {
             return BuildSqlParameter(parameterName, value);
         }
-
+        /// <summary>
+        /// 使用指定参数名、类型和大小创建一个 <see cref="SqlParameter"/> 对象实例。
+        /// </summary>
+        /// <param name="parameterName">参数名称。</param>
+        /// <param name="parameterType">参数类型。取值范围为数据库客户端类库提供的参数类型枚举。</param>
+        /// <param name="size">参数大小。</param>
+        /// <returns>返回一个 <see cref="SqlParameter"/> 对象实例。</returns>
+        public override IDbDataParameter BuildParameter(string parameterName, int parameterType, int? size) //如果给 size 赋默认值就会导致 参数值为 int 类型时把值当作参数类型。
+        {
+            return BuildSqlParameter(parameterName, (SqlDbType)parameterType, size);
+        }
+        /// <summary>
+        /// 使用指定参数名、类型、大小和方向创建一个 <see cref="SqlParameter"/> 对象实例。
+        /// </summary>
+        /// <param name="parameterName">参数名称。</param>
+        /// <param name="direction">参数方向。</param>
+        /// <param name="parameterType">参数类型。取值范围为数据库客户端类库提供的参数类型枚举。</param>
+        /// <param name="size">参数大小。</param>
+        /// <returns>返回一个 <see cref="SqlParameter"/> 对象实例。</returns>
+        public override IDbDataParameter BuildParameter(string parameterName, ParameterDirection direction, int parameterType, int? size = default)
+        {
+            return BuildSqlParameter(parameterName, (SqlDbType)parameterType, size, direction);
+        }
+        /// <summary>
+        /// 使用指定参数名、参数值、类型和大小创建一个 <see cref="SqlParameter"/> 对象实例。
+        /// </summary>
+        /// <param name="parameterName">参数名称。</param>
+        /// <param name="value">参数值。</param>
+        /// <param name="parameterType">参数类型。取值范围为数据库客户端类库提供的参数类型枚举。</param>
+        /// <param name="size">参数大小。</param>
+        /// <returns>返回一个 <see cref="SqlParameter"/> 对象实例。</returns>
+#if NETSTANDARD2_0
+        public override IDbDataParameter BuildParameter(string parameterName, object value, int parameterType, int? size = default)
+#else
+        public override IDbDataParameter BuildParameter(string parameterName, object? value, int parameterType, int? size = default)
+#endif //NETSTANDARD2_0
+        {
+            return BuildSqlParameter(parameterName, (SqlDbType)parameterType, size, value: value);
+        }
+        /// <summary>
+        /// 使用指定参数名、参数值、类型、大小和方向创建一个 <see cref="SqlParameter"/> 对象实例。
+        /// </summary>
+        /// <param name="parameterName">参数名称。</param>
+        /// <param name="value">参数值。</param>
+        /// <param name="direction">参数方向。</param>
+        /// <param name="parameterType">参数类型。取值范围为数据库客户端类库提供的参数类型枚举。</param>
+        /// <param name="size">参数大小。</param>
+        /// <returns>返回一个 <see cref="SqlParameter"/> 对象实例。</returns>
+#if NETSTANDARD2_0
+        public override IDbDataParameter BuildParameter(string parameterName, object value, ParameterDirection direction, int parameterType, int? size = default)
+#else
+        public override IDbDataParameter BuildParameter(string parameterName, object? value, ParameterDirection direction, int parameterType, int? size = default)
+#endif //NETSTANDARD2_0
+        {
+            return BuildSqlParameter(parameterName, (SqlDbType)parameterType, size, direction, value);
+        }
 
 
 
@@ -418,7 +555,11 @@ namespace Sweety.Common.DataProvider.SqlServer
         /// <param name="commandText">存储过程名或 <c>T-SQL</c> 语句。</param> 
         /// <param name="commandParameters">参数数组，如果没有参数则为 <c>null</c>。</param> 
         /// <returns>返回受影响的记录数。</returns>
+#if NETSTANDARD2_0
         protected override int ExecuteNonQuery(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters)
+#else
+        protected override int ExecuteNonQuery(IDbConnection? connection, IDbTransaction? transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters)
+#endif // NETSTANDARD2_0
         {
             if (transaction != null)
             {
@@ -435,12 +576,12 @@ namespace Sweety.Common.DataProvider.SqlServer
             {
                 if (transaction == null)
                 {
-                    PrepareCommand(cmd, ConvertToSqlConnection(connection), null, commandType, commandText, ConvertToSqlParameterArrary(commandParameters), out mustCloseConnection);
+                    PrepareCommand(cmd, ConvertToSqlConnection(connection), null, commandType, commandText, ConvertToSqlParameterArrary(commandParameters, out var recyclingParameters), recyclingParameters, out mustCloseConnection);
                 }
                 else
                 {
                     // SQL Server 要获取 SqlTransaction 对象实例的话连接必须是打开的，所以如果传入 transaction 就可以忽略 connection 参数了。
-                    PrepareCommand(cmd, null, ConvertToSqlTransaction(transaction), commandType, commandText, ConvertToSqlParameterArrary(commandParameters), out _);
+                    PrepareCommand(cmd, null, ConvertToSqlTransaction(transaction), commandType, commandText, ConvertToSqlParameterArrary(commandParameters, out var recyclingParameters), recyclingParameters, out _);
                 }
 
                 return cmd.ExecuteNonQuery();
@@ -463,10 +604,10 @@ namespace Sweety.Common.DataProvider.SqlServer
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <returns>返回受影响的记录数。</returns>
 #if NETSTANDARD2_0
-        protected override async Task<int> ExecuteNonQueryAsync(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, CancellationToken? cancellationToken = null)
+        protected override async Task<int> ExecuteNonQueryAsync(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, CancellationToken cancellationToken = default)
 #else
-        protected override async ValueTask<int> ExecuteNonQueryAsync(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, CancellationToken? cancellationToken = null)
-#endif
+        protected override async ValueTask<int> ExecuteNonQueryAsync(IDbConnection? connection, IDbTransaction? transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, CancellationToken cancellationToken = default)
+#endif // NETSTANDARD2_0
         {
             if (transaction != null)
             {
@@ -484,22 +625,22 @@ namespace Sweety.Common.DataProvider.SqlServer
                 if (transaction == null)
                 {
                     mustCloseConnection = connection.State != ConnectionState.Open;
-                    await PrepareCommandAsync(cmd, ConvertToSqlConnection(connection), null, commandType, commandText, ConvertToSqlParameterArrary(commandParameters), cancellationToken);
+                    await PrepareCommandAsync(cmd, ConvertToSqlConnection(connection), null, commandType, commandText, ConvertToSqlParameterArrary(commandParameters, out var recyclingParameters), recyclingParameters, cancellationToken);
                 }
                 else
                 {
                     // SQL Server 要获取 SqlTransaction 对象实例的话连接必须是打开的，所以如果传入 transaction 就可以忽略 connection 参数了。
-                    await PrepareCommandAsync(cmd, null, ConvertToSqlTransaction(transaction), commandType, commandText, ConvertToSqlParameterArrary(commandParameters), cancellationToken);
+                    await PrepareCommandAsync(cmd, null, ConvertToSqlTransaction(transaction), commandType, commandText, ConvertToSqlParameterArrary(commandParameters, out var recyclingParameters), recyclingParameters, cancellationToken);
                 }
 
-                return cancellationToken.HasValue
-                    ? await cmd.ExecuteNonQueryAsync(cancellationToken.Value)
+                return cancellationToken.CanBeCanceled
+                    ? await cmd.ExecuteNonQueryAsync(cancellationToken)
                     : await cmd.ExecuteNonQueryAsync();
             }
             finally
             {
                 cmd.Parameters.Clear();
-                if (mustCloseConnection) connection.Close();
+                if (mustCloseConnection) connection?.Close();
             }
         }
 
@@ -513,7 +654,11 @@ namespace Sweety.Common.DataProvider.SqlServer
         /// <param name="commandText">存储过程名或 <c>T-SQL</c> 语句。</param> 
         /// <param name="commandParameters">参数数组，如果没有参数则为 <c>null</c>。</param> 
         /// <returns>返回结果集中的第一行第一列的数据。</returns>
+#if NETSTANDARD2_0
         protected override object ExecuteScalar(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters)
+#else
+        protected override object ExecuteScalar(IDbConnection? connection, IDbTransaction? transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters)
+#endif // NETSTANDARD2_0
         {
             if (transaction != null)
             {
@@ -530,12 +675,12 @@ namespace Sweety.Common.DataProvider.SqlServer
             {
                 if (transaction == null)
                 {
-                    PrepareCommand(cmd, ConvertToSqlConnection(connection), null, commandType, commandText, ConvertToSqlParameterArrary(commandParameters), out mustCloseConnection);
+                    PrepareCommand(cmd, ConvertToSqlConnection(connection), null, commandType, commandText, ConvertToSqlParameterArrary(commandParameters, out var recyclingParameters), recyclingParameters, out mustCloseConnection);
                 }
                 else
                 {
                     // SQL Server 要获取 SqlTransaction 对象实例的话连接必须是打开的，所以如果传入 transaction 就可以忽略 connection 参数了。
-                    PrepareCommand(cmd, null, ConvertToSqlTransaction(transaction), commandType, commandText, ConvertToSqlParameterArrary(commandParameters), out _);
+                    PrepareCommand(cmd, null, ConvertToSqlTransaction(transaction), commandType, commandText, ConvertToSqlParameterArrary(commandParameters, out var recyclingParameters), recyclingParameters, out _);
                 }
 
                 return cmd.ExecuteScalar();
@@ -557,7 +702,11 @@ namespace Sweety.Common.DataProvider.SqlServer
         /// <param name="commandParameters">参数数组，如果没有参数则为 <c>null</c>。</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <returns>返回结果集中的第一行第一列的数据。</returns>
-        protected override async Task<object> ExecuteScalarAsync(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, CancellationToken? cancellationToken = null)
+#if NETSTANDARD2_0
+        protected override async Task<object> ExecuteScalarAsync(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, CancellationToken cancellationToken = default)
+#else
+        protected override async Task<object> ExecuteScalarAsync(IDbConnection? connection, IDbTransaction? transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, CancellationToken cancellationToken = default)
+#endif // NETSTANDARD2_0
         {
             if (transaction != null)
             {
@@ -575,16 +724,16 @@ namespace Sweety.Common.DataProvider.SqlServer
                 if (transaction == null)
                 {
                     mustCloseConnection = connection.State != ConnectionState.Open;
-                    await PrepareCommandAsync(cmd, ConvertToSqlConnection(connection), null, commandType, commandText, ConvertToSqlParameterArrary(commandParameters), cancellationToken);
+                    await PrepareCommandAsync(cmd, ConvertToSqlConnection(connection), null, commandType, commandText, ConvertToSqlParameterArrary(commandParameters, out var recyclingParameters), recyclingParameters, cancellationToken);
                 }
                 else
                 {
                     // SQL Server 要获取 SqlTransaction 对象实例的话连接必须是打开的，所以如果传入 transaction 就可以忽略 connection 参数了。
-                    await PrepareCommandAsync(cmd, null, ConvertToSqlTransaction(transaction), commandType, commandText, ConvertToSqlParameterArrary(commandParameters), cancellationToken);
+                    await PrepareCommandAsync(cmd, null, ConvertToSqlTransaction(transaction), commandType, commandText, ConvertToSqlParameterArrary(commandParameters, out var recyclingParameters), recyclingParameters, cancellationToken);
                 }
 
-                return cancellationToken.HasValue
-                    ? await cmd.ExecuteScalarAsync(cancellationToken.Value)
+                return cancellationToken.CanBeCanceled
+                    ? await cmd.ExecuteScalarAsync(cancellationToken)
                     : await cmd.ExecuteScalarAsync();
             }
             finally
@@ -605,7 +754,11 @@ namespace Sweety.Common.DataProvider.SqlServer
         /// <param name="commandParameters">参数数组，如果没有参数则为 <c>null</c>。</param> 
         /// <param name="connectionOwnership">标识数据库连接对象由调用者提供还是有此类或直接或间接子类提供。</param> 
         /// <returns>返回包含结果集的数据读取器。</returns> 
+#if NETSTANDARD2_0
         protected override IDataReader ExecuteReader(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, SqlConnectionOwnership connectionOwnership)
+#else
+        protected override IDataReader ExecuteReader(IDbConnection? connection, IDbTransaction? transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, SqlConnectionOwnership connectionOwnership)
+#endif // NETSTANDARD2_0
         {
             if (transaction != null)
             {
@@ -622,12 +775,12 @@ namespace Sweety.Common.DataProvider.SqlServer
             {
                 if (transaction == null)
                 {
-                    PrepareCommand(cmd, ConvertToSqlConnection(connection), null, commandType, commandText, ConvertToSqlParameterArrary(commandParameters), out mustCloseConnection);
+                    PrepareCommand(cmd, ConvertToSqlConnection(connection), null, commandType, commandText, ConvertToSqlParameterArrary(commandParameters, out var recyclingParameters), recyclingParameters, out mustCloseConnection);
                 }
                 else
                 {
                     // SQL Server 要获取 SqlTransaction 对象实例的话连接必须是打开的，所以如果传入 transaction 就可以忽略 connection 参数了。
-                    PrepareCommand(cmd, null, ConvertToSqlTransaction(transaction), commandType, commandText, ConvertToSqlParameterArrary(commandParameters), out _);
+                    PrepareCommand(cmd, null, ConvertToSqlTransaction(transaction), commandType, commandText, ConvertToSqlParameterArrary(commandParameters, out var recyclingParameters), recyclingParameters, out _);
                 }
 
 
@@ -659,7 +812,11 @@ namespace Sweety.Common.DataProvider.SqlServer
         /// <param name="connectionOwnership">标识数据库连接对象由调用者提供还是有此类或直接或间接子类提供。</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <returns>返回包含结果集的数据读取器。</returns>
-        protected override async Task<IDataReader> ExecuteReaderAsync(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, SqlConnectionOwnership connectionOwnership, CancellationToken? cancellationToken = null)
+#if NETSTANDARD2_0
+        protected override async Task<IDataReader> ExecuteReaderAsync(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, SqlConnectionOwnership connectionOwnership, CancellationToken cancellationToken = default)
+#else
+        protected override async Task<IDataReader> ExecuteReaderAsync(IDbConnection? connection, IDbTransaction? transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, SqlConnectionOwnership connectionOwnership, CancellationToken cancellationToken = default)
+#endif // NETSTANDARD2_0
         {
             if (transaction != null)
             {
@@ -677,22 +834,22 @@ namespace Sweety.Common.DataProvider.SqlServer
                 if (transaction == null)
                 {
                     mustCloseConnection = connection.State != ConnectionState.Open;
-                    await PrepareCommandAsync(cmd, ConvertToSqlConnection(connection), null, commandType, commandText, ConvertToSqlParameterArrary(commandParameters), cancellationToken);
+                    await PrepareCommandAsync(cmd, ConvertToSqlConnection(connection), null, commandType, commandText, ConvertToSqlParameterArrary(commandParameters, out var recyclingParameters), recyclingParameters, cancellationToken);
                 }
                 else
                 {
                     // SQL Server 要获取 SqlTransaction 对象实例的话连接必须是打开的，所以如果传入 transaction 就可以忽略 connection 参数了。
-                    await PrepareCommandAsync(cmd, null, ConvertToSqlTransaction(transaction), commandType, commandText, ConvertToSqlParameterArrary(commandParameters), cancellationToken);
+                    await PrepareCommandAsync(cmd, null, ConvertToSqlTransaction(transaction), commandType, commandText, ConvertToSqlParameterArrary(commandParameters, out var recyclingParameters), recyclingParameters, cancellationToken);
                 }
 
 
                 // 创建数据阅读器 
                 return await (connectionOwnership == SqlConnectionOwnership.External
-                    ? cancellationToken.HasValue
-                        ? cmd.ExecuteReaderAsync(cancellationToken.Value)
+                    ? cancellationToken.CanBeCanceled
+                        ? cmd.ExecuteReaderAsync(cancellationToken)
                         : cmd.ExecuteReaderAsync()
-                    : cancellationToken.HasValue
-                        ? cmd.ExecuteReaderAsync(CommandBehavior.CloseConnection, cancellationToken.Value)
+                    : cancellationToken.CanBeCanceled
+                        ? cmd.ExecuteReaderAsync(CommandBehavior.CloseConnection, cancellationToken)
                         : cmd.ExecuteReaderAsync(CommandBehavior.CloseConnection));
             }
             catch
@@ -714,29 +871,53 @@ namespace Sweety.Common.DataProvider.SqlServer
         /// 将 <see cref="IDataParameter"/>[] 转换为 <see cref="SqlParameter[]"/> 类型。
         /// </summary>
         /// <param name="parameters">参数集。</param>
+        /// <param name="recycling">指示调用方是否需要调用 <see cref="ArrayPool{T}.Return(T[], bool)"/> 方法回收返回的数据。</param>
         /// <returns>如果 <paramref name="parameters"/> 为 <c>null</c> 或包含零个元素则返回 <c>null</c>，否则返回 <see cref="SqlParameter[]"/>。</returns>
-        private SqlParameter[] ConvertToSqlParameterArrary(IDataParameter[] parameters)
+#if NETSTANDARD2_0
+        private SqlParameter[] ConvertToSqlParameterArrary(IDataParameter[] parameters, out bool recycling)
+#else
+        private SqlParameter[]? ConvertToSqlParameterArrary(IDataParameter[]? parameters, out bool recycling)
+#endif // NETSTANDARD2_0
         {
-            if (parameters == null || parameters.Length == 0) return null;
-
-            if (parameters is SqlParameter[] result) return result;
-
-            result = new SqlParameter[parameters.Length];
-            for (int i = 0; i < parameters.Length; i++)
+            if (parameters == null || parameters.Length == 0)
             {
-                if (parameters[i] == null)
+                recycling = false;
+                return null;
+            }
+
+            if (parameters is SqlParameter[] result)
+            {
+                recycling = false;
+                return result;
+            }
+
+
+            result = ArrayPool<SqlParameter>.Shared.Rent(parameters.Length);
+            try
+            {
+                for (int i = 0; i < parameters.Length; i++)
                 {
-                    if (BreakWhenParametersElementIsNull)
+                    if (parameters[i] == null)
                     {
-                        break;
+                        if (BreakWhenParametersElementIsNull)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            continue;
+                        }
                     }
-                    else
-                    {
-                        continue;
-                    }
+
+                    result[i] = (SqlParameter)parameters[i];
                 }
 
-                result[i] = (SqlParameter)parameters[i];
+                recycling = true;
+            }
+            catch
+            {
+                recycling = false;
+                ArrayPool<SqlParameter>.Shared.Return(result, true);
             }
 
             return result;
@@ -748,7 +929,11 @@ namespace Sweety.Common.DataProvider.SqlServer
         /// <param name="conn"><see cref="SqlConnection"/> 对象。</param>
         /// <returns>返回 <see cref="SqlConnection"/> 对象实例。</returns>
         /// <exception cref="ArgumentException">如果 <paramref name="conn"/> 不是 <see cref="SqlConnection"/> 对象实例且不能转换成 <see cref="SqlConnection"/> 对象实例则抛出此异常。</exception>
+#if NETSTANDARD2_0
         private SqlConnection ConvertToSqlConnection(IDbConnection conn)
+#else
+        private SqlConnection ConvertToSqlConnection(IDbConnection? conn)
+#endif // NETSTANDARD2_0
         {
             if (!(conn is SqlConnection result)) throw new ArgumentException(String.Format(Properties.LocalizationResources.this_instance_only_accepts_database_connection_objects_of_type_XXX, "System.Data.SqlClient.SqlConnection"), nameof(conn));
 
@@ -761,7 +946,11 @@ namespace Sweety.Common.DataProvider.SqlServer
         /// <param name="tran"><see cref="SqlTransaction"/> 对象实例。</param>
         /// <returns>返回 <see cref="SqlTransaction"/> 对象实例。</returns>
         /// <exception cref="ArgumentException">如果 <paramref name="tran"/> 不是 <see cref="SqlTransaction"/> 对象实例且不能转换成 <see cref="SqlTransaction"/> 对象实例则抛出此异常。</exception>
+#if NETSTANDARD2_0
         private SqlTransaction ConvertToSqlTransaction(IDbTransaction tran)
+#else
+        private SqlTransaction ConvertToSqlTransaction(IDbTransaction? tran)
+#endif // NETSTANDARD2_0
         {
             if (!(tran is SqlTransaction result)) throw new ArgumentException(String.Format(Properties.LocalizationResources.this_instance_only_accepts_transaction_objects_of_type_XXX, "System.Data.SqlClient.SqlTransaction"), nameof(tran));
 
@@ -777,10 +966,17 @@ namespace Sweety.Common.DataProvider.SqlServer
         /// </summary>
         /// <param name="command">命令对象实例。</param> 
         /// <param name="commandParameters">参数数组。</param>
+        /// <param name="recyclingParameters">指示是否需要调用 <see cref="ArrayPool{T}.Return(T[], bool)"/> 方法回收 <paramref name="commandParameters"/> 参数。</param>
         /// <exception cref="ArgumentNullException">当 <paramref name="command"/> 为 <c>null</c> 是引发此异常。</exception>
-        private void AttachParameters(SqlCommand command, SqlParameter[] commandParameters)
+        private void AttachParameters(SqlCommand command, SqlParameter[] commandParameters, bool recyclingParameters)
         {
-            if (command == null) throw new ArgumentNullException(nameof(command));
+            if (command == null)
+            {
+                if (recyclingParameters) ArrayPool<SqlParameter>.Shared.Return(commandParameters, true);
+
+                throw new ArgumentNullException(nameof(command));
+            }
+
             if (commandParameters != null)
             {
                 foreach (SqlParameter p in commandParameters)
@@ -799,6 +995,8 @@ namespace Sweety.Common.DataProvider.SqlServer
                         break;
                     }
                 }
+
+                if (recyclingParameters) ArrayPool<SqlParameter>.Shared.Return(commandParameters, true);
             }
         }
 
@@ -811,8 +1009,13 @@ namespace Sweety.Common.DataProvider.SqlServer
         /// <param name="commandType">命令类型 (存储过程，文本命令，其它)。</param> 
         /// <param name="commandText">存储过程名或 <c>T-SQL</c> 命令。</param> 
         /// <param name="commandParameters">和命令相关联的参数数组，如果没有参数为 <c>null</c>。</param> 
+        /// <param name="recyclingParameters">指示是否需要调用 <see cref="ArrayPool{T}.Return(T[], bool)"/> 方法回收 <paramref name="commandParameters"/> 参数。</param>
         /// <param name="mustCloseConnection">如果连接是打开的则为 <c>true</c>，否则为 <c>false</c>。</param> 
-        private void PrepareCommand(SqlCommand command, SqlConnection connection, SqlTransaction transaction, CommandType commandType, string commandText, SqlParameter[] commandParameters, out bool mustCloseConnection)
+#if NETSTANDARD2_0
+        private void PrepareCommand(SqlCommand command, SqlConnection connection, SqlTransaction transaction, CommandType commandType, string commandText, SqlParameter[] commandParameters, bool recyclingParameters, out bool mustCloseConnection)
+#else
+        private void PrepareCommand(SqlCommand command, SqlConnection? connection, SqlTransaction? transaction, CommandType commandType, string commandText, SqlParameter[]? commandParameters, bool recyclingParameters, out bool mustCloseConnection)
+#endif // NETSTANDARD2_0
         {
             if (command == null) throw new ArgumentNullException(nameof(command));
             if (commandText == null || commandText.Length == 0) throw new ArgumentNullException(nameof(commandText));
@@ -820,7 +1023,7 @@ namespace Sweety.Common.DataProvider.SqlServer
             command.CommandType = commandType;
             command.CommandText = commandText;
 
-            if (commandParameters != null) AttachParameters(command, commandParameters);
+            if (commandParameters != null) AttachParameters(command, commandParameters, recyclingParameters);
 
             if (transaction == null)
             {
@@ -854,11 +1057,12 @@ namespace Sweety.Common.DataProvider.SqlServer
         /// <param name="commandType">命令类型 (存储过程，文本命令，其它)。</param> 
         /// <param name="commandText">存储过程名或 <c>T-SQL</c> 命令。</param> 
         /// <param name="commandParameters">和命令相关联的参数数组，如果没有参数为 <c>null</c>。</param> 
+        /// <param name="recyclingParameters">指示是否需要调用 <see cref="ArrayPool{T}.Return(T[], bool)"/> 方法回收 <paramref name="commandParameters"/> 参数。</param>
         /// <param name="cancellationToken">传播取消操作通知的 <c>Token</c>。</param>
 #if NETSTANDARD2_0
-        private async Task PrepareCommandAsync(SqlCommand command, SqlConnection connection, SqlTransaction transaction, CommandType commandType, string commandText, SqlParameter[] commandParameters, CancellationToken? cancellationToken = null)
+        private async Task PrepareCommandAsync(SqlCommand command, SqlConnection connection, SqlTransaction transaction, CommandType commandType, string commandText, SqlParameter[] commandParameters, bool recyclingParameters, CancellationToken cancellationToken = default)
 #else
-        private async ValueTask PrepareCommandAsync(SqlCommand command, SqlConnection connection, SqlTransaction transaction, CommandType commandType, string commandText, SqlParameter[] commandParameters, CancellationToken? cancellationToken = null)
+        private async ValueTask PrepareCommandAsync(SqlCommand command, SqlConnection? connection, SqlTransaction? transaction, CommandType commandType, string commandText, SqlParameter[]? commandParameters, bool recyclingParameters, CancellationToken cancellationToken = default)
 #endif
         {
             if (command == null) throw new ArgumentNullException(nameof(command));
@@ -867,7 +1071,7 @@ namespace Sweety.Common.DataProvider.SqlServer
             command.CommandType = commandType;
             command.CommandText = commandText;
 
-            if (commandParameters != null) AttachParameters(command, commandParameters);
+            if (commandParameters != null) AttachParameters(command, commandParameters, recyclingParameters);
 
             if (transaction == null)
             {
@@ -875,9 +1079,9 @@ namespace Sweety.Common.DataProvider.SqlServer
 
                 if (connection.State != ConnectionState.Open)
                 {
-                    if (cancellationToken.HasValue)
+                    if (cancellationToken.CanBeCanceled)
                     {
-                        await connection.OpenAsync(cancellationToken.Value);
+                        await connection.OpenAsync(cancellationToken);
                     }
                     else
                     {

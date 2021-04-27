@@ -22,14 +22,14 @@ namespace Sweety.Common.Cryptography
     using System.Text;
     using System.Security.Cryptography;
 
-    
+
     /// <summary>
     /// 计算哈希值的类。
     /// </summary>
     internal class InternalHash : IHash, IDisposable
     {
-        private HashAlgorithm _hash = null;
-        private string _algorithmName = null;
+        private readonly HashAlgorithm _hash;
+        private string _algorithmName = String.Empty;
 
         /// <summary>
         /// 构建一个哈希函数对象实例。
@@ -37,9 +37,7 @@ namespace Sweety.Common.Cryptography
         /// <param name="hash">实际执行哈希算法的哈希函数类型。</param>
         internal InternalHash(HashAlgorithm hash)
         {
-            if (hash == null) throw new ArgumentNullException(nameof(hash));
-
-            _hash = hash;
+            _hash = hash ?? throw new ArgumentNullException(nameof(hash));
         }
 
 
@@ -48,7 +46,7 @@ namespace Sweety.Common.Cryptography
         {
             get
             {
-                if (_algorithmName == null)
+                if (_algorithmName.Length == 0)
                 {
                     _algorithmName = _hash.GetType().Name;
                 }
@@ -66,7 +64,7 @@ namespace Sweety.Common.Cryptography
         public byte[] GetHash(byte[] bytes, int start)
         {
             if (bytes == null) throw new ArgumentNullException(nameof(bytes));
-            if (start < 0 || start >= bytes.Length) throw new ArgumentOutOfRangeException(nameof(start)); 
+            if (start < 0 || start >= bytes.Length) throw new ArgumentOutOfRangeException(nameof(start));
 
             return _hash.ComputeHash(bytes, start, bytes.Length - start);
         }
@@ -209,7 +207,7 @@ namespace Sweety.Common.Cryptography
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
             if (stream.CanRead == false) throw new ArgumentException(Properties.Localization.the_stream_does_not_support_read_operations, nameof(stream));
-            
+
             return _hash.ComputeHash(stream);
         }
 
@@ -230,7 +228,6 @@ namespace Sweety.Common.Cryptography
         public void Dispose()
         {
             _hash.Dispose();
-            _hash = null;
         }
         #endregion IHash interface implementation.
     }

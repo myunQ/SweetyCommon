@@ -31,6 +31,29 @@ namespace Sweety.Common.DataProvider
     /// </summary>
     public abstract class RelationalDBUtilityBase : IRelationalDBUtility
     {
+        /// <summary>
+        /// 辅助数据库服务器之间实现轮询的类。
+        /// 用于记录当前使用的数据库连接字符串。
+        /// </summary>
+        /// <remarks>
+        /// 对同一个数据库的所有数据库操作对象实例都应该共享此对象的同一个实例，这样才是实现轮询的效果。
+        /// </remarks>
+        public class ServersPolling
+        {
+            /// <summary>
+            /// 所有数据库链接（主数据库和从数据库）的连接字符串集合的索引。
+            /// </summary>
+            public int _allConnStrIndex = -1;
+            /// <summary>
+            /// 主数据库链接字符串集合的索引。
+            /// </summary>
+            public int _masterConnStrIndex = -1;
+            /// <summary>
+            /// 从数据库链接字符串集合的索引。
+            /// </summary>
+            public int _slaveConnStrIndex = -1;
+        }
+
         /// <summary> 
         /// 枚举,标识数据库连接是由SqlHelper提供还是由调用者提供 
         /// </summary> 
@@ -45,39 +68,43 @@ namespace Sweety.Common.DataProvider
         /// <summary>
         /// 存放主库连接字符串和从库连接字符串，主库连接字符串放在前。
         /// </summary>
-        protected static string[] __allConnStr;
+        protected string[] _allConnStr;
         /// <summary>
         /// 存放主库连接字符串。
         /// </summary>
-        protected static string[] __masterConnStr;
+        protected string[] _masterConnStr;
         /// <summary>
         /// 存放从库连接字符串。
         /// </summary>
-        protected static string[] __slaveConnStr;
+#if NETSTANDARD2_0
+        protected string[] _slaveConnStr;
+#else
+        protected string[]? _slaveConnStr;
+#endif //NETSTANDARD2_0
         /*
         /// <summary>
         /// 表示数据库连接字符串指向的数据库服务器现在是否可用。
         /// </summary>
-        protected static bool[] __usableAllConnStr;
+        protected bool[] _usableAllConnStr;
         /// <summary>
         /// 表示数据库连接字符串指向的数据库服务器现在是否可用。
         /// </summary>
-        protected static bool[] __usableMasterConnStr;
+        protected bool[] _usableMasterConnStr;
         /// <summary>
         /// 表示数据库连接字符串指向的数据库服务器现在是否可用。
         /// </summary>
-        protected static bool[] __usableSlaveConnStr;
+        protected bool[] _usableSlaveConnStr;
         */
 
-
-        static int __allConnStrIndex = 0;
-        static int __masterConnStrIndex = 0;
-        static int __slaveConnStrIndex = 0;
-
+#if NETSTANDARD2_0
+        readonly ServersPolling _polling;
+#else
+        readonly ServersPolling? _polling;
+#endif
         /// <summary>
         /// 所有数据库链接（主数据库和从数据库）的连接字符串集合的索引。
         /// </summary>
-        protected int _allConnStrIndex = -1;
+        protected int _allConnStrIndex = 0;
         /// <summary>
         /// 主数据库链接字符串集合的索引。
         /// </summary>
@@ -85,9 +112,9 @@ namespace Sweety.Common.DataProvider
         /// <summary>
         /// 从数据库链接字符串集合的索引。
         /// </summary>
-        protected int _slaveConnStrIndex = -1;
+        protected int _slaveConnStrIndex = 0;
 
-
+#if NETSTANDARD2_0
         protected object _modelInstance = null;              //model object.
         protected object _listInstance = null;               //IList<T>
         protected object _setInstance = null;                //ISet<T>
@@ -99,48 +126,95 @@ namespace Sweety.Common.DataProvider
         protected object _funBuildSetInstance = null;        //Func<T>
         protected object _funBuildCollectionInstance = null; //Func<T>
         protected object _funBuildDictionaryInstance = null; //Func<T>
+#else
+        protected object? _modelInstance = null;              //model object.
+        protected object? _listInstance = null;               //IList<T>
+        protected object? _setInstance = null;                //ISet<T>
+        protected object? _collectionInstance = null;         //ICollection<T>
+        protected object? _dictionaryInstance = null;         //IDictionary<TKey, TValue>
 
-        DatabaseServerRole _targetRole = DatabaseServerRole.Master;
+        protected object? _funBuildModelInstance = null;      //Func<T>
+        protected object? _funBuildListInstance = null;       //Func<T>
+        protected object? _funBuildSetInstance = null;        //Func<T>
+        protected object? _funBuildCollectionInstance = null; //Func<T>
+        protected object? _funBuildDictionaryInstance = null; //Func<T>
+#endif //NETSTANDARD2_0
 
+        DatabaseServerRole _targetRole;
 
         /// <summary>
-        /// 设置数据库连接字符串集合。
+        /// 创建数据库操作对象实例。
         /// </summary>
-        /// <remarks>
-        /// 在调用构造函数构造对象实例前，必须先调用此方法进行初始化。
-        /// </remarks>
+        /// <param name="connStr">数据库链接字符串。</param>
+        public RelationalDBUtilityBase(string connStr)
+        {
+            if (String.IsNullOrWhiteSpace(connStr)) throw new ArgumentNullException(nameof(connStr));
+
+            _polling = null;
+            _slaveConnStr = null;
+            _targetRole = DatabaseServerRole.Master;
+            _masterConnStr = _allConnStr = new string[] { connStr };
+        }
+
+        /// <summary>
+        /// 创建数据库操作对象实例。
+        /// </summary>
+        /// <param name="polling">表示应使用的数据库连接字符串索引，辅助实现数据库服务器轮询。</param>
         /// <param name="masterConnStr">主数据库服务器链接字符串集合。</param>
         /// <param name="slaveConnStr">从数据库服务器链接字符串集合。</param>
         /// <exception cref="ArgumentNullException">当<paramref name="masterConnStr"/>为<c>null</c>时引发此异常。</exception>
         /// <exception cref="ArgumentException">当<paramref name="masterConnStr"/>不包含任何元素或<paramref name="masterConnStr"/>、<paramref name="slaveConnStr"/>包含<c>null</c>、Unicode空白字符时引发此异常。</exception>
-        public static void Initialize(string[] masterConnStr, string[] slaveConnStr = null)
+#if NETSTANDARD2_0
+        public RelationalDBUtilityBase(ServersPolling polling, string[] masterConnStr, string[] slaveConnStr)
+#else
+        public RelationalDBUtilityBase(ServersPolling polling, string[] masterConnStr, string[]? slaveConnStr)
+#endif //NETSTANDARD2_0
+            : this(polling, DatabaseServerRole.Master, masterConnStr, slaveConnStr)
         {
+
+        }
+
+        /// <summary>
+        /// 创建数据库操作对象实例。
+        /// </summary>
+        /// <param name="polling">表示应使用的数据库连接字符串索引，辅助实现数据库服务器轮询。</param>
+        /// <param name="role">要使用什么角色的数据库服务器。</param>
+        /// <param name="masterConnStr">主数据库服务器链接字符串集合。</param>
+        /// <param name="slaveConnStr">从数据库服务器链接字符串集合。</param>
+        /// <exception cref="ArgumentNullException">当<paramref name="masterConnStr"/>为<c>null</c>时引发此异常。</exception>
+        /// <exception cref="ArgumentException">当<paramref name="masterConnStr"/>不包含任何元素或<paramref name="masterConnStr"/>、<paramref name="slaveConnStr"/>包含<c>null</c>、Unicode空白字符时引发此异常。</exception>
+#if NETSTANDARD2_0
+        public RelationalDBUtilityBase(ServersPolling polling, DatabaseServerRole role, string[] masterConnStr, string[] slaveConnStr)
+#else
+        public RelationalDBUtilityBase(ServersPolling polling, DatabaseServerRole role, string[] masterConnStr, string[]? slaveConnStr)
+#endif //NETSTANDARD2_0
+        {
+            _polling = polling ?? throw new ArgumentNullException(nameof(polling));
             if (masterConnStr == null) throw new ArgumentNullException(nameof(masterConnStr));
             if (masterConnStr.Length == 0) throw new ArgumentException(Properties.Localization.please_specify_the_main_database_connection_string, nameof(masterConnStr));
 
             if (slaveConnStr == null || slaveConnStr.Length == 0)
             {
-                __allConnStr = new string[masterConnStr.Length];
-                __masterConnStr = new string[masterConnStr.Length];
-                Array.Copy(masterConnStr, __masterConnStr, masterConnStr.Length);
-                Array.Copy(masterConnStr, __allConnStr, masterConnStr.Length);
-                __slaveConnStr = null;
+                _masterConnStr = new string[masterConnStr.Length];
+                Array.Copy(masterConnStr, _masterConnStr, masterConnStr.Length);
+                _allConnStr = _masterConnStr;
+                _slaveConnStr = null;
             }
             else
             {
-                __allConnStr = new string[masterConnStr.Length + slaveConnStr.Length];
-                __masterConnStr = new string[masterConnStr.Length];
-                __slaveConnStr = new string[slaveConnStr.Length];
-                Array.Copy(masterConnStr, __masterConnStr, masterConnStr.Length);
-                Array.Copy(slaveConnStr, __slaveConnStr, slaveConnStr.Length);
+                _allConnStr = new string[masterConnStr.Length + slaveConnStr.Length];
+                _masterConnStr = new string[masterConnStr.Length];
+                _slaveConnStr = new string[slaveConnStr.Length];
+                Array.Copy(masterConnStr, _masterConnStr, masterConnStr.Length);
+                Array.Copy(slaveConnStr, _slaveConnStr, slaveConnStr.Length);
 
-                Array.Copy(masterConnStr, __allConnStr, masterConnStr.Length);
-                Array.Copy(slaveConnStr, 0, __allConnStr, masterConnStr.Length, slaveConnStr.Length);
+                Array.Copy(masterConnStr, _allConnStr, masterConnStr.Length);
+                Array.Copy(slaveConnStr, 0, _allConnStr, masterConnStr.Length, slaveConnStr.Length);
             }
 
-            for (int i = 0; i < __allConnStr.Length; i++)
+            for (int i = 0; i < _allConnStr.Length; i++)
             {
-                if (String.IsNullOrWhiteSpace(__allConnStr[i]))
+                if (String.IsNullOrWhiteSpace(_allConnStr[i]))
                 {
                     if (i < masterConnStr.Length)
                     {
@@ -152,20 +226,9 @@ namespace Sweety.Common.DataProvider
                     }
                 }
             }
+
+            TargetRole = role;
         }
-
-
-        /// <summary>
-        /// 构造函数，创建数据库操作对象实例。
-        /// </summary>
-        public RelationalDBUtilityBase()
-        {
-            if (__masterConnStr == null) throw new InvalidOperationException(String.Format(Properties.Localization.please_call_the_static_method_XXX_to_initialize_before_constructing_the_instance, nameof(Initialize)));
-
-            NextServer();
-        }
-
-
 
         /// <summary>
         /// 一条SQL语句中IN运算符中最多放置多少个值。值的多数量取决于是否能使用索引和整体SQL语句有没有超过最大长度。
@@ -185,15 +248,13 @@ namespace Sweety.Common.DataProvider
             get => _targetRole;
             set
             {
-                if (Enum.IsDefined(typeof(DatabaseServerRole), value))
+                if (!Enum.IsDefined(typeof(DatabaseServerRole), value)) throw new ArgumentException(String.Format(Properties.Localization.invalid_value_XXX, value));
+
+                if (_targetRole != value)
                 {
                     _targetRole = value;
 
-                    if ((_targetRole == DatabaseServerRole.MasterOrSlave && _allConnStrIndex == -1)
-                        || (_targetRole == DatabaseServerRole.Slave && _slaveConnStrIndex == -1))
-                    {
-                        NextServer();
-                    }
+                    NextServer();
                 }
             }
         }
@@ -207,11 +268,11 @@ namespace Sweety.Common.DataProvider
                 if (TargetRole == DatabaseServerRole.MasterOrSlave) return _allConnStrIndex;
                 throw new NotSupportedException(String.Format(Properties.Localization.the_value_of_the_property_XXX_is_invalid, nameof(TargetRole)));
             }
-            set
+            protected set
             {
                 if (TargetRole == DatabaseServerRole.Master)
                 {
-                    if (value < __masterConnStr.Length)
+                    if (value > -1 && value < _masterConnStr.Length)
                     {
                         _masterConnStrIndex = value;
                     }
@@ -222,7 +283,7 @@ namespace Sweety.Common.DataProvider
                 }
                 else if (TargetRole == DatabaseServerRole.Slave)
                 {
-                    if (__slaveConnStr != null && value < __slaveConnStr.Length)
+                    if (_slaveConnStr != null && value > -1 && value < _slaveConnStr.Length)
                     {
                         _slaveConnStrIndex = value;
                     }
@@ -233,7 +294,7 @@ namespace Sweety.Common.DataProvider
                 }
                 else if (TargetRole == DatabaseServerRole.MasterOrSlave)
                 {
-                    if (value < __allConnStr.Length)
+                    if (value > -1 && value < _allConnStr.Length)
                     {
                         _allConnStrIndex = value;
                     }
@@ -277,6 +338,218 @@ namespace Sweety.Common.DataProvider
 
         public abstract string WildcardEscape(string value);
 
+
+        public virtual string GetSqlInExpressions(byte bitFields)
+        {
+            return GetSqlInExpressions(bitFields, null, out _);
+        }
+
+        public virtual string GetSqlInExpressions(byte bitFields, out int parameterCount)
+        {
+            return GetSqlInExpressions(bitFields, null, out parameterCount);
+        }
+
+#if NETSTANDARD2_0
+        public virtual string GetSqlInExpressions(byte bitFields, byte[] values, out int parameterCount)
+#else
+        public virtual string GetSqlInExpressions(byte bitFields, byte[]? values, out int parameterCount)
+#endif
+        {
+            StringBuilder strBuilder = new StringBuilder(21); //"1,2,4,8,16,32,64,128,".Length = 21
+            parameterCount = 0;
+
+            if (values == null || values.Length == 0)
+            {
+                for (int i = 0; i < 8; i++)
+                {
+                    int value = 1 << i;
+                    if ((bitFields & value) == value)
+                    {
+                        parameterCount++;
+                        strBuilder.Append(value);
+                        strBuilder.Append(',');
+                    }
+                }
+            }
+            else
+            {
+                foreach (var value in values)
+                {
+                    if ((bitFields & value) == value)
+                    {
+                        parameterCount++;
+                        strBuilder.Append(value);
+                        strBuilder.Append(',');
+                    }
+                }
+            }
+
+            if (parameterCount > 0)
+            {
+                return strBuilder.ToString(0, strBuilder.Length - 1);
+            }
+
+            return String.Empty;
+        }
+
+        public virtual string GetSqlInExpressions(ushort bitFields)
+        {
+            return GetSqlInExpressions(bitFields, null, out _);
+        }
+
+        public virtual string GetSqlInExpressions(ushort bitFields, out int parameterCount)
+        {
+            return GetSqlInExpressions(bitFields, null, out parameterCount);
+        }
+
+#if NETSTANDARD2_0
+        public virtual string GetSqlInExpressions(ushort bitFields, ushort[] values, out int parameterCount)
+#else
+        public virtual string GetSqlInExpressions(ushort bitFields, ushort[]? values, out int parameterCount)
+#endif
+        {
+            StringBuilder strBuilder = new StringBuilder(61); //"1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768," = 61
+            parameterCount = 0;
+
+            if (values == null || values.Length == 0)
+            {
+                for (int i = 0; i < 16; i++)
+                {
+                    int value = 1 << i;
+                    if ((bitFields & value) == value)
+                    {
+                        parameterCount++;
+                        strBuilder.Append(value);
+                        strBuilder.Append(',');
+                    }
+                }
+            }
+            else
+            {
+                foreach (var value in values)
+                {
+                    if ((bitFields & value) == value)
+                    {
+                        parameterCount++;
+                        strBuilder.Append(value);
+                        strBuilder.Append(',');
+                    }
+                }
+            }
+
+            if (parameterCount > 0)
+            {
+                return strBuilder.ToString(0, strBuilder.Length - 1);
+            }
+
+            return String.Empty;
+        }
+
+        public virtual string GetSqlInExpressions(uint bitFields)
+        {
+            return GetSqlInExpressions(bitFields, null, out _);
+        }
+
+        public virtual string GetSqlInExpressions(uint bitFields, out int parameterCount)
+        {
+            return GetSqlInExpressions(bitFields, null, out parameterCount);
+        }
+
+#if NETSTANDARD2_0
+        public virtual string GetSqlInExpressions(uint bitFields, uint[] values, out int parameterCount)
+#else
+        public virtual string GetSqlInExpressions(uint bitFields, uint[]? values, out int parameterCount)
+#endif
+        {
+            StringBuilder strBuilder = new StringBuilder(199); //"1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768,65536,131072,262144,524288,1048576,2097152,4194304,8388608,16777216,33554432,67108864,134217728,268435456,536870912,1073741824,2147483648," = 199
+            parameterCount = 0;
+
+            if (values == null || values.Length == 0)
+            {
+                for (int i = 0; i < 32; i++)
+                {
+                    uint value = 1U << i;
+                    if ((bitFields & value) == value)
+                    {
+                        parameterCount++;
+                        strBuilder.Append(value);
+                        strBuilder.Append(',');
+                    }
+                }
+            }
+            else
+            {
+                foreach (var value in values)
+                {
+                    if ((bitFields & value) == value)
+                    {
+                        parameterCount++;
+                        strBuilder.Append(value);
+                        strBuilder.Append(',');
+                    }
+                }
+            }
+
+            if (parameterCount > 0)
+            {
+                return strBuilder.ToString(0, strBuilder.Length - 1);
+            }
+
+            return String.Empty;
+        }
+
+        public virtual string GetSqlInExpressions(ulong bitFields)
+        {
+            return GetSqlInExpressions(bitFields, null, out _);
+        }
+
+        public virtual string GetSqlInExpressions(ulong bitFields, out int parameterCount)
+        {
+            return GetSqlInExpressions(bitFields, null, out parameterCount);
+        }
+
+#if NETSTANDARD2_0
+        public virtual string GetSqlInExpressions(ulong bitFields, ulong[] values, out int parameterCount)
+#else
+        public virtual string GetSqlInExpressions(ulong bitFields, ulong[]? values, out int parameterCount)
+#endif
+        {
+            StringBuilder strBuilder = new StringBuilder(704); //"1,2,4,8,16,32,64,128,256,512,1024,2048,4096,8192,16384,32768,65536,131072,262144,524288,1048576,2097152,4194304,8388608,16777216,33554432,67108864,134217728,268435456,536870912,1073741824,2147483648,4294967296,8589934592,17179869184,34359738368,68719476736,137438953472,274877906944,549755813888,1099511627776,2199023255552,4398046511104,8796093022208,17592186044416,35184372088832,70368744177664,140737488355328,281474976710656,562949953421312,1125899906842624,2251799813685248,4503599627370496,9007199254740992,18014398509481984,36028797018963968,72057594037927936,144115188075855872,288230376151711744,576460752303423488,1152921504606846976,2305843009213693952,4611686018427387904,9223372036854775808," = 704
+            parameterCount = 0;
+
+            if (values == null || values.Length == 0)
+            {
+                for (int i = 0; i < 64; i++)
+                {
+                    ulong value = 1UL << i;
+                    if ((bitFields & value) == value)
+                    {
+                        parameterCount++;
+                        strBuilder.Append(value);
+                        strBuilder.Append(',');
+                    }
+                }
+            }
+            else
+            {
+                foreach (var value in values)
+                {
+                    if ((bitFields & value) == value)
+                    {
+                        parameterCount++;
+                        strBuilder.Append(value);
+                        strBuilder.Append(',');
+                    }
+                }
+            }
+
+            if (parameterCount > 0)
+            {
+                return strBuilder.ToString(0, strBuilder.Length - 1);
+            }
+
+            return String.Empty;
+        }
 
 
         public virtual string[] GetSqlInExpressions(IEnumerable<string> parameters)
@@ -410,41 +683,52 @@ namespace Sweety.Common.DataProvider
         {
             if (TargetRole == DatabaseServerRole.Master)
             {
-                if (__masterConnStr.Length == 1)
+                if (_masterConnStr.Length == 1)
                 {
                     if (_masterConnStrIndex != 0) _masterConnStrIndex = 0;
                 }
                 else
                 {
-                    _ = Interlocked.Increment(ref __masterConnStrIndex);
-
-                    _masterConnStrIndex = Interlocked.CompareExchange(ref __masterConnStrIndex, 0, __masterConnStr.Length - 1);
+#if NETSTANDARD2_0
+                    _masterConnStrIndex = Interlocked.Increment(ref _polling._masterConnStrIndex);
+#else
+                    _masterConnStrIndex = Interlocked.Increment(ref _polling!._masterConnStrIndex);
+#endif
+                    _ = Interlocked.CompareExchange(ref _polling._masterConnStrIndex, -1, _masterConnStr.Length - 1);
                 }
             }
             else if (TargetRole == DatabaseServerRole.Slave)
             {
-                if (__slaveConnStr == null || __slaveConnStr.Length == 0) throw new InvalidOperationException(Properties.Localization.the_connection_string_of_the_slave_database_is_not_specified);
+                if (_slaveConnStr == null || _slaveConnStr.Length == 0) throw new InvalidOperationException(Properties.Localization.the_connection_string_of_the_slave_database_is_not_specified);
 
-                if (__slaveConnStr.Length == 1)
+                if (_slaveConnStr.Length == 1)
                 {
                     if (_slaveConnStrIndex != 0) _slaveConnStrIndex = 0;
                 }
                 else
                 {
-                    _ = Interlocked.Increment(ref __slaveConnStrIndex);
-                    _slaveConnStrIndex = Interlocked.CompareExchange(ref __slaveConnStrIndex, 0, __slaveConnStr.Length - 1);
+#if NETSTANDARD2_0
+                    _slaveConnStrIndex = Interlocked.Increment(ref _polling._slaveConnStrIndex);
+#else
+                    _slaveConnStrIndex = Interlocked.Increment(ref _polling!._slaveConnStrIndex);
+#endif
+                    _ = Interlocked.CompareExchange(ref _polling._slaveConnStrIndex, -1, _slaveConnStr.Length - 1);
                 }
             }
             else
             {
-                if (__allConnStr.Length == 1)
+                if (_allConnStr.Length == 1)
                 {
                     if (_allConnStrIndex != 0) _allConnStrIndex = 0;
                 }
                 else
                 {
-                    _ = Interlocked.Increment(ref __allConnStrIndex);
-                    _allConnStrIndex = Interlocked.CompareExchange(ref __allConnStrIndex, 0, __allConnStr.Length - 1);
+#if NETSTANDARD2_0
+                    _allConnStrIndex = Interlocked.Increment(ref _polling._allConnStrIndex);
+#else
+                    _allConnStrIndex = Interlocked.Increment(ref _polling!._allConnStrIndex);
+#endif
+                    _ = Interlocked.CompareExchange(ref _polling._allConnStrIndex, -1, _allConnStr.Length - 1);
                 }
             }
         }
@@ -485,7 +769,6 @@ namespace Sweety.Common.DataProvider
         /// <returns>数据库事务对象实例。</returns>
         public abstract IDbTransaction BuildTransaction(IsolationLevel level);
 
-#if !NETSTANDARD2_0
         /// <summary>
         /// 使用默认数据库链接对象创建数据库事务对象实例。
         /// </summary>
@@ -499,13 +782,68 @@ namespace Sweety.Common.DataProvider
         /// <param name="cancellationToken">表示异步任务是否取消的令牌。</param>
         /// <returns>数据库事务对象实例。</returns>
         public abstract Task<IDbTransaction> BuildTransactionAsync(IsolationLevel level, CancellationToken cancellationToken = default);
-#endif //!NETSTANDARD2_0
 
 
-
+        /// <summary>
+        /// 创建一个参数对象实例。
+        /// </summary>
+        /// <returns>返回一个用于<see cref="IDbCommand"/>的参数对象实例。</returns>
         public abstract IDbDataParameter BuildParameter();
-
+        /// <summary>
+        /// 使用指定参数名和参数值创建一个参数对象实例。
+        /// </summary>
+        /// <param name="parameterName">参数名称。</param>
+        /// <param name="value">参数的值。</param>
+        /// <returns>返回一个用于<see cref="IDbCommand"/>的参数对象实例。</returns>
+#if NETSTANDARD2_0
         public abstract IDbDataParameter BuildParameter(string parameterName, object value);
+#else
+        public abstract IDbDataParameter BuildParameter(string parameterName, object? value);
+#endif
+        /// <summary>
+        /// 使用指定参数名、类型和大小创建一个参数对象实例。
+        /// </summary>
+        /// <param name="parameterName">参数名称。</param>
+        /// <param name="parameterType">参数类型。取值范围为数据库客户端类库提供的参数类型枚举。</param>
+        /// <param name="size">参数大小。</param>
+        /// <returns>返回一个用于<see cref="IDbCommand"/>的参数对象实例。</returns>
+        public abstract IDbDataParameter BuildParameter(string parameterName, int parameterType, int? size);  //如果给 size 赋默认值就会导致 参数值为 int 类型时把值当作参数类型。
+        /// <summary>
+        /// 使用指定参数名、类型、大小和方向创建一个参数对象实例。
+        /// </summary>
+        /// <param name="parameterName">参数名称。</param>
+        /// <param name="direction">参数方向。</param>
+        /// <param name="parameterType">参数类型。取值范围为数据库客户端类库提供的参数类型枚举。</param>
+        /// <param name="size">参数大小。</param>
+        /// <returns>返回一个用于<see cref="IDbCommand"/>的参数对象实例。</returns>
+        public abstract IDbDataParameter BuildParameter(string parameterName, ParameterDirection direction, int parameterType, int? size = default);
+        /// <summary>
+        /// 使用指定参数名、参数值、类型和大小创建一个参数对象实例。
+        /// </summary>
+        /// <param name="parameterName">参数名称。</param>
+        /// <param name="value">参数值。</param>
+        /// <param name="parameterType">参数类型。取值范围为数据库客户端类库提供的参数类型枚举。</param>
+        /// <param name="size">参数大小。</param>
+        /// <returns>返回一个用于<see cref="IDbCommand"/>的参数对象实例。</returns>
+#if NETSTANDARD2_0
+        public abstract IDbDataParameter BuildParameter(string parameterName, object value, int parameterType, int? size = default);
+#else
+        public abstract IDbDataParameter BuildParameter(string parameterName, object? value, int parameterType, int? size = default);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 使用指定参数名、参数值、类型、大小和方向创建一个参数对象实例。
+        /// </summary>
+        /// <param name="parameterName">参数名称。</param>
+        /// <param name="value">参数值。</param>
+        /// <param name="direction">参数方向。</param>
+        /// <param name="parameterType">参数类型。取值范围为数据库客户端类库提供的参数类型枚举。</param>
+        /// <param name="size">参数大小。</param>
+        /// <returns>返回一个用于<see cref="IDbCommand"/>的参数对象实例。</returns>
+#if NETSTANDARD2_0
+        public abstract IDbDataParameter BuildParameter(string parameterName, object value, ParameterDirection direction, int parameterType, int? size = default);
+#else
+        public abstract IDbDataParameter BuildParameter(string parameterName, object? value, ParameterDirection direction, int parameterType, int? size = default);
+#endif //NETSTANDARD2_0
 
 
 
@@ -525,27 +863,27 @@ namespace Sweety.Common.DataProvider
         }
 
 #if NETSTANDARD2_0
-        public Task<int> ExecuteNonQueryAsync(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters)
+        public Task<int> ExecuteNonQueryAsync(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
 #else
-        public ValueTask<int> ExecuteNonQueryAsync(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters)
+        public ValueTask<int> ExecuteNonQueryAsync(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
 #endif
         {
             return ExecuteNonQueryAsync(BuildConnection(), null, cmdType, cmdText, parameters, cancellationToken);
         }
 
 #if NETSTANDARD2_0
-        public Task<int> ExecuteNonQueryAsync(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters)
+        public Task<int> ExecuteNonQueryAsync(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
 #else
-        public ValueTask<int> ExecuteNonQueryAsync(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters)
+        public ValueTask<int> ExecuteNonQueryAsync(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
 #endif
         {
             return ExecuteNonQueryAsync(null, tran, cmdType, cmdText, parameters, cancellationToken);
         }
 
 #if NETSTANDARD2_0
-        public Task<int> ExecuteNonQueryAsync(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters)
+        public Task<int> ExecuteNonQueryAsync(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
 #else
-        public ValueTask<int> ExecuteNonQueryAsync(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters)
+        public ValueTask<int> ExecuteNonQueryAsync(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
 #endif
         {
             return ExecuteNonQueryAsync(conn, null, cmdType, cmdText, parameters, cancellationToken);
@@ -568,17 +906,17 @@ namespace Sweety.Common.DataProvider
             return ExecuteReader(conn, null, cmdType, cmdText, parameters, SqlConnectionOwnership.External);
         }
 
-        public virtual Task<IDataReader> GetReaderAsync(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters)
+        public virtual Task<IDataReader> GetReaderAsync(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
         {
             return ExecuteReaderAsync(BuildConnection(), null, cmdType, cmdText, parameters, SqlConnectionOwnership.External, cancellationToken);
         }
 
-        public virtual Task<IDataReader> GetReaderAsync(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters)
+        public virtual Task<IDataReader> GetReaderAsync(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
         {
             return ExecuteReaderAsync(conn, null, cmdType, cmdText, parameters, SqlConnectionOwnership.External, cancellationToken);
         }
 
-        public virtual Task<IDataReader> GetReaderAsync(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters)
+        public virtual Task<IDataReader> GetReaderAsync(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
         {
             return ExecuteReaderAsync(null, tran, cmdType, cmdText, parameters, SqlConnectionOwnership.External, cancellationToken);
         }
@@ -600,24 +938,30 @@ namespace Sweety.Common.DataProvider
             return ObjectToScalar<T>(ExecuteScalar(conn, null, cmdType, cmdText, parameters));
         }
 
-        public virtual async Task<T> GetScalarAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters)
+        public virtual async Task<T> GetScalarAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
         {
             return ObjectToScalar<T>(await ExecuteScalarAsync(BuildConnection(), null, cmdType, cmdText, parameters, cancellationToken));
         }
 
-        public virtual async Task<T> GetScalarAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters)
+        public virtual async Task<T> GetScalarAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
         {
-            return ObjectToScalar<T>(await ExecuteScalarAsync(BuildConnection(), null, cmdType, cmdText, parameters, cancellationToken));
+            return ObjectToScalar<T>(await ExecuteScalarAsync(tran.Connection, tran, cmdType, cmdText, parameters, cancellationToken));
         }
 
-        public virtual async Task<T> GetScalarAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters)
+        public virtual async Task<T> GetScalarAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
         {
-            return ObjectToScalar<T>(await ExecuteScalarAsync(BuildConnection(), null, cmdType, cmdText, parameters, cancellationToken));
+            return ObjectToScalar<T>(await ExecuteScalarAsync(conn, null, cmdType, cmdText, parameters, cancellationToken));
         }
 
 
 
+#if NETSTANDARD2_0
         public virtual IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+#elif NETSTANDARD2_1
+        public virtual IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where TKey : notnull
+#else
+        public virtual IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where TKey : notnull
+#endif //NETSTANDARD2_0
         {
             using (var reader = GetReader(cmdText, cmdType, parameters))
             {
@@ -625,7 +969,13 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+#if NETSTANDARD2_0
         public virtual IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+#elif NETSTANDARD2_1
+        public virtual IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where TKey : notnull
+#else
+        public virtual IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where TKey : notnull
+#endif //NETSTANDARD2_0
         {
             using (var reader = GetReader(tran, cmdText, cmdType, parameters))
             {
@@ -633,7 +983,13 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+#if NETSTANDARD2_0
         public virtual IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+#elif NETSTANDARD2_1
+        public virtual IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where TKey : notnull
+#else
+        public virtual IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where TKey : notnull
+#endif //NETSTANDARD2_0
         {
             using (var reader = GetReader(conn, cmdText, cmdType, parameters))
             {
@@ -641,7 +997,13 @@ namespace Sweety.Common.DataProvider
             }
         }
 
-        public virtual async Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters)
+#if NETSTANDARD2_0
+        public virtual async Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+#elif NETSTANDARD2_1
+        public virtual async Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where TKey : notnull
+#else
+        public virtual async Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where TKey : notnull
+#endif //NETSTANDARD2_0
         {
             using (var reader = (DbDataReader)await GetReaderAsync(cmdText, cmdType, cancellationToken, parameters))
             {
@@ -649,7 +1011,13 @@ namespace Sweety.Common.DataProvider
             }
         }
 
-        public virtual async Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters)
+#if NETSTANDARD2_0
+        public virtual async Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+#elif NETSTANDARD2_1
+        public virtual async Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where TKey : notnull
+#else
+        public virtual async Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where TKey : notnull
+#endif //NETSTANDARD2_0
         {
             using (var reader = (DbDataReader)await GetReaderAsync(tran, cmdText, cmdType, cancellationToken, parameters))
             {
@@ -657,7 +1025,13 @@ namespace Sweety.Common.DataProvider
             }
         }
 
-        public virtual async Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters)
+#if NETSTANDARD2_0
+        public virtual async Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+#elif NETSTANDARD2_1
+        public virtual async Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where TKey : notnull
+#else
+        public virtual async Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where TKey : notnull
+#endif //NETSTANDARD2_0
         {
             using (var reader = (DbDataReader)await GetReaderAsync(conn, cmdText, cmdType, cancellationToken, parameters))
             {
@@ -667,7 +1041,11 @@ namespace Sweety.Common.DataProvider
 
 
 
+#if NETSTANDARD2_0
         public virtual T GetSingle<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+#else
+        public virtual T? GetSingle<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+#endif //NETSTANDARD2_0
         {
             using (var reader = GetReader(cmdText, cmdType, parameters))
             {
@@ -675,7 +1053,11 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+#if NETSTANDARD2_0
         public virtual T GetSingle<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+#else
+        public virtual T? GetSingle<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+#endif //NETSTANDARD2_0
         {
             using (var reader = GetReader(tran, cmdText, cmdType, parameters))
             {
@@ -683,7 +1065,11 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+#if NETSTANDARD2_0
         public virtual T GetSingle<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+#else
+        public virtual T? GetSingle<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+#endif //NETSTANDARD2_0
         {
             using (var reader = GetReader(conn, cmdText, cmdType, parameters))
             {
@@ -691,7 +1077,11 @@ namespace Sweety.Common.DataProvider
             }
         }
 
-        public virtual async Task<T> GetSingleAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters) where T : class
+#if NETSTANDARD2_0
+        public virtual async Task<T> GetSingleAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
+#else
+        public virtual async Task<T?> GetSingleAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
+#endif //NETSTANDARD2_0
         {
             using (var reader = (DbDataReader)await GetReaderAsync(cmdText, cmdType, cancellationToken, parameters))
             {
@@ -699,7 +1089,11 @@ namespace Sweety.Common.DataProvider
             }
         }
 
-        public virtual async Task<T> GetSingleAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters) where T : class
+#if NETSTANDARD2_0
+        public virtual async Task<T> GetSingleAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
+#else
+        public virtual async Task<T?> GetSingleAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
+#endif //NETSTANDARD2_0
         {
             using (var reader = (DbDataReader)await GetReaderAsync(tran, cmdText, cmdType, cancellationToken, parameters))
             {
@@ -707,7 +1101,11 @@ namespace Sweety.Common.DataProvider
             }
         }
 
-        public virtual async Task<T> GetSingleAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters) where T : class
+#if NETSTANDARD2_0
+        public virtual async Task<T> GetSingleAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
+#else
+        public virtual async Task<T?> GetSingleAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
+#endif //NETSTANDARD2_0
         {
             using (var reader = (DbDataReader)await GetReaderAsync(conn, cmdText, cmdType, cancellationToken, parameters))
             {
@@ -732,24 +1130,28 @@ namespace Sweety.Common.DataProvider
 
 
 
-        public virtual bool TryGetSingle<T>(ref T structure, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct
+        public virtual bool TryGetSingle<T>(ref T? structure, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct
         {
             throw new NotImplementedException();
         }
 
-        public virtual bool TryGetSingle<T>(ref T structure, IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct
+        public virtual bool TryGetSingle<T>(ref T? structure, IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct
         {
             throw new NotImplementedException();
         }
 
-        public virtual bool TryGetSingle<T>(ref T structure, IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct
+        public virtual bool TryGetSingle<T>(ref T? structure, IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct
         {
             throw new NotImplementedException();
         }
 
 
 
+#if NETSTANDARD2_0
         public virtual IList<T> GetList<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+#else
+        public virtual IList<T>? GetList<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+#endif //NETSTANDARD2_0
         {
             using (var reader = GetReader(cmdText, cmdType, parameters))
             {
@@ -757,7 +1159,11 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+#if NETSTANDARD2_0
         public virtual IList<T> GetList<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+#else
+        public virtual IList<T>? GetList<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+#endif //NETSTANDARD2_0
         {
             using (var reader = GetReader(tran, cmdText, cmdType, parameters))
             {
@@ -765,7 +1171,11 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+#if NETSTANDARD2_0
         public virtual IList<T> GetList<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+#else
+        public virtual IList<T>? GetList<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+#endif //NETSTANDARD2_0
         {
             using (var reader = GetReader(conn, cmdText, cmdType, parameters))
             {
@@ -773,7 +1183,11 @@ namespace Sweety.Common.DataProvider
             }
         }
 
-        public virtual async Task<IList<T>> GetListAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters)
+#if NETSTANDARD2_0
+        public virtual async Task<IList<T>> GetListAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+#else
+        public virtual async Task<IList<T>?> GetListAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+#endif //NETSTANDARD2_0
         {
             using (var reader = (DbDataReader)await GetReaderAsync(cmdText, cmdType, cancellationToken, parameters))
             {
@@ -781,7 +1195,11 @@ namespace Sweety.Common.DataProvider
             }
         }
 
-        public virtual async Task<IList<T>> GetListAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters)
+#if NETSTANDARD2_0
+        public virtual async Task<IList<T>> GetListAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+#else
+        public virtual async Task<IList<T>?> GetListAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+#endif //NETSTANDARD2_0
         {
             using (var reader = (DbDataReader)await GetReaderAsync(tran, cmdText, cmdType, cancellationToken, parameters))
             {
@@ -789,7 +1207,11 @@ namespace Sweety.Common.DataProvider
             }
         }
 
-        public virtual async Task<IList<T>> GetListAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters)
+#if NETSTANDARD2_0
+        public virtual async Task<IList<T>> GetListAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+#else
+        public virtual async Task<IList<T>?> GetListAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+#endif //NETSTANDARD2_0
         {
             using (var reader = (DbDataReader)await GetReaderAsync(conn, cmdText, cmdType, cancellationToken, parameters))
             {
@@ -799,7 +1221,11 @@ namespace Sweety.Common.DataProvider
 
 
 
+#if NETSTANDARD2_0
         public virtual ISet<T> GetSet<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+#else
+        public virtual ISet<T>? GetSet<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+#endif //NETSTANDARD2_0
         {
             using (var reader = GetReader(cmdText, cmdType, parameters))
             {
@@ -807,7 +1233,11 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+#if NETSTANDARD2_0
         public virtual ISet<T> GetSet<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+#else
+        public virtual ISet<T>? GetSet<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+#endif //NETSTANDARD2_0
         {
             using (var reader = GetReader(tran, cmdText, cmdType, parameters))
             {
@@ -815,7 +1245,11 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+#if NETSTANDARD2_0
         public virtual ISet<T> GetSet<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+#else
+        public virtual ISet<T>? GetSet<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+#endif //NETSTANDARD2_0
         {
             using (var reader = GetReader(conn, cmdText, cmdType, parameters))
             {
@@ -823,7 +1257,11 @@ namespace Sweety.Common.DataProvider
             }
         }
 
-        public virtual async Task<ISet<T>> GetSetAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters)
+#if NETSTANDARD2_0
+        public virtual async Task<ISet<T>> GetSetAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+#else
+        public virtual async Task<ISet<T>?> GetSetAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+#endif //NETSTANDARD2_0
         {
             using (var reader = (DbDataReader)await GetReaderAsync(cmdText, cmdType, cancellationToken, parameters))
             {
@@ -831,7 +1269,11 @@ namespace Sweety.Common.DataProvider
             }
         }
 
-        public virtual async Task<ISet<T>> GetSetAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters)
+#if NETSTANDARD2_0
+        public virtual async Task<ISet<T>> GetSetAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+#else
+        public virtual async Task<ISet<T>?> GetSetAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+#endif //NETSTANDARD2_0
         {
             using (var reader = (DbDataReader)await GetReaderAsync(tran, cmdText, cmdType, cancellationToken, parameters))
             {
@@ -839,7 +1281,11 @@ namespace Sweety.Common.DataProvider
             }
         }
 
-        public virtual async Task<ISet<T>> GetSetAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters)
+#if NETSTANDARD2_0
+        public virtual async Task<ISet<T>> GetSetAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+#else
+        public virtual async Task<ISet<T>?> GetSetAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+#endif //NETSTANDARD2_0
         {
             using (var reader = (DbDataReader)await GetReaderAsync(conn, cmdText, cmdType, cancellationToken, parameters))
             {
@@ -849,7 +1295,11 @@ namespace Sweety.Common.DataProvider
 
 
 
+#if NETSTANDARD2_0
         public virtual ICollection<T> GetCollection<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+#else
+        public virtual ICollection<T>? GetCollection<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+#endif //NETSTANDARD2_0
         {
             using (var reader = GetReader(cmdText, cmdType, parameters))
             {
@@ -857,7 +1307,11 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+#if NETSTANDARD2_0
         public virtual ICollection<T> GetCollection<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+#else
+        public virtual ICollection<T>? GetCollection<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+#endif //NETSTANDARD2_0
         {
             using (var reader = GetReader(tran, cmdText, cmdType, parameters))
             {
@@ -865,7 +1319,11 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+#if NETSTANDARD2_0
         public virtual ICollection<T> GetCollection<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+#else
+        public virtual ICollection<T>? GetCollection<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+#endif //NETSTANDARD2_0
         {
             using (var reader = GetReader(conn, cmdText, cmdType, parameters))
             {
@@ -873,7 +1331,11 @@ namespace Sweety.Common.DataProvider
             }
         }
 
-        public virtual async Task<ICollection<T>> GetCollectionAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters)
+#if NETSTANDARD2_0
+        public virtual async Task<ICollection<T>> GetCollectionAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+#else
+        public virtual async Task<ICollection<T>?> GetCollectionAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+#endif //NETSTANDARD2_0
         {
             using (var reader = (DbDataReader)await GetReaderAsync(cmdText, cmdType, cancellationToken, parameters))
             {
@@ -882,7 +1344,11 @@ namespace Sweety.Common.DataProvider
         }
 
 
-        public virtual async Task<ICollection<T>> GetCollectionAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters)
+#if NETSTANDARD2_0
+        public virtual async Task<ICollection<T>> GetCollectionAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+#else
+        public virtual async Task<ICollection<T>?> GetCollectionAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+#endif //NETSTANDARD2_0
         {
             using (var reader = (DbDataReader)await GetReaderAsync(tran, cmdText, cmdType, cancellationToken, parameters))
             {
@@ -890,7 +1356,11 @@ namespace Sweety.Common.DataProvider
             }
         }
 
-        public virtual async Task<ICollection<T>> GetCollectionAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters)
+#if NETSTANDARD2_0
+        public virtual async Task<ICollection<T>> GetCollectionAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+#else
+        public virtual async Task<ICollection<T>?> GetCollectionAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+#endif //NETSTANDARD2_0
         {
             using (var reader = (DbDataReader)await GetReaderAsync(conn, cmdText, cmdType, cancellationToken, parameters))
             {
@@ -911,7 +1381,11 @@ namespace Sweety.Common.DataProvider
         /// <param name="commandText">存储过程名或T-SQL语句</param> 
         /// <param name="commandParameters">参数数组,如果没有参数则为<c>null</c></param> 
         /// <returns>返回受影响的记录数</returns>
+#if NETSTANDARD2_0
         protected abstract int ExecuteNonQuery(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters);
+#else
+        protected abstract int ExecuteNonQuery(IDbConnection? connection, IDbTransaction? transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters);
+#endif //NETSTANDARD2_0
         /// <summary>
         /// 异步执行指定 T-SQL 命令。
         /// </summary>
@@ -923,9 +1397,9 @@ namespace Sweety.Common.DataProvider
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <returns>返回受影响的记录数</returns>
 #if NETSTANDARD2_0
-        protected abstract Task<int> ExecuteNonQueryAsync(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, CancellationToken? cancellationToken = null);
+        protected abstract Task<int> ExecuteNonQueryAsync(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, CancellationToken cancellationToken = default);
 #else
-        protected abstract ValueTask<int> ExecuteNonQueryAsync(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, CancellationToken? cancellationToken = null);
+        protected abstract ValueTask<int> ExecuteNonQueryAsync(IDbConnection? connection, IDbTransaction? transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, CancellationToken cancellationToken = default);
 #endif
 
         /// <summary>
@@ -937,7 +1411,11 @@ namespace Sweety.Common.DataProvider
         /// <param name="commandText">存储过程名或T-SQL语句</param> 
         /// <param name="commandParameters">参数数组,如果没有参数则为<c>null</c></param> 
         /// <returns>返回结果集中的第一行第一列的数据。</returns>
+#if NETSTANDARD2_0
         protected abstract object ExecuteScalar(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters);
+#else
+        protected abstract object ExecuteScalar(IDbConnection? connection, IDbTransaction? transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters);
+#endif //NETSTANDARD2_0
         /// <summary>
         /// 异步执行指定 T-SQL 命令，返回结果集中的第一行第一列的数据。
         /// </summary>
@@ -948,7 +1426,11 @@ namespace Sweety.Common.DataProvider
         /// <param name="commandParameters">参数数组,如果没有参数则为<c>null</c></param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <returns>返回结果集中的第一行第一列的数据。</returns>
-        protected abstract Task<object> ExecuteScalarAsync(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, CancellationToken? cancellationToken = null);
+#if NETSTANDARD2_0
+        protected abstract Task<object> ExecuteScalarAsync(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, CancellationToken cancellationToken = default);
+#else
+        protected abstract Task<object> ExecuteScalarAsync(IDbConnection? connection, IDbTransaction? transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, CancellationToken cancellationToken = default);
+#endif //NETSTANDARD2_0
 
         /// <summary> 
         /// 执行指定 T-SQL 命令，返回结果集的数据读取器。
@@ -960,7 +1442,11 @@ namespace Sweety.Common.DataProvider
         /// <param name="commandParameters">参数数组,如果没有参数则为<c>null</c></param> 
         /// <param name="connectionOwnership">标识数据库连接对象由调用者提供还是有此类或直接或间接子类提供。</param> 
         /// <returns>返回包含结果集的数据读取器</returns> 
+#if NETSTANDARD2_0
         protected abstract IDataReader ExecuteReader(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, SqlConnectionOwnership connectionOwnership);
+#else
+        protected abstract IDataReader ExecuteReader(IDbConnection? connection, IDbTransaction? transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, SqlConnectionOwnership connectionOwnership);
+#endif //NETSTANDARD2_0
         /// <summary> 
         /// 异步执行指定 T-SQL 命令，返回结果集的数据读取器。
         /// </summary> 
@@ -972,7 +1458,11 @@ namespace Sweety.Common.DataProvider
         /// <param name="connectionOwnership">标识数据库连接对象由调用者提供还是有此类或直接或间接子类提供。</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <returns>返回包含结果集的数据读取器</returns> 
-        protected abstract Task<IDataReader> ExecuteReaderAsync(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, SqlConnectionOwnership connectionOwnership, CancellationToken? cancellationToken = null);
+#if NETSTANDARD2_0
+        protected abstract Task<IDataReader> ExecuteReaderAsync(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, SqlConnectionOwnership connectionOwnership, CancellationToken cancellationToken = default);
+#else
+        protected abstract Task<IDataReader> ExecuteReaderAsync(IDbConnection? connection, IDbTransaction? transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, SqlConnectionOwnership connectionOwnership, CancellationToken cancellationToken = default);
+#endif //NETSTANDARD2_0
 
 
 
@@ -999,6 +1489,7 @@ namespace Sweety.Common.DataProvider
         /// <typeparam name="TValue">值的类型</typeparam>
         /// <param name="reader">数据读取器</param>
         /// <returns>如果读取器里有数据则返回这些数据的键值对集合。如果没有数据则返回<c>null</c>。</returns>
+#if NETSTANDARD2_0
         protected virtual IDictionary<TKey, TValue> ReadToDictionary<TKey, TValue>(IDataReader reader)
         {
             IDictionary<TKey, TValue> result = null;
@@ -1028,21 +1519,12 @@ namespace Sweety.Common.DataProvider
             }
             return result;
         }
-        /// <summary>
-        /// 异步将<paramref name="reader"/>[0]作为键、将<paramref name="reader"/>[1]作为值，读取到键值对集合实例里。
-        /// </summary>
-        /// <typeparam name="TKey">键的类型</typeparam>
-        /// <typeparam name="TValue">值的类型</typeparam>
-        /// <param name="reader">数据读取器</param>
-        /// <param name="cancellationToken">通知任务取消的令牌。</param>
-        /// <returns>如果读取器里有数据则返回这些数据的键值对集合。如果没有数据则返回<c>null</c>。</returns>
-        protected virtual async Task<IDictionary<TKey, TValue>> ReadToDictionaryAsync<TKey, TValue>(DbDataReader reader, CancellationToken? cancellationToken = null)
+#elif NETSTANDARD2_1
+        protected virtual IDictionary<TKey, TValue>? ReadToDictionary<TKey, TValue>(IDataReader reader) where TKey : notnull
         {
-            IDictionary<TKey, TValue> result = null;
+            IDictionary<TKey, TValue>? result = null;
 
-            bool hasCancellationToken = cancellationToken.HasValue;
-
-            if (await (hasCancellationToken ? reader.ReadAsync(cancellationToken.Value) : reader.ReadAsync()))
+            if (reader.Read())
             {
                 if (_dictionaryInstance != null)
                 {
@@ -1061,9 +1543,78 @@ namespace Sweety.Common.DataProvider
 
                 do
                 {
-                    if (hasCancellationToken)
+                    result.Add((TKey)reader[0], reader.IsDBNull(1) ? default : (TValue)reader[1]);
+                }
+                while (reader.Read());
+            }
+            return result;
+        }
+#else
+        protected virtual IDictionary<TKey, TValue?>? ReadToDictionary<TKey, TValue>(IDataReader reader) where TKey : notnull
+        {
+            IDictionary<TKey, TValue?>? result = null;
+
+            if (reader.Read())
+            {
+                if (_dictionaryInstance != null)
+                {
+                    result = (IDictionary<TKey, TValue?>)_dictionaryInstance;
+                    _dictionaryInstance = null;
+                }
+                else if (_funBuildDictionaryInstance != null)
+                {
+                    result = ((Func<IDictionary<TKey, TValue?>>)_funBuildDictionaryInstance)();
+                    _funBuildDictionaryInstance = null;
+                }
+                else
+                {
+                    result = new Dictionary<TKey, TValue?>();
+                }
+
+                do
+                {
+                    result.Add((TKey)reader[0], reader.IsDBNull(1) ? default : (TValue)reader[1]);
+                }
+                while (reader.Read());
+            }
+            return result;
+        }
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 异步将<paramref name="reader"/>[0]作为键、将<paramref name="reader"/>[1]作为值，读取到键值对集合实例里。
+        /// </summary>
+        /// <typeparam name="TKey">键的类型</typeparam>
+        /// <typeparam name="TValue">值的类型</typeparam>
+        /// <param name="reader">数据读取器</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <returns>如果读取器里有数据则返回这些数据的键值对集合。如果没有数据则返回<c>null</c>。</returns>
+#if NETSTANDARD2_0
+        protected virtual async Task<IDictionary<TKey, TValue>> ReadToDictionaryAsync<TKey, TValue>(DbDataReader reader, CancellationToken cancellationToken = default)
+        {
+            IDictionary<TKey, TValue> result = null;
+
+            if (await (cancellationToken.CanBeCanceled ? reader.ReadAsync(cancellationToken) : reader.ReadAsync()))
+            {
+                if (_dictionaryInstance != null)
+                {
+                    result = (IDictionary<TKey, TValue>)_dictionaryInstance;
+                    _dictionaryInstance = null;
+                }
+                else if (_funBuildDictionaryInstance != null)
+                {
+                    result = ((Func<IDictionary<TKey, TValue>>)_funBuildDictionaryInstance)();
+                    _funBuildDictionaryInstance = null;
+                }
+                else
+                {
+                    result = new Dictionary<TKey, TValue>();
+                }
+
+                do
+                {
+                    if (cancellationToken.CanBeCanceled)
                     {
-                        result.Add((TKey)reader[0], await reader.IsDBNullAsync(1, cancellationToken.Value) ? default : (TValue)reader[1]);
+                        result.Add((TKey)reader[0], await reader.IsDBNullAsync(1, cancellationToken) ? default : (TValue)reader[1]);
                     }
                     else
                     {
@@ -1071,10 +1622,87 @@ namespace Sweety.Common.DataProvider
                     }
 
                 }
-                while (await (hasCancellationToken ? reader.ReadAsync(cancellationToken.Value) : reader.ReadAsync()));
+                while (await (cancellationToken.CanBeCanceled ? reader.ReadAsync(cancellationToken) : reader.ReadAsync()));
             }
             return result;
         }
+#elif NETSTANDARD2_1
+        protected virtual async Task<IDictionary<TKey, TValue>?> ReadToDictionaryAsync<TKey, TValue>(DbDataReader reader, CancellationToken cancellationToken = default) where TKey : notnull
+        {
+            IDictionary<TKey, TValue>? result = null;
+
+            if (await (cancellationToken.CanBeCanceled ? reader.ReadAsync(cancellationToken) : reader.ReadAsync()))
+            {
+                if (_dictionaryInstance != null)
+                {
+                    result = (IDictionary<TKey, TValue>)_dictionaryInstance;
+                    _dictionaryInstance = null;
+                }
+                else if (_funBuildDictionaryInstance != null)
+                {
+                    result = ((Func<IDictionary<TKey, TValue>>)_funBuildDictionaryInstance)();
+                    _funBuildDictionaryInstance = null;
+                }
+                else
+                {
+                    result = new Dictionary<TKey, TValue>();
+                }
+
+                do
+                {
+                    if (cancellationToken.CanBeCanceled)
+                    {
+                        result.Add((TKey)reader[0], await reader.IsDBNullAsync(1, cancellationToken) ? default : (TValue)reader[1]);
+                    }
+                    else
+                    {
+                        result.Add((TKey)reader[0], await reader.IsDBNullAsync(1) ? default : (TValue)reader[1]);
+                    }
+
+                }
+                while (await (cancellationToken.CanBeCanceled ? reader.ReadAsync(cancellationToken) : reader.ReadAsync()));
+            }
+            return result;
+        }
+#else
+        protected virtual async Task<IDictionary<TKey, TValue?>?> ReadToDictionaryAsync<TKey, TValue>(DbDataReader reader, CancellationToken cancellationToken = default) where TKey : notnull
+        {
+            IDictionary<TKey, TValue?>? result = null;
+
+            if (await (cancellationToken.CanBeCanceled ? reader.ReadAsync(cancellationToken) : reader.ReadAsync()))
+            {
+                if (_dictionaryInstance != null)
+                {
+                    result = (IDictionary<TKey, TValue?>)_dictionaryInstance;
+                    _dictionaryInstance = null;
+                }
+                else if (_funBuildDictionaryInstance != null)
+                {
+                    result = ((Func<IDictionary<TKey, TValue?>>)_funBuildDictionaryInstance)();
+                    _funBuildDictionaryInstance = null;
+                }
+                else
+                {
+                    result = new Dictionary<TKey, TValue?>();
+                }
+
+                do
+                {
+                    if (cancellationToken.CanBeCanceled)
+                    {
+                        result.Add((TKey)reader[0], await reader.IsDBNullAsync(1, cancellationToken) ? default : (TValue)reader[1]);
+                    }
+                    else
+                    {
+                        result.Add((TKey)reader[0], await reader.IsDBNullAsync(1) ? default : (TValue)reader[1]);
+                    }
+
+                }
+                while (await (cancellationToken.CanBeCanceled ? reader.ReadAsync(cancellationToken) : reader.ReadAsync()));
+            }
+            return result;
+        }
+#endif //NETSTANDARD2_0
 
 
         /// <summary>
@@ -1083,9 +1711,13 @@ namespace Sweety.Common.DataProvider
         /// <typeparam name="T">模型类型</typeparam>
         /// <param name="reader">数据读取器</param>
         /// <returns>如果读取器里有数据则将这些数据写入类型<typeparamref name="T"/>的实例并返回此实例。如果没有数据则返回<c>null</c>。</returns>
+#if NETSTANDARD2_0
         protected virtual T ReadToModel<T>(IDataReader reader) where T : class
+#else
+        protected virtual T? ReadToModel<T>(IDataReader reader) where T : class
+#endif //NETSTANDARD2_0
         {
-            if (!reader.Read()) return null;
+            if (!reader.Read()) return default;
 
             if (_modelInstance != null)
             {
@@ -1111,9 +1743,13 @@ namespace Sweety.Common.DataProvider
         /// <param name="reader">数据读取器</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <returns>如果读取器里有数据则将这些数据写入类型<typeparamref name="T"/>的实例并返回此实例。如果没有数据则返回<c>null</c>。</returns>
+#if NETSTANDARD2_0
         protected virtual async Task<T> ReadToModelAsync<T>(DbDataReader reader, CancellationToken? cancellationToken) where T : class
+#else
+        protected virtual async Task<T?> ReadToModelAsync<T>(DbDataReader reader, CancellationToken? cancellationToken) where T : class
+#endif //NETSTANDARD2_0
         {
-            if (!await (cancellationToken.HasValue ? reader.ReadAsync(cancellationToken.Value) : reader.ReadAsync())) return null;
+            if (!await (cancellationToken.HasValue ? reader.ReadAsync(cancellationToken.Value) : reader.ReadAsync())) return default;
 
             if (_modelInstance != null)
             {
@@ -1148,14 +1784,14 @@ namespace Sweety.Common.DataProvider
             //struct 类型的 t.IsValueType 等于 true，typeCode 等于 TypeCode.Object。
             if ((t.IsValueType && typeCode != TypeCode.Object) || typeCode == TypeCode.String || t == ValueTypeConstants.GuidType)
             {
-                T defaultValue = default;
+                //T defaultValue = default;
                 do
                 {
                     do
                     {
                         if (reader.IsDBNull(0))
                         {
-                            collection.Add(defaultValue);
+                            //collection.Add(defaultValue);
                         }
                         else
                         {
@@ -1206,14 +1842,14 @@ namespace Sweety.Common.DataProvider
             //struct 类型的 t.IsValueType 等于 true，typeCode 等于 TypeCode.Object。
             if ((t.IsValueType && typeCode != TypeCode.Object) || typeCode == TypeCode.String || t == typeof(Guid))
             {
-                T defaultValue = default;
+                //T defaultValue = default;
                 do
                 {
                     do
                     {
                         if (await reader.IsDBNullAsync(0))
                         {
-                            collection.Add(defaultValue);
+                            //collection.Add(defaultValue);
                         }
                         else
                         {
@@ -1274,14 +1910,14 @@ namespace Sweety.Common.DataProvider
             //struct 类型的 t.IsValueType 等于 true，typeCode 等于 TypeCode.Object。
             if ((t.IsValueType && typeCode != TypeCode.Object) || typeCode == TypeCode.String || t == typeof(Guid))
             {
-                T defaultValue = default;
+                //T defaultValue = default;
                 do
                 {
                     do
                     {
                         if (await reader.IsDBNullAsync(0, cancellationToken))
                         {
-                            collection.Add(defaultValue);
+                            //collection.Add(defaultValue);
                         }
                         else
                         {
@@ -1329,9 +1965,15 @@ namespace Sweety.Common.DataProvider
         /// <typeparam name="T">数据类型</typeparam>
         /// <param name="reader">数据读取器</param>
         /// <returns>承载<paramref name="reader"/>数据的对象列表。</returns>
+#if NETSTANDARD2_0
         protected virtual IList<T> ReadToList<T>(IDataReader reader)
         {
             IList<T> result = null;
+#else
+        protected virtual IList<T>? ReadToList<T>(IDataReader reader)
+        {
+            IList<T>? result = null;
+#endif //NETSTANDARD2_0
 
             if (reader.Read())
             {
@@ -1361,11 +2003,17 @@ namespace Sweety.Common.DataProvider
         /// <param name="reader">数据读取器</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <returns>承载<paramref name="reader"/>数据的对象列表。</returns>
-        protected virtual async Task<IList<T>> ReadToListAsync<T>(DbDataReader reader, CancellationToken? cancellationToken = null)
+#if NETSTANDARD2_0
+        protected virtual async Task<IList<T>> ReadToListAsync<T>(DbDataReader reader, CancellationToken cancellationToken = default)
         {
             IList<T> result = null;
+#else
+        protected virtual async Task<IList<T>?> ReadToListAsync<T>(DbDataReader reader, CancellationToken cancellationToken = default)
+        {
+            IList<T>? result = null;
+#endif //NETSTANDARD2_0
 
-            if (await (cancellationToken.HasValue ? reader.ReadAsync(cancellationToken.Value) : reader.ReadAsync()))
+            if (await (cancellationToken.CanBeCanceled ? reader.ReadAsync(cancellationToken) : reader.ReadAsync()))
             {
                 if (_listInstance != null)
                 {
@@ -1382,8 +2030,8 @@ namespace Sweety.Common.DataProvider
                     result = new List<T>();
                 }
 
-                await (cancellationToken.HasValue
-                    ? FillToCollectionAsync<T>(reader, result, cancellationToken.Value)
+                await (cancellationToken.CanBeCanceled
+                    ? FillToCollectionAsync<T>(reader, result, cancellationToken)
                     : FillToCollectionAsync<T>(reader, result));
 
             }
@@ -1397,9 +2045,15 @@ namespace Sweety.Common.DataProvider
         /// <typeparam name="T">数据类型</typeparam>
         /// <param name="reader">数据读取器</param>
         /// <returns>承载<paramref name="reader"/>数据的对象集。</returns>
+#if NETSTANDARD2_0
         protected virtual ISet<T> ReadToSet<T>(IDataReader reader)
         {
             ISet<T> result = null;
+#else
+        protected virtual ISet<T>? ReadToSet<T>(IDataReader reader)
+        {
+            ISet<T>? result = null;
+#endif //NETSTANDARD2_0
 
             if (reader.Read())
             {
@@ -1429,11 +2083,17 @@ namespace Sweety.Common.DataProvider
         /// <param name="reader">数据读取器</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <returns>承载<paramref name="reader"/>数据的对象集。</returns>
-        protected virtual async Task<ISet<T>> ReadToSetAsync<T>(DbDataReader reader, CancellationToken? cancellationToken)
+#if NETSTANDARD2_0
+        protected virtual async Task<ISet<T>> ReadToSetAsync<T>(DbDataReader reader, CancellationToken cancellationToken)
         {
             ISet<T> result = null;
+#else
+        protected virtual async Task<ISet<T>?> ReadToSetAsync<T>(DbDataReader reader, CancellationToken cancellationToken)
+        {
+            ISet<T>? result = null;
+#endif //NETSTANDARD2_0
 
-            if (await (cancellationToken.HasValue ? reader.ReadAsync(cancellationToken.Value) : reader.ReadAsync()))
+            if (await (cancellationToken.CanBeCanceled ? reader.ReadAsync(cancellationToken) : reader.ReadAsync()))
             {
                 if (_setInstance != null)
                 {
@@ -1450,8 +2110,8 @@ namespace Sweety.Common.DataProvider
                     result = new HashSet<T>();
                 }
 
-                await (cancellationToken.HasValue
-                    ? FillToCollectionAsync<T>(reader, result, cancellationToken.Value)
+                await (cancellationToken.CanBeCanceled
+                    ? FillToCollectionAsync<T>(reader, result, cancellationToken)
                     : FillToCollectionAsync<T>(reader, result));
             }
             return result;
@@ -1464,9 +2124,15 @@ namespace Sweety.Common.DataProvider
         /// <typeparam name="T">数据类型</typeparam>
         /// <param name="reader">数据读取器</param>
         /// <returns>承载<paramref name="reader"/>数据的对象集合。</returns>
+#if NETSTANDARD2_0
         protected virtual ICollection<T> ReadToCollection<T>(IDataReader reader)
         {
             ICollection<T> result = null;
+#else
+        protected virtual ICollection<T>? ReadToCollection<T>(IDataReader reader)
+        {
+            ICollection<T>? result = null;
+#endif //NETSTANDARD2_0
 
             if (reader.Read())
             {
@@ -1496,11 +2162,17 @@ namespace Sweety.Common.DataProvider
         /// <param name="reader">数据读取器</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <returns>承载<paramref name="reader"/>数据的对象集合。</returns>
-        protected virtual async Task<ICollection<T>> ReadToCollectionAsync<T>(DbDataReader reader, CancellationToken? cancellationToken)
+#if NETSTANDARD2_0
+        protected virtual async Task<ICollection<T>> ReadToCollectionAsync<T>(DbDataReader reader, CancellationToken cancellationToken)
         {
             ICollection<T> result = null;
+#else
+        protected virtual async Task<ICollection<T>?> ReadToCollectionAsync<T>(DbDataReader reader, CancellationToken cancellationToken)
+        {
+            ICollection<T>? result = null;
+#endif //NETSTANDARD2_0
 
-            if (await (cancellationToken.HasValue ? reader.ReadAsync(cancellationToken.Value) : reader.ReadAsync()))
+            if (await (cancellationToken.CanBeCanceled ? reader.ReadAsync(cancellationToken) : reader.ReadAsync()))
             {
                 if (_collectionInstance != null)
                 {
@@ -1517,8 +2189,8 @@ namespace Sweety.Common.DataProvider
                     result = new List<T>();
                 }
 
-                await (cancellationToken.HasValue
-                    ? FillToCollectionAsync<T>(reader, result, cancellationToken.Value)
+                await (cancellationToken.CanBeCanceled
+                    ? FillToCollectionAsync<T>(reader, result, cancellationToken)
                     : FillToCollectionAsync<T>(reader, result));
             }
             return result;

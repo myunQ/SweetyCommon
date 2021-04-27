@@ -4,8 +4,12 @@
  * Description:
  * 
  * Members Index:
- *      struct
+ *      class
  *          Pagination
+ *          
+ *      struct 
+ *          ValuePagination
+ *          
  * * * * * * * * * * * * * * * * * * * * */
 
 

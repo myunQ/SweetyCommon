@@ -1,157 +1,231 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
-	<resheader name="resmimetype">
-		<value>text/microsoft-resx</value>
-	</resheader>
-	<resheader name="version">
-		<value>2.0</value>
-	</resheader>
-	<resheader name="reader">
-		<value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-	</resheader>
-	<resheader name="writer">
-		<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-	</resheader>
+  <!-- 
+    Microsoft ResX Schema 
     
-    <data name="the stream does not support read operations" xml:space="preserve">
-        <value>流不支持读取操作。</value>
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
     </data>
-    
-    <data name="the stream does not support write operations" xml:space="preserve">
-        <value>流不支持写操作。</value>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
     </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
     
-    <data name="the specified key size is invalid for this algorithm" xml:space="preserve">
-        <value>指定的密钥大小对于此算法无效。</value>
-    </data>
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
     
-    <data name="the specified initialization vector does not match the block size of this algorithm" xml:space="preserve">
-        <value>指定的初始化向量（IV）与此算法的块大小不匹配。</value>
-    </data>
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
     
-    <data name="unknown encryption cipher mode" xml:space="preserve">
-        <value>未知的加密密码模式。</value>
-    </data>
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
     
-    <data name="unknown data block padding mode" xml:space="preserve">
-        <value>未知的数据块填充模式。</value>
-    </data>
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
     
-    <data name="the plaintext cannot be empty" xml:space="preserve">
-        <value>要加密的内容不能为空。</value>
-    </data>
-    
-    <data name="the ciphertext cannot be empty" xml:space="preserve">
-        <value>密文不能为空。</value>
-    </data>
-    
-    <data name="please specify the main database connection string" xml:space="preserve">
-        <value>请指定主数据库连接字符串。</value>
-    </data>
-    
-    <data name="the connection string of the slave database is not specified" xml:space="preserve">
-        <value>没有指定从数据库的连接字符串。</value>
-    </data>
-    
-    <data name="the byte length of the compared strings must not be less than zero" xml:space="preserve">
-        <value>被比较的字符串字节长度不得小于零。</value>
-    </data>
-    
-    <data name="the length of the string to be appended to the end exceeds the length to be intercepted or equal to the length to be intercepted" xml:space="preserve">
-        <value>要追加到末尾的字符串长度超过了要截取的长度或跟要截取长度相等。</value>
-    </data>
-    
-    <data name="the length of bytes after the intercepted string plus the appended string exceeds the expected length" xml:space="preserve">
-        <value>截取的字符串加上附加字符串之后的字节长度超出了预期的长度。</value>
-    </data>
-    
-    <data name="the length of the hexadecimal string should be an even number" xml:space="preserve">
-        <value>十六进制字符串的长度应为偶数。</value>
-    </data>
-    
-    <data name="the read-only collection cannot be modified" xml:space="preserve">
-        <value>不能修改只读集合。</value>
-    </data>
-    
-    <data name="the starting index must be greater than or equal to zero" xml:space="preserve">
-        <value>起始索引必须大于等于零。</value>
-    </data>
-    
-    <data name="the length must be greater than zero" xml:space="preserve">
-        <value>长度必须大于零。</value>
-    </data>
-    
-    <data name="the starting index is not in the valid range" xml:space="preserve">
-        <value>起始索引不在有效范围内。</value>
-    </data>
-    
-    <data name="the page number must be greater than zero" xml:space="preserve">
-        <value>页码必须大于零。</value>
-    </data>
-    
-    <data name="the page size must be greater than zero" xml:space="preserve">
-        <value>每页记录数必须大于零。</value>
-    </data>
-    
-    <data name="the database connection string cannot be null or empty" xml:space="preserve">
-        <value>数据库连接字符串不能是null或空字符串。</value>
-    </data>
-    
-    <data name="the transaction was rollbacked or commited, please provide an open transaction" xml:space="preserve">
-        <value>事务已回滚或提交，请提供一个未完成的事务。</value>
-    </data>
-    
-    <data name="the database connection provided and the database connection used by the transaction must be the same instance" xml:space="preserve">
-        <value>提供的数据库连接与事务使用的数据库连接必须是同一个实例。</value>
-    </data>
-    
-    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
 
-    <data name="the value XXX of type XXXType cannot be converted to a value of type IPAddressType" xml:space="preserve">
-        <value>不能将{1}类型的值“{0}”转换成{2}类型的值。</value>
-    </data>
-    
-    <data name="the XXX property of the encryption algorithm instance contains XXX elements, not just one element" xml:space="preserve">
-        <value>加密算法实例的 {0} 属性含有 {1} 个元素，并非仅含有一个元素。</value>
-    </data>
-    
-    <data name="the element of the master database connection string index XXX is a null or empty string" xml:space="preserve">
-        <value>主数据库连接字符串索引 [{0}] 的元素是 null 或空字符串。</value>
-    </data>
-    
-    <data name="the element of the slave database connection string index XXX is a null or empty string" xml:space="preserve">
-        <value>从数据库连接字符串索引 [{0}] 的元素是 null 或空字符串。</value>
-    </data>
-    
-    <data name="please call the static method XXX to initialize before constructing the instance" xml:space="preserve">
-        <value>请先调用静态方法 {0} 进行初始化在构造实例。</value>
-    </data>
-    
-    <data name="the value of the property XXX is invalid" xml:space="preserve">
-        <value>属性 {0} 的值无效。</value>
-    </data>
-    
-    <data name="the value ranges from XXX to XXX" xml:space="preserve">
-        <value>取值范围在 {0}~{1} 之间。</value>
-    </data>
-    
-    <data name="the value ranges from XXX to XXX milliseconds" xml:space="preserve">
-        <value>取值范围在 {0}~{1} 毫秒之间。</value>
-    </data>
-    
-    <data name="invalid character XXX" xml:space="preserve">
-        <value>无效的字符 '{0}'。</value>
-    </data>
-    
-    <data name="at least XXX bytes" xml:space="preserve">
-        <value>不得少于 {0} 个字节。</value>
-    </data>
-    
-    <data name="this instance only accepts database connection objects of type XXX" xml:space="preserve">
-        <value>此实例仅接受类型为 {0} 的数据库链接对象。</value>
-    </data>
-    
-    <data name="this instance only accepts transaction objects of type XXX" xml:space="preserve">
-        <value>此实例只接受 {0} 类型的事务对象。</value>
-    </data>
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="the stream does not support read operations" xml:space="preserve">
+    <value>流不支持读取操作。</value>
+  </data>
+  <data name="the stream does not support write operations" xml:space="preserve">
+    <value>流不支持写操作。</value>
+  </data>
+  <data name="the specified key size is invalid for this algorithm" xml:space="preserve">
+    <value>指定的密钥大小对于此算法无效。</value>
+  </data>
+  <data name="the specified initialization vector does not match the block size of this algorithm" xml:space="preserve">
+    <value>指定的初始化向量（IV）与此算法的块大小不匹配。</value>
+  </data>
+  <data name="unknown encryption cipher mode" xml:space="preserve">
+    <value>未知的加密密码模式。</value>
+  </data>
+  <data name="unknown data block padding mode" xml:space="preserve">
+    <value>未知的数据块填充模式。</value>
+  </data>
+  <data name="the plaintext cannot be empty" xml:space="preserve">
+    <value>要加密的内容不能为空。</value>
+  </data>
+  <data name="the ciphertext cannot be empty" xml:space="preserve">
+    <value>密文不能为空。</value>
+  </data>
+  <data name="please specify the main database connection string" xml:space="preserve">
+    <value>请指定主数据库连接字符串。</value>
+  </data>
+  <data name="the connection string of the slave database is not specified" xml:space="preserve">
+    <value>没有指定从数据库的连接字符串。</value>
+  </data>
+  <data name="the byte length of the compared strings must not be less than zero" xml:space="preserve">
+    <value>被比较的字符串字节长度不得小于零。</value>
+  </data>
+  <data name="the length of the string to be appended to the end exceeds the length to be intercepted or equal to the length to be intercepted" xml:space="preserve">
+    <value>要追加到末尾的字符串长度超过了要截取的长度或跟要截取长度相等。</value>
+  </data>
+  <data name="the length of bytes after the intercepted string plus the appended string exceeds the expected length" xml:space="preserve">
+    <value>截取的字符串加上附加字符串之后的字节长度超出了预期的长度。</value>
+  </data>
+  <data name="the length of the hexadecimal string should be an even number" xml:space="preserve">
+    <value>十六进制字符串的长度应为偶数。</value>
+  </data>
+  <data name="the read-only collection cannot be modified" xml:space="preserve">
+    <value>不能修改只读集合。</value>
+  </data>
+  <data name="the starting index must be greater than or equal to zero" xml:space="preserve">
+    <value>起始索引必须大于等于零。</value>
+  </data>
+  <data name="the length must be greater than zero" xml:space="preserve">
+    <value>长度必须大于零。</value>
+  </data>
+  <data name="the starting index is not in the valid range" xml:space="preserve">
+    <value>起始索引不在有效范围内。</value>
+  </data>
+  <data name="the page number must be greater than zero" xml:space="preserve">
+    <value>页码必须大于零。</value>
+  </data>
+  <data name="the page size must be greater than zero" xml:space="preserve">
+    <value>每页记录数必须大于零。</value>
+  </data>
+  <data name="the database connection string cannot be null or empty" xml:space="preserve">
+    <value>数据库连接字符串不能是null或空字符串。</value>
+  </data>
+  <data name="the transaction was rollbacked or commited, please provide an open transaction" xml:space="preserve">
+    <value>事务已回滚或提交，请提供一个未完成的事务。</value>
+  </data>
+  <data name="the database connection provided and the database connection used by the transaction must be the same instance" xml:space="preserve">
+    <value>提供的数据库连接与事务使用的数据库连接必须是同一个实例。</value>
+  </data>
+  <data name="the value XXX of type XXXType cannot be converted to a value of type IPAddressType" xml:space="preserve">
+    <value>不能将{1}类型的值“{0}”转换成{2}类型的值。</value>
+  </data>
+  <data name="the XXX property of the encryption algorithm instance contains XXX elements, not just one element" xml:space="preserve">
+    <value>加密算法实例的 {0} 属性含有 {1} 个元素，并非仅含有一个元素。</value>
+  </data>
+  <data name="the element of the master database connection string index XXX is a null or empty string" xml:space="preserve">
+    <value>主数据库连接字符串索引 [{0}] 的元素是 null 或空字符串。</value>
+  </data>
+  <data name="the element of the slave database connection string index XXX is a null or empty string" xml:space="preserve">
+    <value>从数据库连接字符串索引 [{0}] 的元素是 null 或空字符串。</value>
+  </data>
+  <data name="please call the static method XXX to initialize before constructing the instance" xml:space="preserve">
+    <value>请先调用静态方法 {0} 进行初始化在构造实例。</value>
+  </data>
+  <data name="the value of the property XXX is invalid" xml:space="preserve">
+    <value>属性 {0} 的值无效。</value>
+  </data>
+  <data name="the value ranges from XXX to XXX" xml:space="preserve">
+    <value>取值范围在 {0}~{1} 之间。</value>
+  </data>
+  <data name="the value ranges from XXX to XXX milliseconds" xml:space="preserve">
+    <value>取值范围在 {0}~{1} 毫秒之间。</value>
+  </data>
+  <data name="invalid character XXX" xml:space="preserve">
+    <value>无效的字符 ‘{0}’。</value>
+  </data>
+  <data name="at least XXX bytes" xml:space="preserve">
+    <value>不得少于 {0} 个字节。</value>
+  </data>
+  <data name="this instance only accepts database connection objects of type XXX" xml:space="preserve">
+    <value>此实例仅接受类型为 {0} 的数据库链接对象。</value>
+  </data>
+  <data name="this instance only accepts transaction objects of type XXX" xml:space="preserve">
+    <value>此实例只接受 {0} 类型的事务对象。</value>
+  </data>
+  <data name="arguments X and Y cannot be null at the same time" xml:space="preserve">
+    <value>参数 {0} 与 {1} 不能同时为 null。</value>
+  </data>
+  <data name="invalid value XXX" xml:space="preserve">
+    <value>无效的值 ‘{0}’。</value>
+  </data>
 </root>

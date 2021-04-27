@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net5.0;netstandard2.1;netstandard2.0</TargetFrameworks>
-    <PackageVersion>0.0.6</PackageVersion>
+    <PackageVersion>0.0.13</PackageVersion>
     <Authors>Mingyun Qin</Authors>
     <Copyright>Mingyun Qin</Copyright>
     <Owners>Mingyun Qin</Owners>
@@ -44,6 +44,8 @@
   <ItemGroup>
     <Compile Update="Properties\Localization.Designer.cs">
       <DependentUpon>Localization.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
     </Compile>
   </ItemGroup>
 </Project>

@@ -31,6 +31,7 @@
  *          bool TryFromBase64String(this string value, out byte[] result)
  *          string ToSBC(this string str)
  *          string ToDBC(this string str)
+ *          uint JenkinsHash32(this string str)
  *          
  *      
  * * * * * * * * * * * * * * * * * * * * */
@@ -742,6 +743,32 @@ namespace Sweety.Common.Extensions
             if (cArr == null) return str;
 
             return new String(cArr);
+        }
+
+        /// <summary>
+        /// 使用 Jenkins hash 算法计算字符串的哈希值。
+        /// </summary>
+        /// <param name="str">要计算哈希值的字符串。</param>
+        /// <returns>一个 32-bit 的哈希值。</returns>
+        public static uint JenkinsHash32(this string str)
+        {
+            if (str == null) throw new ArgumentNullException(nameof(str));
+
+            // Jenkins one-at-a-time https://en.wikipedia.org/wiki/Jenkins_hash_function
+            unchecked
+            {
+                uint hash = 0;
+                for (var i = 0; i < str.Length; ++i)
+                {
+                    hash += str[i];
+                    hash += (hash << 10);
+                    hash ^= (hash >> 6);
+                }
+                hash += (hash << 3);
+                hash ^= (hash >> 11);
+                hash += (hash << 15);
+                return hash;
+            }
         }
     }
 }

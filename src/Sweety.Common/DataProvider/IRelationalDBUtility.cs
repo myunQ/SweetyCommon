@@ -38,9 +38,9 @@ namespace Sweety.Common.DataProvider
         /// </summary>
         DatabaseServerRole TargetRole { get; set; }
         /// <summary>
-        /// 获取或设置实例当前使用的数据库服务器索引。注意：<see cref="TargetRole"/>将影响此属性。
+        /// 获取当前使用的数据库服务器索引。注意：<see cref="TargetRole"/>将影响此属性。
         /// </summary>
-        int ServerIndex { get; set; }
+        int ServerIndex { get; }
 
         /// <summary>
         /// 使用指定模型对象实例接收<see cref="GetSingle{T}(string, CommandType, IDataParameter[])"/>方法及其重载方法读取到的数据并返回此实例。
@@ -152,31 +152,131 @@ namespace Sweety.Common.DataProvider
         /// <returns>处理后的字符串值</returns>
         string SafeHandler(string value);
 
+        /// <summary>
+        /// 将位域转换成SQL条件的IN里的表达式。
+        /// </summary>
+        /// <param name="bitFields">位域。</param>
+        /// <returns>SQL条件IN的表达式，例如：<c>1,2,4,8,16,32</c>。</returns>
+        string GetSqlInExpressions(byte bitFields);
+        /// <summary>
+        /// 将位域转换成SQL条件的IN里的表达式。
+        /// </summary>
+        /// <param name="bitFields">位域。</param>
+        /// <param name="parameterCount">返回参数总数。也就是返回了 <paramref name="bitFields"/> 中的几个 <c>bit</c>。</param>
+        /// <returns>SQL条件IN的表达式，例如：<c>1,2,4,8,16,32</c>。</returns>
+        string GetSqlInExpressions(byte bitFields, out int parameterCount);
+        /// <summary>
+        /// 将位域转换成SQL条件的IN里的表达式。
+        /// </summary>
+        /// <param name="bitFields">位域。</param>
+        /// <param name="values">位域的可用值。方法返回的所有值都是这里出现过的值。如果为 <c>null</c> 则默认使用 <see cref="byte"/> 的 8 个独立位域值。</param>
+        /// <param name="parameterCount">返回参数总数。也就是返回了 <paramref name="bitFields"/> 中的几个 <c>bit</c>。</param>
+        /// <returns>SQL条件IN的表达式，例如：<c>1,2,4,8,16,32</c>。</returns>
+#if NETSTANDARD2_0
+        string GetSqlInExpressions(byte bitFields, byte[] values, out int parameterCount);
+#else
+        string GetSqlInExpressions(byte bitFields, byte[]? values, out int parameterCount);
+#endif
+        /// <summary>
+        /// 将位域转换成SQL条件的IN里的表达式。
+        /// </summary>
+        /// <param name="bitFields">位域。</param>
+        /// <returns>SQL条件IN的表达式，例如：<c>1,2,4,8,16,32</c>。</returns>
+        string GetSqlInExpressions(ushort bitFields);
+        /// <summary>
+        /// 将位域转换成SQL条件的IN里的表达式。
+        /// </summary>
+        /// <param name="bitFields">位域。</param>
+        /// <param name="parameterCount">返回参数总数。也就是返回了 <paramref name="bitFields"/> 中的几个 <c>bit</c>。</param>
+        /// <returns>SQL条件IN的表达式，例如：<c>1,2,4,8,16,32</c>。</returns>
+        string GetSqlInExpressions(ushort bitFields, out int parameterCount);
+        /// <summary>
+        /// 将位域转换成SQL条件的IN里的表达式。
+        /// </summary>
+        /// <param name="bitFields">位域。</param>
+        /// <param name="values">位域的可用值。方法返回的所有值都是这里出现过的值。如果为 <c>null</c> 则默认使用 <see cref="ushort"/> 的 16 个独立位域值。</param>
+        /// <param name="parameterCount">返回参数总数。也就是返回了 <paramref name="bitFields"/> 中的几个 <c>bit</c>。</param>
+        /// <returns>SQL条件IN的表达式，例如：<c>1,2,4,8,16,32</c>。</returns>
+#if NETSTANDARD2_0
+        string GetSqlInExpressions(ushort bitFields, ushort[] values, out int parameterCount);
+#else
+        string GetSqlInExpressions(ushort bitFields, ushort[]? values, out int parameterCount);
+#endif
+        /// <summary>
+        /// 将位域转换成SQL条件的IN里的表达式。
+        /// </summary>
+        /// <param name="bitFields">位域。</param>
+        /// <returns>SQL条件IN的表达式，例如：<c>1,2,4,8,16,32</c>。</returns>
+        string GetSqlInExpressions(uint bitFields);
+        /// <summary>
+        /// 将位域转换成SQL条件的IN里的表达式。
+        /// </summary>
+        /// <param name="bitFields">位域。</param>
+        /// <param name="parameterCount">返回参数总数。也就是返回了 <paramref name="bitFields"/> 中的几个 <c>bit</c>。</param>
+        /// <returns>SQL条件IN的表达式，例如：<c>1,2,4,8,16,32</c>。</returns>
+        string GetSqlInExpressions(uint bitFields, out int parameterCount);
+        /// <summary>
+        /// 将位域转换成SQL条件的IN里的表达式。
+        /// </summary>
+        /// <param name="bitFields">位域。</param>
+        /// <param name="values">位域的可用值。方法返回的所有值都是这里出现过的值。如果为 <c>null</c> 则默认使用 <see cref="uint"/> 的 32 个独立位域值。</param>
+        /// <param name="parameterCount">返回参数总数。也就是返回了 <paramref name="bitFields"/> 中的几个 <c>bit</c>。</param>
+        /// <returns>SQL条件IN的表达式，例如：<c>1,2,4,8,16,32</c>。</returns>
+#if NETSTANDARD2_0
+        string GetSqlInExpressions(uint bitFields, uint[] values, out int parameterCount);
+#else
+        string GetSqlInExpressions(uint bitFields, uint[]? values, out int parameterCount);
+#endif
+        /// <summary>
+        /// 将位域转换成SQL条件的IN里的表达式。
+        /// </summary>
+        /// <param name="bitFields">位域。</param>
+        /// <returns>SQL条件IN的表达式，例如：<c>1,2,4,8,16,32</c>。</returns>
+        string GetSqlInExpressions(ulong bitFields);
+        /// <summary>
+        /// 将位域转换成SQL条件的IN里的表达式。
+        /// </summary>
+        /// <param name="bitFields">位域。</param>
+        /// <param name="parameterCount">返回参数总数。也就是返回了 <paramref name="bitFields"/> 中的几个 <c>bit</c>。</param>
+        /// <returns>SQL条件IN的表达式，例如：<c>1,2,4,8,16,32</c>。</returns>
+        string GetSqlInExpressions(ulong bitFields, out int parameterCount);
+        /// <summary>
+        /// 将位域转换成SQL条件的IN里的表达式。
+        /// </summary>
+        /// <param name="bitFields">位域。</param>
+        /// <param name="values">位域的可用值。方法返回的所有值都是这里出现过的值。如果为 <c>null</c> 则默认使用 <see cref="ulong"/> 的 64 个独立位域值。</param>
+        /// <param name="parameterCount">返回参数总数。也就是返回了 <paramref name="bitFields"/> 中的几个 <c>bit</c>。</param>
+        /// <returns>SQL条件IN的表达式，例如：<c>1,2,4,8,16,32</c>。</returns>
+#if NETSTANDARD2_0
+        string GetSqlInExpressions(ulong bitFields, ulong[] values, out int parameterCount);
+#else
+        string GetSqlInExpressions(ulong bitFields, ulong[]? values, out int parameterCount);
+#endif
 
         /// <summary>
-        /// 将参数集合转换成多组SQL条件IN里的表达式，同时会对每个元素进行安全处理
+        /// 将参数集合转换成多组SQL条件IN里的表达式，同时会对每个元素进行安全处理。
         /// </summary>
         /// <param name="parameters">参数集合</param>
         /// <returns>SQL条件IN的表达式数组，每个元素不包括任何SQL关键字及括号。</returns>
         string[] GetSqlInExpressions(IEnumerable<string> parameters);
         /// <summary>
-        /// 将参数集合转换成多组SQL条件IN里的表达式，同时会对每个元素进行安全处理
+        /// 将参数集合转换成多组SQL条件IN里的表达式，同时会对每个元素进行安全处理。
         /// </summary>
-        /// <param name="parameters">参数集合</param>
-        /// <param name="parameterCount">返回参数总数</param>
+        /// <param name="parameters">参数集合。</param>
+        /// <param name="parameterCount">返回参数总数。</param>
         /// <returns>SQL条件IN的表达式数组，每个元素不包括任何SQL关键字及括号。</returns>
         string[] GetSqlInExpressions(IEnumerable<string> parameters, out int parameterCount);
         /// <summary>
-        /// 将参数集合转换成多组SQL条件IN里的表达式
+        /// 将参数集合转换成多组SQL条件IN里的表达式。
         /// </summary>
-        /// <param name="parameters">参数集合</param>
+        /// <param name="parameters">参数集合。</param>
         /// <returns>SQL条件IN的表达式数组，每个元素不包括任何SQL关键字及括号。</returns>
         string[] GetSqlInExpressions<T>(IEnumerable<T> parameters) where T : struct;
         /// <summary>
-        /// 将参数集合转换成多组SQL条件IN里的表达式
+        /// 将参数集合转换成多组SQL条件IN里的表达式。
         /// </summary>
-        /// <param name="parameters">参数集合</param>
-        /// <param name="parameterCount">返回参数总数</param>
+        /// <param name="parameters">参数集合。</param>
+        /// <param name="parameterCount">返回参数总数。</param>
         /// <returns>SQL条件IN的表达式数组，每个元素不包括任何SQL关键字及括号。</returns>
         string[] GetSqlInExpressions<T>(IEnumerable<T> parameters, out int parameterCount) where T : struct;
 
@@ -268,7 +368,6 @@ namespace Sweety.Common.DataProvider
         /// <returns>数据库事务对象实例。</returns>
         IDbTransaction BuildTransaction(IsolationLevel level);
 
-#if !NETSTANDARD2_0
         /// <summary>
         /// 使用默认数据库链接对象创建数据库事务对象实例。
         /// </summary>
@@ -282,7 +381,6 @@ namespace Sweety.Common.DataProvider
         /// <param name="cancellationToken">表示异步任务是否取消的令牌。</param>
         /// <returns>数据库事务对象实例。</returns>
         Task<IDbTransaction> BuildTransactionAsync(IsolationLevel level, CancellationToken cancellationToken = default);
-#endif //!NETSTANDARD2_0
 
 
         /// <summary>
@@ -293,10 +391,59 @@ namespace Sweety.Common.DataProvider
         /// <summary>
         /// 使用指定参数名和参数值创建一个参数对象实例。
         /// </summary>
-        /// <param name="parameterName">参数名称</param>
-        /// <param name="value">参数的值</param>
+        /// <param name="parameterName">参数名称。</param>
+        /// <param name="value">参数的值。</param>
         /// <returns>返回一个用于<see cref="IDbCommand"/>的参数对象实例。</returns>
+#if NETSTANDARD2_0
         IDbDataParameter BuildParameter(string parameterName, object value);
+#else
+        IDbDataParameter BuildParameter(string parameterName, object? value);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 使用指定参数名、类型和大小创建一个参数对象实例。
+        /// </summary>
+        /// <param name="parameterName">参数名称。</param>
+        /// <param name="parameterType">参数类型。取值范围为数据库客户端类库提供的参数类型枚举。</param>
+        /// <param name="size">参数大小。</param>
+        /// <returns>返回一个用于<see cref="IDbCommand"/>的参数对象实例。</returns>
+        IDbDataParameter BuildParameter(string parameterName, int parameterType, int? size);  //如果给 size 赋默认值就会导致 参数值为 int 类型时把值当作参数类型。
+        /// <summary>
+        /// 使用指定参数名、类型、大小和方向创建一个参数对象实例。
+        /// </summary>
+        /// <param name="parameterName">参数名称。</param>
+        /// <param name="direction">参数方向。</param>
+        /// <param name="parameterType">参数类型。取值范围为数据库客户端类库提供的参数类型枚举。</param>
+        /// <param name="size">参数大小。</param>
+        /// <returns>返回一个用于<see cref="IDbCommand"/>的参数对象实例。</returns>
+        IDbDataParameter BuildParameter(string parameterName, ParameterDirection direction, int parameterType, int? size = default);
+        /// <summary>
+        /// 使用指定参数名、参数值、类型和大小创建一个参数对象实例。
+        /// </summary>
+        /// <param name="parameterName">参数名称。</param>
+        /// <param name="value">参数值。</param>
+        /// <param name="parameterType">参数类型。取值范围为数据库客户端类库提供的参数类型枚举。</param>
+        /// <param name="size">参数大小。</param>
+        /// <returns>返回一个用于<see cref="IDbCommand"/>的参数对象实例。</returns>
+#if NETSTANDARD2_0
+        IDbDataParameter BuildParameter(string parameterName, object value, int parameterType, int? size = default);
+#else
+        IDbDataParameter BuildParameter(string parameterName, object? value, int parameterType, int? size = default);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 使用指定参数名、参数值、类型、大小和方向创建一个参数对象实例。
+        /// </summary>
+        /// <param name="parameterName">参数名称。</param>
+        /// <param name="value">参数值。</param>
+        /// <param name="direction">参数方向。</param>
+        /// <param name="parameterType">参数类型。取值范围为数据库客户端类库提供的参数类型枚举。</param>
+        /// <param name="size">参数大小。</param>
+        /// <returns>返回一个用于<see cref="IDbCommand"/>的参数对象实例。</returns>
+#if NETSTANDARD2_0
+        IDbDataParameter BuildParameter(string parameterName, object value, ParameterDirection direction, int parameterType, int? size = default);
+#else
+        IDbDataParameter BuildParameter(string parameterName, object? value, ParameterDirection direction, int parameterType, int? size = default);
+#endif //NETSTANDARD2_0
+
 
 
         /// <summary>
@@ -335,9 +482,9 @@ namespace Sweety.Common.DataProvider
         /// <param name="parameters">SQL参数对象数组</param>
         /// <returns>返回受影响的记录数</returns>
 #if NETSTANDARD2_0
-        Task<int> ExecuteNonQueryAsync(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters);
+        Task<int> ExecuteNonQueryAsync(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
 #else
-        ValueTask<int> ExecuteNonQueryAsync(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters);
+        ValueTask<int> ExecuteNonQueryAsync(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
 #endif
         /// <summary>
         /// 异步执行T-SQL命令
@@ -349,9 +496,9 @@ namespace Sweety.Common.DataProvider
         /// <param name="parameters">SQL参数对象数组</param>
         /// <returns>返回受影响的记录数</returns>
 #if NETSTANDARD2_0
-        Task<int> ExecuteNonQueryAsync(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters);
+        Task<int> ExecuteNonQueryAsync(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
 #else
-        ValueTask<int> ExecuteNonQueryAsync(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters);
+        ValueTask<int> ExecuteNonQueryAsync(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
 #endif
         /// <summary>
         /// 异步执行T-SQL命令
@@ -363,9 +510,9 @@ namespace Sweety.Common.DataProvider
         /// <param name="parameters">SQL参数对象数组</param>
         /// <returns>返回受影响的记录数</returns>
 #if NETSTANDARD2_0
-        Task<int> ExecuteNonQueryAsync(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters);
+        Task<int> ExecuteNonQueryAsync(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
 #else
-        ValueTask<int> ExecuteNonQueryAsync(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters);
+        ValueTask<int> ExecuteNonQueryAsync(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
 #endif
 
 
@@ -404,7 +551,7 @@ namespace Sweety.Common.DataProvider
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">SQL参数对象数组</param>
         /// <returns>返回<see cref="System.Data.IDataReader"/>对象实例</returns>
-        Task<IDataReader> GetReaderAsync(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters);
+        Task<IDataReader> GetReaderAsync(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
         /// <summary>
         /// 异步执行T-SQL命令，并生成<see cref="System.Data.IDataReader"/>。
         /// </summary>
@@ -414,7 +561,7 @@ namespace Sweety.Common.DataProvider
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">SQL参数对象数组</param>
         /// <returns>返回<see cref="System.Data.IDataReader"/>对象实例</returns>
-        Task<IDataReader> GetReaderAsync(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters);
+        Task<IDataReader> GetReaderAsync(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
         /// <summary>
         /// 异步执行T-SQL命令，并生成<see cref="System.Data.IDataReader"/>。
         /// </summary>
@@ -424,7 +571,7 @@ namespace Sweety.Common.DataProvider
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">SQL参数对象数组</param>
         /// <returns>返回<see cref="System.Data.IDataReader"/>对象实例</returns>
-        Task<IDataReader> GetReaderAsync(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters);
+        Task<IDataReader> GetReaderAsync(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
 
 
 
@@ -467,7 +614,7 @@ namespace Sweety.Common.DataProvider
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>结果集中第一行的第一列；如果结果集为空，则为预返回类型的默认值。</returns>
-        Task<T> GetScalarAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters);
+        Task<T> GetScalarAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
         /// <summary>
         /// 异步执行查询，并返回查询所返回的结果集中第一行的第一列。忽略其他列或行。
         /// </summary>
@@ -478,7 +625,7 @@ namespace Sweety.Common.DataProvider
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>结果集中第一行的第一列；如果结果集为空，则为预返回类型的默认值。</returns>
-        Task<T> GetScalarAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters);
+        Task<T> GetScalarAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
         /// <summary>
         /// 异步执行查询，并返回查询所返回的结果集中第一行的第一列。忽略其他列或行。
         /// </summary>
@@ -489,7 +636,7 @@ namespace Sweety.Common.DataProvider
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>结果集中第一行的第一列；如果结果集为空，则为预返回类型的默认值。</returns>
-        Task<T> GetScalarAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters);
+        Task<T> GetScalarAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
 
 
         /// <summary>
@@ -501,7 +648,13 @@ namespace Sweety.Common.DataProvider
         /// <param name="cmdType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回键值对集合，没有数据返回null</returns>
+#if NETSTANDARD2_0
         IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+#elif NETSTANDARD2_1
+        IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where TKey : notnull;
+#else
+        IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where TKey : notnull;
+#endif //NETSTANDARD2_0
         /// <summary>
         /// 获取键值对集合
         /// </summary>
@@ -512,7 +665,13 @@ namespace Sweety.Common.DataProvider
         /// <param name="cmdType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回键值对集合，没有数据返回null</returns>
+#if NETSTANDARD2_0
         IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+#elif NETSTANDARD2_1
+        IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where TKey : notnull;
+#else
+        IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where TKey : notnull;
+#endif //NETSTANDARD2_0
         /// <summary>
         /// 获取键值对集合
         /// </summary>
@@ -523,7 +682,13 @@ namespace Sweety.Common.DataProvider
         /// <param name="cmdType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回键值对集合，没有数据返回null</returns>
+#if NETSTANDARD2_0
         IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+#elif NETSTANDARD2_1
+        IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where TKey : notnull;
+#else
+        IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where TKey : notnull;
+#endif //NETSTANDARD2_0
 
         /// <summary>
         /// 异步获取键值对集合
@@ -535,7 +700,13 @@ namespace Sweety.Common.DataProvider
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回键值对集合，没有数据返回null</returns>
-        Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters);
+#if NETSTANDARD2_0
+        Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#elif NETSTANDARD2_1
+        Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where TKey : notnull;
+#else
+        Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where TKey : notnull;
+#endif //NETSTANDARD2_0
         /// <summary>
         /// 异步获取键值对集合
         /// </summary>
@@ -547,7 +718,13 @@ namespace Sweety.Common.DataProvider
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回键值对集合，没有数据返回null</returns>
-        Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters);
+#if NETSTANDARD2_0
+        Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#elif NETSTANDARD2_1
+        Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where TKey : notnull;
+#else
+        Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where TKey : notnull;
+#endif //NETSTANDARD2_0
         /// <summary>
         /// 异步获取键值对集合
         /// </summary>
@@ -559,8 +736,13 @@ namespace Sweety.Common.DataProvider
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回键值对集合，没有数据返回null</returns>
-        Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters);
-
+#if NETSTANDARD2_0
+        Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#elif NETSTANDARD2_1
+        Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where TKey : notnull;
+#else
+        Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where TKey : notnull;
+#endif //NETSTANDARD2_0
 
 
         /// <summary>
@@ -571,7 +753,11 @@ namespace Sweety.Common.DataProvider
         /// <param name="cmdType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回单个实体，没有数据返回null</returns>
+#if NETSTANDARD2_0
         T GetSingle<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class;
+#else
+        T? GetSingle<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class;
+#endif //NETSTANDARD2_0
         /// <summary>
         /// 获取单个实体
         /// </summary>
@@ -581,7 +767,11 @@ namespace Sweety.Common.DataProvider
         /// <param name="cmdType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回单个实体，没有数据返回null</returns>
+#if NETSTANDARD2_0
         T GetSingle<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class;
+#else
+        T? GetSingle<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class;
+#endif //NETSTANDARD2_0
         /// <summary>
         /// 获取单个实体
         /// </summary>
@@ -591,7 +781,11 @@ namespace Sweety.Common.DataProvider
         /// <param name="cmdType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回单个实体，没有数据返回null</returns>
+#if NETSTANDARD2_0
         T GetSingle<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class;
+#else
+        T? GetSingle<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class;
+#endif //NETSTANDARD2_0
 
         /// <summary>
         /// 异步获取单个实体
@@ -602,7 +796,11 @@ namespace Sweety.Common.DataProvider
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回单个实体，没有数据返回null</returns>
-        Task<T> GetSingleAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters) where T : class;
+#if NETSTANDARD2_0
+        Task<T> GetSingleAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class;
+#else
+        Task<T?> GetSingleAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class;
+#endif //NETSTANDARD2_0
         /// <summary>
         /// 异步获取单个实体
         /// </summary>
@@ -613,7 +811,11 @@ namespace Sweety.Common.DataProvider
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回单个实体，没有数据返回null</returns>
-        Task<T> GetSingleAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters) where T : class;
+#if NETSTANDARD2_0
+        Task<T> GetSingleAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class;
+#else
+        Task<T?> GetSingleAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class;
+#endif //NETSTANDARD2_0
         /// <summary>
         /// 异步获取单个实体
         /// </summary>
@@ -624,7 +826,11 @@ namespace Sweety.Common.DataProvider
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回单个实体，没有数据返回null</returns>
-        Task<T> GetSingleAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters) where T : class;
+#if NETSTANDARD2_0
+        Task<T> GetSingleAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class;
+#else
+        Task<T?> GetSingleAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class;
+#endif //NETSTANDARD2_0
 
         /// <summary>
         /// 获取单个实体
@@ -668,7 +874,7 @@ namespace Sweety.Common.DataProvider
         /// <param name="cmdType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>读取到数据返回<c>true</c>，否则返回<c>false</c>。</returns>
-        bool TryGetSingle<T>(ref T structure, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct;
+        bool TryGetSingle<T>(ref T? structure, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct;
         /// <summary>
         /// 获取单个实体
         /// </summary>
@@ -679,7 +885,7 @@ namespace Sweety.Common.DataProvider
         /// <param name="cmdType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>读取到数据返回<c>true</c>，否则返回<c>false</c>。</returns>
-        bool TryGetSingle<T>(ref T structure, IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct;
+        bool TryGetSingle<T>(ref T? structure, IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct;
         /// <summary>
         /// 获取单个实体
         /// </summary>
@@ -690,7 +896,7 @@ namespace Sweety.Common.DataProvider
         /// <param name="cmdType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>读取到数据返回<c>true</c>，否则返回<c>false</c>。</returns>
-        bool TryGetSingle<T>(ref T structure, IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct;
+        bool TryGetSingle<T>(ref T? structure, IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct;
 
 
 
@@ -702,7 +908,11 @@ namespace Sweety.Common.DataProvider
         /// <param name="cmdType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回据列表，没有数据返回null</returns>
+#if NETSTANDARD2_0
         IList<T> GetList<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+#else
+        IList<T>? GetList<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+#endif //NETSTANDARD2_0
         /// <summary>
         /// 获取实体列表
         /// </summary>
@@ -712,7 +922,11 @@ namespace Sweety.Common.DataProvider
         /// <param name="cmdType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回据列表，没有数据返回null</returns>
+#if NETSTANDARD2_0
         IList<T> GetList<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+#else
+        IList<T>? GetList<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+#endif //NETSTANDARD2_0
         /// <summary>
         /// 获取实体列表
         /// </summary>
@@ -722,7 +936,11 @@ namespace Sweety.Common.DataProvider
         /// <param name="cmdType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据列表，没有数据返回null</returns>
+#if NETSTANDARD2_0
         IList<T> GetList<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+#else
+        IList<T>? GetList<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+#endif //NETSTANDARD2_0
 
         /// <summary>
         /// 异步获取实体列表
@@ -733,7 +951,11 @@ namespace Sweety.Common.DataProvider
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回据列表，没有数据返回null</returns>
-        Task<IList<T>> GetListAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters);
+#if NETSTANDARD2_0
+        Task<IList<T>> GetListAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#else
+        Task<IList<T>?> GetListAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#endif //NETSTANDARD2_0
         /// <summary>
         /// 异步获取实体列表
         /// </summary>
@@ -744,7 +966,11 @@ namespace Sweety.Common.DataProvider
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回据列表，没有数据返回null</returns>
-        Task<IList<T>> GetListAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters);
+#if NETSTANDARD2_0
+        Task<IList<T>> GetListAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#else
+        Task<IList<T>?> GetListAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#endif //NETSTANDARD2_0
         /// <summary>
         /// 异步获取实体列表
         /// </summary>
@@ -755,7 +981,11 @@ namespace Sweety.Common.DataProvider
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回据列表，没有数据返回null</returns>
-        Task<IList<T>> GetListAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters);
+#if NETSTANDARD2_0
+        Task<IList<T>> GetListAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#else
+        Task<IList<T>?> GetListAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#endif //NETSTANDARD2_0
 
 
         /// <summary>
@@ -766,7 +996,11 @@ namespace Sweety.Common.DataProvider
         /// <param name="cmdType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集，没有数据返回null</returns>
+#if NETSTANDARD2_0
         ISet<T> GetSet<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+#else
+        ISet<T>? GetSet<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+#endif //NETSTANDARD2_0
         /// <summary>
         /// 获取实体集
         /// </summary>
@@ -776,7 +1010,11 @@ namespace Sweety.Common.DataProvider
         /// <param name="cmdType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集，没有数据返回null</returns>
+#if NETSTANDARD2_0
         ISet<T> GetSet<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+#else
+        ISet<T>? GetSet<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+#endif //NETSTANDARD2_0
         /// <summary>
         /// 获取实体集
         /// </summary>
@@ -786,7 +1024,11 @@ namespace Sweety.Common.DataProvider
         /// <param name="cmdType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集，没有数据返回null</returns>
+#if NETSTANDARD2_0
         ISet<T> GetSet<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+#else
+        ISet<T>? GetSet<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+#endif //NETSTANDARD2_0
 
         /// <summary>
         /// 异步获取实体集
@@ -797,7 +1039,11 @@ namespace Sweety.Common.DataProvider
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集，没有数据返回null</returns>
-        Task<ISet<T>> GetSetAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters);
+#if NETSTANDARD2_0
+        Task<ISet<T>> GetSetAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#else
+        Task<ISet<T>?> GetSetAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#endif //NETSTANDARD2_0
         /// <summary>
         /// 异步获取实体集
         /// </summary>
@@ -808,7 +1054,11 @@ namespace Sweety.Common.DataProvider
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集，没有数据返回null</returns>
-        Task<ISet<T>> GetSetAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters);
+#if NETSTANDARD2_0
+        Task<ISet<T>> GetSetAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#else
+        Task<ISet<T>?> GetSetAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#endif //NETSTANDARD2_0
         /// <summary>
         /// 异步获取实体集
         /// </summary>
@@ -819,7 +1069,11 @@ namespace Sweety.Common.DataProvider
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集，没有数据返回null</returns>
-        Task<ISet<T>> GetSetAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters);
+#if NETSTANDARD2_0
+        Task<ISet<T>> GetSetAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#else
+        Task<ISet<T>?> GetSetAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#endif //NETSTANDARD2_0
 
 
 
@@ -832,7 +1086,11 @@ namespace Sweety.Common.DataProvider
         /// <param name="cmdType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集合，没有数据返回null</returns>
+#if NETSTANDARD2_0
         ICollection<T> GetCollection<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+#else
+        ICollection<T>? GetCollection<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+#endif //NETSTANDARD2_0
         /// <summary>
         /// 获取实体集合
         /// </summary>
@@ -842,7 +1100,11 @@ namespace Sweety.Common.DataProvider
         /// <param name="cmdType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集合，没有数据返回null</returns>
+#if NETSTANDARD2_0
         ICollection<T> GetCollection<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+#else
+        ICollection<T>? GetCollection<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+#endif //NETSTANDARD2_0
         /// <summary>
         /// 获取实体集合
         /// </summary>
@@ -852,7 +1114,11 @@ namespace Sweety.Common.DataProvider
         /// <param name="cmdType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集合，没有数据返回null</returns>
+#if NETSTANDARD2_0
         ICollection<T> GetCollection<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+#else
+        ICollection<T>? GetCollection<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+#endif //NETSTANDARD2_0
 
         /// <summary>
         /// 异步获取实体集合
@@ -863,7 +1129,11 @@ namespace Sweety.Common.DataProvider
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集合，没有数据返回null</returns>
-        Task<ICollection<T>> GetCollectionAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters);
+#if NETSTANDARD2_0
+        Task<ICollection<T>> GetCollectionAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#else
+        Task<ICollection<T>?> GetCollectionAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#endif //NETSTANDARD2_0
         /// <summary>
         /// 异步获取实体集合
         /// </summary>
@@ -874,7 +1144,11 @@ namespace Sweety.Common.DataProvider
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集合，没有数据返回null</returns>
-        Task<ICollection<T>> GetCollectionAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters);
+#if NETSTANDARD2_0
+        Task<ICollection<T>> GetCollectionAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#else
+        Task<ICollection<T>?> GetCollectionAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#endif //NETSTANDARD2_0
         /// <summary>
         /// 异步获取实体集合
         /// </summary>
@@ -885,6 +1159,10 @@ namespace Sweety.Common.DataProvider
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集合，没有数据返回null</returns>
-        Task<ICollection<T>> GetCollectionAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken? cancellationToken = null, params IDataParameter[] parameters);
+#if NETSTANDARD2_0
+        Task<ICollection<T>> GetCollectionAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#else
+        Task<ICollection<T>?> GetCollectionAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#endif //NETSTANDARD2_0
     }
 }

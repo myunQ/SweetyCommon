@@ -44,6 +44,7 @@ namespace Sweety.Common.Properties
         }
 
         #region 同步 Sweety.Common.Properties.Localization 里自动生成的属性。
+        public static string arguments_X_and_Y_cannot_be_null_at_the_same_time => Localization.arguments_X_and_Y_cannot_be_null_at_the_same_time;
         public static string the_database_connection_string_cannot_be_null_or_empty => Localization.the_database_connection_string_cannot_be_null_or_empty;
 
         public static string the_transaction_was_rollbacked_or_commited__please_provide_an_open_transaction => Localization.the_transaction_was_rollbacked_or_commited__please_provide_an_open_transaction;
