@@ -23,7 +23,6 @@
   <ItemGroup>
     <Folder Include="Cryptography\" />
     <Folder Include="Extensions\" />
-    <Folder Include="Verification\" />
     <Folder Include="CustomException\" />
     <Folder Include="Comparer\" />
     <Folder Include="Security\" />
@@ -31,7 +30,6 @@
     <Folder Include="DataProvider\" />
     <Folder Include="Compression\" />
     <Folder Include="Converter\" />
-    <Folder Include="Net\" />
     <Folder Include="Net\Client\" />
     <Folder Include="Properties\" />
   </ItemGroup>
