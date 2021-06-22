@@ -23,7 +23,7 @@ namespace Sweety.Common.Converter
     using System.Collections.Generic;
     using System.Linq.Expressions;
     using System.Reflection;
-    
+
 
     /// <summary>
     /// 动态生成对象属性赋值的拉姆达表达式
@@ -49,11 +49,13 @@ namespace Sweety.Common.Converter
             Properties = new Dictionary<string, Action<T, Object>>(properties.Length, StringComparer.OrdinalIgnoreCase);
 
             Type attribType = typeof(FieldNameAttribute);
+            Type dateTimeKindAttribType = typeof(SpecifierStoredDateTimeKindAttribute);
 
             ParameterExpression pe_instance = Expression.Parameter(modelType, "instance");
             ParameterExpression pe_value = Expression.Parameter(typeof(Object), "value");
 
             MethodInfo hackType = typeof(InternalConvertUtility).GetMethod("HackType", BindingFlags.Static | BindingFlags.NonPublic);
+            MethodInfo specifyKind = ValueTypeConstants.DateTimeType.GetMethod("SpecifyKind", BindingFlags.Static | BindingFlags.Public);
 
             foreach (PropertyInfo p in properties)
             {
@@ -63,15 +65,26 @@ namespace Sweety.Common.Converter
                 string key = (attrib == null) ? p.Name : ((FieldNameAttribute)attrib).FiledName;
 
                 var expr_method = Expression.Call(hackType, pe_value, Expression.Constant(p.PropertyType, typeof(Type)));
-                
+
                 var expr_property = Expression.Property(pe_instance, p);
-                var expr_assign = Expression.Assign(expr_property, Expression.Convert(expr_method, p.PropertyType));
+
+                BinaryExpression expr_assign;
+                if (p.PropertyType == ValueTypeConstants.DateTimeType && (attrib = Attribute.GetCustomAttribute(p, dateTimeKindAttribType)) != null)
+                {
+
+                    expr_assign = Expression.Assign(expr_property, Expression.Call(specifyKind, Expression.Convert(expr_method, p.PropertyType), Expression.Constant(((SpecifierStoredDateTimeKindAttribute)attrib).Kind, typeof(DateTimeKind))));
+                }
+                else
+                {
+                    expr_assign = Expression.Assign(expr_property, Expression.Convert(expr_method, p.PropertyType));
+                }
+
                 var expr_lambda = Expression.Lambda<Action<T, Object>>(expr_assign, pe_instance, pe_value);
 
                 Properties.Add(key, expr_lambda.Compile());
             }
         }
-        
+
         /// <summary>
         /// 调用对象的无参构造函数的委托
         /// </summary>

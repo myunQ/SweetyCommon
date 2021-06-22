@@ -9,7 +9,7 @@ namespace Sweety.Common.Tests.Extensions
     public class IntExtensionsTest
     {
         [Fact]
-        public void ToString_BY_i_radix()
+        public void ToString_int_int()
         {
             string[] expectedArr = {
                 "1111111111111111111111111111111"
@@ -236,6 +236,65 @@ namespace Sweety.Common.Tests.Extensions
                 string actual = (-8508).ToString(i);
 
                 Assert.Equal(expectedArr[i - 2], actual);
+            }
+        }
+
+        [Theory]
+        [InlineData(2021, "2021-01-01 00:00:00", true)]
+        [InlineData(1000, "1000-01-01 00:00:00", true)]
+        [InlineData(20200229, "2020-02-29 00:00:00", true)]
+        [InlineData(202103, "2021-03-01 00:00:00", true)]
+        [InlineData(20210421, "2021-04-21 00:00:00", true)]
+        [InlineData(2021042113, "2021-04-21 13:00:00", true)]
+        [InlineData(2021022800, "2021-02-28 00:00:00", true)]
+        [InlineData(2021013109, "2021-01-31 09:00:00", true)]
+        [InlineData(2021033116, "2021-03-31 16:00:00", true)]
+        [InlineData(2021053123, "2021-05-31 23:00:00", true)]
+        [InlineData(2021073103, "2021-07-31 03:00:00", true)]
+        [InlineData(2021083111, "2021-08-31 11:00:00", true)]
+        [InlineData(2021103106, "2021-10-31 06:00:00", true)]
+        [InlineData(2021123102, "2021-12-31 02:00:00", true)]
+        [InlineData(202, "202-01-01 00:00:00", false)]
+        [InlineData(20213, null, false)]
+        [InlineData(20210, null, false)]
+        [InlineData(202100, null, false)]
+        [InlineData(202113, null, false)]
+        [InlineData(2021040, null, false)]
+        [InlineData(2021045, null, false)]
+        [InlineData(20210001, null, false)]
+        [InlineData(20210400, null, false)]
+        [InlineData(20210231, null, false)]
+        [InlineData(20210431, null, false)]
+        [InlineData(20210631, null, false)]
+        [InlineData(20210931, null, false)]
+        [InlineData(20211131, null, false)]
+        [InlineData(20210450, null, false)]
+        [InlineData(20210229, null, false)]
+        [InlineData(202102280, null, false)]
+        [InlineData(202102281, null, false)]
+        [InlineData(2021022824, null, false)]
+        [InlineData(2021022896, null, false)]
+        public void ToDateTimeTest(int value, string expected, bool result)
+        {
+            const string format = "yyyy-MM-dd HH:mm:ss";
+
+            if (result)
+            {
+                Assert.True(value.TryToDateTime(DateTimeKind.Utc, out var actual));
+                Assert.Equal(expected, actual.ToString(format));
+                Assert.Equal(DateTimeKind.Utc, actual.Kind);
+
+                Assert.True(value.TryToDateTime(DateTimeKind.Local, out actual));
+                Assert.Equal(expected, actual.ToString(format));
+                Assert.Equal(DateTimeKind.Local, actual.Kind);
+
+                Assert.True(value.TryToDateTime(DateTimeKind.Unspecified, out actual));
+                Assert.Equal(expected, actual.ToString(format));
+                Assert.Equal(DateTimeKind.Unspecified, actual.Kind);
+            }
+            else
+            {
+                Assert.False(value.TryToDateTime(DateTimeKind.Utc, out var actual));
             }
         }
     }

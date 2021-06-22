@@ -61,7 +61,7 @@ namespace Sweety.Common.Converter
                 }
             }
 
-            
+
             if (Object.ReferenceEquals(valueType, conversionType)) return value;
 
             // 字符串 GUID 转 System.Guid。
@@ -75,7 +75,7 @@ namespace Sweety.Common.Converter
             {
                 return value.ToString();
             }
-            
+
             //字符串IP地址转换成 System.Net.IPAddress 类型
             if (conversionType == ReferenceTypeConstants.IPAddressType)
             {

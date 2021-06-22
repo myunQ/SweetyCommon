@@ -248,7 +248,7 @@ namespace Sweety.Common.DataProvider.PostgreSQL
         /// </summary>
         /// <param name="cancellationToken">表示异步任务是否取消的令牌。</param>
         /// <returns><c>PostgreSQL</c> 数据库事务对象实例。</returns>
-        public async ValueTask<NpgsqlTransaction> BuildSqlTransactionAsync(CancellationToken cancellationToken = default)
+        public async Task<NpgsqlTransaction> BuildSqlTransactionAsync(CancellationToken cancellationToken = default)
         {
 #if NETSTANDARD2_0
             return (await BuildSqlConnectionAndOpenAsync(cancellationToken)).BeginTransaction();
@@ -263,7 +263,7 @@ namespace Sweety.Common.DataProvider.PostgreSQL
         /// <param name="level">事务隔离级别。</param>
         /// <param name="cancellationToken">表示异步任务是否取消的令牌。</param>
         /// <returns><c>PostgreSQL</c> 数据库事务对象实例。</returns>
-        public async ValueTask<NpgsqlTransaction> BuildSqlTransactionAsync(IsolationLevel level, CancellationToken cancellationToken = default)
+        public async Task<NpgsqlTransaction> BuildSqlTransactionAsync(IsolationLevel level, CancellationToken cancellationToken = default)
         {
 #if NETSTANDARD2_0
             return (await BuildSqlConnectionAndOpenAsync(cancellationToken)).BeginTransaction(level);
@@ -1066,7 +1066,7 @@ namespace Sweety.Common.DataProvider.PostgreSQL
         /// <param name="recyclingParameters">指示是否需要调用 <see cref="ArrayPool{T}.Return(T[], bool)"/> 方法回收 <paramref name="commandParameters"/> 参数。</param>
         /// <param name="cancellationToken">传播取消操作通知的 <c>Token</c>。</param>
 #if NETSTANDARD2_0
-        private async Task PrepareCommandAsync(NpgsqlCommand command, NpgsqlConnection connection, NpgsqlTransaction transaction, CommandType commandType, string commandText, NpgsqlParameter[] commandParameters, bool recyclingParameters, CancellationToken cancellationToken = default)
+        private async ValueTask PrepareCommandAsync(NpgsqlCommand command, NpgsqlConnection connection, NpgsqlTransaction transaction, CommandType commandType, string commandText, NpgsqlParameter[] commandParameters, bool recyclingParameters, CancellationToken cancellationToken = default)
 #else
         private async ValueTask PrepareCommandAsync(NpgsqlCommand command, NpgsqlConnection? connection, NpgsqlTransaction? transaction, CommandType commandType, string commandText, NpgsqlParameter[]? commandParameters, bool recyclingParameters, CancellationToken cancellationToken = default)
 #endif

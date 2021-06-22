@@ -29,7 +29,6 @@
     <Folder Include="Caching\" />
     <Folder Include="DataProvider\" />
     <Folder Include="Compression\" />
-    <Folder Include="Converter\" />
     <Folder Include="Net\Client\" />
     <Folder Include="Properties\" />
   </ItemGroup>
