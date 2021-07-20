@@ -204,9 +204,9 @@ namespace Sweety.Common.Converter
         /// <param name="cancellationToken">用于取消异步操作的令牌。</param>
         /// <param name="funBuildModel">创建模型实例的委托。如果为<c>null</c>则使用模型的公共无参构造函数创建模型。</param>
 #if NETSTANDARD2_0
-        public static async Task ToCollectionAsync<T>(this DbDataReader reader, ICollection<T> collection, CancellationToken? cancellationToken = null, Func<T> funBuildModel = null)
+        public static async Task ToCollectionAsync<T>(this DbDataReader reader, ICollection<T> collection, CancellationToken cancellationToken = default, Func<T> funBuildModel = null)
 #else
-        public static async ValueTask ToCollectionAsync<T>(this DbDataReader reader, ICollection<T> collection, CancellationToken? cancellationToken = null, Func<T>? funBuildModel = null)
+        public static async ValueTask ToCollectionAsync<T>(this DbDataReader reader, ICollection<T> collection, CancellationToken cancellationToken = default, Func<T>? funBuildModel = null)
 #endif
         {
             Type modelType = typeof(T);
@@ -244,48 +244,25 @@ namespace Sweety.Common.Converter
 
             bool hasFun = funBuildModel != null;
             // 从 reader 里读取数据到集合 collection。
-            if (cancellationToken.HasValue)
+
+            do
             {
-                do
-                {
 #if NETSTANDARD2_0
                     T model = hasFun ? funBuildModel() : dynamicAssign.DefaultConstructor();
 #else
-                    T model = hasFun ? funBuildModel!() : dynamicAssign.DefaultConstructor();
+                T model = hasFun ? funBuildModel!() : dynamicAssign.DefaultConstructor();
 #endif
 
-                    for (int i = 0; i < fieldCount; i++)
-                    {
-                        if (actions[i] == null || await reader.IsDBNullAsync(i, cancellationToken.Value)) continue;
-
-                        actions[i](model, reader[i]);
-                    }
-
-                    collection.Add(model);
-                }
-                while (await reader.ReadAsync(cancellationToken.Value));
-            }
-            else
-            {
-                do
+                for (int i = 0; i < fieldCount; i++)
                 {
-#if NETSTANDARD2_0
-                    T model = hasFun ? funBuildModel() : dynamicAssign.DefaultConstructor();
-#else
-                    T model = hasFun ? funBuildModel!() : dynamicAssign.DefaultConstructor();
-#endif
+                    if (actions[i] == null || await reader.IsDBNullAsync(i, cancellationToken)) continue;
 
-                    for (int i = 0; i < fieldCount; i++)
-                    {
-                        if (actions[i] == null || await reader.IsDBNullAsync(i)) continue;
-
-                        actions[i](model, reader[i]);
-                    }
-
-                    collection.Add(model);
+                    actions[i](model, reader[i]);
                 }
-                while (await reader.ReadAsync());
+
+                collection.Add(model);
             }
+            while (await reader.ReadAsync(cancellationToken));
         }
     }
 }

@@ -807,7 +807,7 @@ namespace Sweety.Common.DataProvider
         /// <param name="parameterType">参数类型。取值范围为数据库客户端类库提供的参数类型枚举。</param>
         /// <param name="size">参数大小。</param>
         /// <returns>返回一个用于<see cref="IDbCommand"/>的参数对象实例。</returns>
-        public abstract IDbDataParameter BuildParameter(string parameterName, int parameterType, int? size);  //如果给 size 赋默认值就会导致 参数值为 int 类型时把值当作参数类型。
+        public abstract IDbDataParameter BuildParameter(string parameterName, int parameterType, int size);  //如果给 size 赋默认值就会导致 参数值为 int 类型时把值当作参数类型。
         /// <summary>
         /// 使用指定参数名、类型、大小和方向创建一个参数对象实例。
         /// </summary>
@@ -816,7 +816,7 @@ namespace Sweety.Common.DataProvider
         /// <param name="parameterType">参数类型。取值范围为数据库客户端类库提供的参数类型枚举。</param>
         /// <param name="size">参数大小。</param>
         /// <returns>返回一个用于<see cref="IDbCommand"/>的参数对象实例。</returns>
-        public abstract IDbDataParameter BuildParameter(string parameterName, ParameterDirection direction, int parameterType, int? size = default);
+        public abstract IDbDataParameter BuildParameter(string parameterName, ParameterDirection direction, int parameterType, int size = default);
         /// <summary>
         /// 使用指定参数名、参数值、类型和大小创建一个参数对象实例。
         /// </summary>
@@ -826,9 +826,9 @@ namespace Sweety.Common.DataProvider
         /// <param name="size">参数大小。</param>
         /// <returns>返回一个用于<see cref="IDbCommand"/>的参数对象实例。</returns>
 #if NETSTANDARD2_0
-        public abstract IDbDataParameter BuildParameter(string parameterName, object value, int parameterType, int? size = default);
+        public abstract IDbDataParameter BuildParameter(string parameterName, object value, int parameterType, int size = default);
 #else
-        public abstract IDbDataParameter BuildParameter(string parameterName, object? value, int parameterType, int? size = default);
+        public abstract IDbDataParameter BuildParameter(string parameterName, object? value, int parameterType, int size = default);
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 使用指定参数名、参数值、类型、大小和方向创建一个参数对象实例。
@@ -840,9 +840,41 @@ namespace Sweety.Common.DataProvider
         /// <param name="size">参数大小。</param>
         /// <returns>返回一个用于<see cref="IDbCommand"/>的参数对象实例。</returns>
 #if NETSTANDARD2_0
-        public abstract IDbDataParameter BuildParameter(string parameterName, object value, ParameterDirection direction, int parameterType, int? size = default);
+        public abstract IDbDataParameter BuildParameter(string parameterName, object value, ParameterDirection direction, int parameterType, int size = default);
 #else
-        public abstract IDbDataParameter BuildParameter(string parameterName, object? value, ParameterDirection direction, int parameterType, int? size = default);
+        public abstract IDbDataParameter BuildParameter(string parameterName, object? value, ParameterDirection direction, int parameterType, int size = default);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 将参数对象的参数名、参数值、类型、大小和方向重置为指定的值。
+        /// </summary>
+        /// <param name="parameter">参数对象。</param>
+        /// <param name="parameterName">参数名称。</param>
+        /// <param name="value">参数值。</param>
+        /// <param name="parameterType">参数类型。取值范围为数据库客户端类库提供的参数类型枚举。</param>
+        /// <param name="size">参数大小。</param>
+        /// <param name="direction">参数方向。</param>
+        /// <returns>返回一个用于<see cref="IDbCommand"/>的参数对象实例。</returns>
+#if NETSTANDARD2_0
+        public abstract void ResetParameter(IDbDataParameter parameter, string parameterName, object value, int parameterType, int size = default, ParameterDirection direction = ParameterDirection.Input);
+#else
+        public abstract void ResetParameter(IDbDataParameter parameter, string parameterName, object? value, int parameterType, int size = default, ParameterDirection direction = ParameterDirection.Input);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 如果<paramref name="parameter"/>不会<c>null</c>则将参数对象的参数名、参数值、类型、大小和方向重置为指定的值，否则用这些参数创建一个新的参数对象。
+        /// </summary>
+        /// <param name="parameter">参数对象。</param>
+        /// <param name="parameterName">参数名称。</param>
+        /// <param name="value">参数值。</param>
+        /// <param name="parameterType">参数类型。取值范围为数据库客户端类库提供的参数类型枚举。</param>
+        /// <param name="size">参数大小。</param>
+        /// <param name="direction">参数方向。</param>
+        /// <returns>返回一个用于<see cref="IDbCommand"/>的参数对象实例。</returns>
+#if NETSTANDARD2_0
+        public abstract IDbDataParameter ResetOrBuildParameter(IDbDataParameter parameter, string parameterName, object value, int parameterType, int size = default, ParameterDirection direction = ParameterDirection.Input);
+#else
+        public abstract IDbDataParameter ResetOrBuildParameter(IDbDataParameter? parameter, string parameterName, object? value, int parameterType, int size = default, ParameterDirection direction = ParameterDirection.Input);
 #endif //NETSTANDARD2_0
 
 
@@ -1593,7 +1625,7 @@ namespace Sweety.Common.DataProvider
         {
             IDictionary<TKey, TValue> result = null;
 
-            if (await (cancellationToken.CanBeCanceled ? reader.ReadAsync(cancellationToken) : reader.ReadAsync()))
+            if (await reader.ReadAsync(cancellationToken))
             {
                 if (_dictionaryInstance != null)
                 {
@@ -1612,17 +1644,9 @@ namespace Sweety.Common.DataProvider
 
                 do
                 {
-                    if (cancellationToken.CanBeCanceled)
-                    {
-                        result.Add((TKey)reader[0], await reader.IsDBNullAsync(1, cancellationToken) ? default : (TValue)reader[1]);
-                    }
-                    else
-                    {
-                        result.Add((TKey)reader[0], await reader.IsDBNullAsync(1) ? default : (TValue)reader[1]);
-                    }
-
+                    result.Add((TKey)reader[0], await reader.IsDBNullAsync(1, cancellationToken) ? default : (TValue)reader[1]);
                 }
-                while (await (cancellationToken.CanBeCanceled ? reader.ReadAsync(cancellationToken) : reader.ReadAsync()));
+                while (await reader.ReadAsync(cancellationToken));
             }
             return result;
         }
@@ -1631,7 +1655,7 @@ namespace Sweety.Common.DataProvider
         {
             IDictionary<TKey, TValue>? result = null;
 
-            if (await (cancellationToken.CanBeCanceled ? reader.ReadAsync(cancellationToken) : reader.ReadAsync()))
+            if (await reader.ReadAsync(cancellationToken))
             {
                 if (_dictionaryInstance != null)
                 {
@@ -1649,18 +1673,10 @@ namespace Sweety.Common.DataProvider
                 }
 
                 do
-                {
-                    if (cancellationToken.CanBeCanceled)
-                    {
-                        result.Add((TKey)reader[0], await reader.IsDBNullAsync(1, cancellationToken) ? default : (TValue)reader[1]);
-                    }
-                    else
-                    {
-                        result.Add((TKey)reader[0], await reader.IsDBNullAsync(1) ? default : (TValue)reader[1]);
-                    }
-
+                {    
+                    result.Add((TKey)reader[0], await reader.IsDBNullAsync(1, cancellationToken) ? default : (TValue)reader[1]);
                 }
-                while (await (cancellationToken.CanBeCanceled ? reader.ReadAsync(cancellationToken) : reader.ReadAsync()));
+                while (await reader.ReadAsync(cancellationToken));
             }
             return result;
         }
@@ -1669,7 +1685,7 @@ namespace Sweety.Common.DataProvider
         {
             IDictionary<TKey, TValue?>? result = null;
 
-            if (await (cancellationToken.CanBeCanceled ? reader.ReadAsync(cancellationToken) : reader.ReadAsync()))
+            if (await reader.ReadAsync(cancellationToken))
             {
                 if (_dictionaryInstance != null)
                 {
@@ -1688,17 +1704,10 @@ namespace Sweety.Common.DataProvider
 
                 do
                 {
-                    if (cancellationToken.CanBeCanceled)
-                    {
-                        result.Add((TKey)reader[0], await reader.IsDBNullAsync(1, cancellationToken) ? default : (TValue)reader[1]);
-                    }
-                    else
-                    {
-                        result.Add((TKey)reader[0], await reader.IsDBNullAsync(1) ? default : (TValue)reader[1]);
-                    }
 
+                    result.Add((TKey)reader[0], await reader.IsDBNullAsync(1, cancellationToken) ? default : (TValue)reader[1]);
                 }
-                while (await (cancellationToken.CanBeCanceled ? reader.ReadAsync(cancellationToken) : reader.ReadAsync()));
+                while (await reader.ReadAsync(cancellationToken));
             }
             return result;
         }
@@ -1744,12 +1753,12 @@ namespace Sweety.Common.DataProvider
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <returns>如果读取器里有数据则将这些数据写入类型<typeparamref name="T"/>的实例并返回此实例。如果没有数据则返回<c>null</c>。</returns>
 #if NETSTANDARD2_0
-        protected virtual async Task<T> ReadToModelAsync<T>(DbDataReader reader, CancellationToken? cancellationToken) where T : class
+        protected virtual async Task<T> ReadToModelAsync<T>(DbDataReader reader, CancellationToken cancellationToken) where T : class
 #else
-        protected virtual async Task<T?> ReadToModelAsync<T>(DbDataReader reader, CancellationToken? cancellationToken) where T : class
+        protected virtual async Task<T?> ReadToModelAsync<T>(DbDataReader reader, CancellationToken cancellationToken) where T : class
 #endif //NETSTANDARD2_0
         {
-            if (!await (cancellationToken.HasValue ? reader.ReadAsync(cancellationToken.Value) : reader.ReadAsync())) return default;
+            if (!await reader.ReadAsync(cancellationToken)) return default;
 
             if (_modelInstance != null)
             {
@@ -1823,73 +1832,8 @@ namespace Sweety.Common.DataProvider
                 }
             }
         }
-        /// <summary>
-        /// 异步将<paramref name="reader"/>里的数据读取到<paramref name="collection"/>对象实例中。
-        /// </summary>
-        /// <typeparam name="T">数据类型</typeparam>
-        /// <param name="reader">数据读取器</param>
-        /// <param name="collection">存储数据的集合。</param>
-#if NETSTANDARD2_0
-        private async Task FillToCollectionAsync<T>(DbDataReader reader, ICollection<T> collection)
-#else
-        private async ValueTask FillToCollectionAsync<T>(DbDataReader reader, ICollection<T> collection)
-#endif
-        {
-            Task<bool> nextResult;
-            Task<bool> readResult;
-            Type t = typeof(T);
-            TypeCode typeCode = Type.GetTypeCode(t);
-            //struct 类型的 t.IsValueType 等于 true，typeCode 等于 TypeCode.Object。
-            if ((t.IsValueType && typeCode != TypeCode.Object) || typeCode == TypeCode.String || t == typeof(Guid))
-            {
-                //T defaultValue = default;
-                do
-                {
-                    do
-                    {
-                        if (await reader.IsDBNullAsync(0))
-                        {
-                            //collection.Add(defaultValue);
-                        }
-                        else
-                        {
-                            collection.Add((T)reader[0]);
-                        }
-                    } while (await reader.ReadAsync());
 
-                    nextResult = reader.NextResultAsync();
-                    readResult = reader.ReadAsync();
-                }
-                while (await nextResult && await readResult);
-            }
-            else
-            {
-                if (_funBuildModelInstance == null)
-                {
-                    do
-                    {
-                        await reader.ToCollectionAsync<T>(collection);
 
-                        nextResult = reader.NextResultAsync();
-                        readResult = reader.ReadAsync();
-                    }
-                    while (await nextResult && await readResult);
-                }
-                else
-                {
-                    Func<T> fun = (Func<T>)_funBuildModelInstance;
-                    _funBuildModelInstance = null;
-                    do
-                    {
-                        await reader.ToCollectionAsync<T>(collection, (CancellationToken?)null, fun);
-
-                        nextResult = reader.NextResultAsync();
-                        readResult = reader.ReadAsync();
-                    }
-                    while (await nextResult && await readResult);
-                }
-            }
-        }
         /// <summary>
         /// 异步将<paramref name="reader"/>里的数据读取到<paramref name="collection"/>对象实例中。
         /// </summary>
@@ -2013,7 +1957,7 @@ namespace Sweety.Common.DataProvider
             IList<T>? result = null;
 #endif //NETSTANDARD2_0
 
-            if (await (cancellationToken.CanBeCanceled ? reader.ReadAsync(cancellationToken) : reader.ReadAsync()))
+            if (await reader.ReadAsync(cancellationToken))
             {
                 if (_listInstance != null)
                 {
@@ -2030,9 +1974,7 @@ namespace Sweety.Common.DataProvider
                     result = new List<T>();
                 }
 
-                await (cancellationToken.CanBeCanceled
-                    ? FillToCollectionAsync<T>(reader, result, cancellationToken)
-                    : FillToCollectionAsync<T>(reader, result));
+                await FillToCollectionAsync<T>(reader, result, cancellationToken);
 
             }
             return result;
@@ -2093,7 +2035,7 @@ namespace Sweety.Common.DataProvider
             ISet<T>? result = null;
 #endif //NETSTANDARD2_0
 
-            if (await (cancellationToken.CanBeCanceled ? reader.ReadAsync(cancellationToken) : reader.ReadAsync()))
+            if (await reader.ReadAsync(cancellationToken))
             {
                 if (_setInstance != null)
                 {
@@ -2110,9 +2052,7 @@ namespace Sweety.Common.DataProvider
                     result = new HashSet<T>();
                 }
 
-                await (cancellationToken.CanBeCanceled
-                    ? FillToCollectionAsync<T>(reader, result, cancellationToken)
-                    : FillToCollectionAsync<T>(reader, result));
+                await FillToCollectionAsync<T>(reader, result, cancellationToken);
             }
             return result;
         }
@@ -2172,7 +2112,7 @@ namespace Sweety.Common.DataProvider
             ICollection<T>? result = null;
 #endif //NETSTANDARD2_0
 
-            if (await (cancellationToken.CanBeCanceled ? reader.ReadAsync(cancellationToken) : reader.ReadAsync()))
+            if (await reader.ReadAsync(cancellationToken))
             {
                 if (_collectionInstance != null)
                 {
@@ -2189,9 +2129,7 @@ namespace Sweety.Common.DataProvider
                     result = new List<T>();
                 }
 
-                await (cancellationToken.CanBeCanceled
-                    ? FillToCollectionAsync<T>(reader, result, cancellationToken)
-                    : FillToCollectionAsync<T>(reader, result));
+                await FillToCollectionAsync<T>(reader, result, cancellationToken);
             }
             return result;
         }

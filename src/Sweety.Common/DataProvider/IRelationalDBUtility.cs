@@ -406,7 +406,7 @@ namespace Sweety.Common.DataProvider
         /// <param name="parameterType">参数类型。取值范围为数据库客户端类库提供的参数类型枚举。</param>
         /// <param name="size">参数大小。</param>
         /// <returns>返回一个用于<see cref="IDbCommand"/>的参数对象实例。</returns>
-        IDbDataParameter BuildParameter(string parameterName, int parameterType, int? size);  //如果给 size 赋默认值就会导致 参数值为 int 类型时把值当作参数类型。
+        IDbDataParameter BuildParameter(string parameterName, int parameterType, int size);  //如果给 size 赋默认值就会导致 参数值为 int 类型时把值当作参数类型。
         /// <summary>
         /// 使用指定参数名、类型、大小和方向创建一个参数对象实例。
         /// </summary>
@@ -415,7 +415,7 @@ namespace Sweety.Common.DataProvider
         /// <param name="parameterType">参数类型。取值范围为数据库客户端类库提供的参数类型枚举。</param>
         /// <param name="size">参数大小。</param>
         /// <returns>返回一个用于<see cref="IDbCommand"/>的参数对象实例。</returns>
-        IDbDataParameter BuildParameter(string parameterName, ParameterDirection direction, int parameterType, int? size = default);
+        IDbDataParameter BuildParameter(string parameterName, ParameterDirection direction, int parameterType, int size = default);
         /// <summary>
         /// 使用指定参数名、参数值、类型和大小创建一个参数对象实例。
         /// </summary>
@@ -425,9 +425,9 @@ namespace Sweety.Common.DataProvider
         /// <param name="size">参数大小。</param>
         /// <returns>返回一个用于<see cref="IDbCommand"/>的参数对象实例。</returns>
 #if NETSTANDARD2_0
-        IDbDataParameter BuildParameter(string parameterName, object value, int parameterType, int? size = default);
+        IDbDataParameter BuildParameter(string parameterName, object value, int parameterType, int size = default);
 #else
-        IDbDataParameter BuildParameter(string parameterName, object? value, int parameterType, int? size = default);
+        IDbDataParameter BuildParameter(string parameterName, object? value, int parameterType, int size = default);
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 使用指定参数名、参数值、类型、大小和方向创建一个参数对象实例。
@@ -439,11 +439,42 @@ namespace Sweety.Common.DataProvider
         /// <param name="size">参数大小。</param>
         /// <returns>返回一个用于<see cref="IDbCommand"/>的参数对象实例。</returns>
 #if NETSTANDARD2_0
-        IDbDataParameter BuildParameter(string parameterName, object value, ParameterDirection direction, int parameterType, int? size = default);
+        IDbDataParameter BuildParameter(string parameterName, object value, ParameterDirection direction, int parameterType, int size = default);
 #else
-        IDbDataParameter BuildParameter(string parameterName, object? value, ParameterDirection direction, int parameterType, int? size = default);
+        IDbDataParameter BuildParameter(string parameterName, object? value, ParameterDirection direction, int parameterType, int size = default);
 #endif //NETSTANDARD2_0
 
+
+        /// <summary>
+        /// 将参数对象的参数名、参数值、类型、大小和方向重置为指定的值。
+        /// </summary>
+        /// <param name="parameter">参数对象。</param>
+        /// <param name="parameterName">参数名称。</param>
+        /// <param name="value">参数值。</param>
+        /// <param name="parameterType">参数类型。取值范围为数据库客户端类库提供的参数类型枚举。</param>
+        /// <param name="size">参数大小。</param>
+        /// <param name="direction">参数方向。</param>
+#if NETSTANDARD2_0
+        void ResetParameter(IDbDataParameter parameter, string parameterName, object value, int parameterType, int size = default, ParameterDirection direction = ParameterDirection.Input);
+#else
+        void ResetParameter(IDbDataParameter parameter, string parameterName, object? value, int parameterType, int size = default, ParameterDirection direction = ParameterDirection.Input);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 如果<paramref name="parameter"/>不会<c>null</c>则将参数对象的参数名、参数值、类型、大小和方向重置为指定的值，否则用这些参数创建一个新的参数对象。
+        /// </summary>
+        /// <param name="parameter">参数对象。</param>
+        /// <param name="parameterName">参数名称。</param>
+        /// <param name="value">参数值。</param>
+        /// <param name="parameterType">参数类型。取值范围为数据库客户端类库提供的参数类型枚举。</param>
+        /// <param name="size">参数大小。</param>
+        /// <param name="direction">参数方向。</param>
+        /// <returns>返回一个用于<see cref="IDbCommand"/>的参数对象实例。</returns>
+#if NETSTANDARD2_0
+        IDbDataParameter ResetOrBuildParameter(IDbDataParameter parameter, string parameterName, object value, int parameterType, int size = default, ParameterDirection direction = ParameterDirection.Input);
+#else
+        IDbDataParameter ResetOrBuildParameter(IDbDataParameter? parameter, string parameterName, object? value, int parameterType, int size = default, ParameterDirection direction = ParameterDirection.Input);
+#endif //NETSTANDARD2_0
 
 
         /// <summary>
