@@ -692,9 +692,7 @@ namespace Sweety.Common.DataProvider.SqlServer
                     await PrepareCommandAsync(cmd, null, ConvertToSqlTransaction(transaction), commandType, commandText, ConvertToSqlParameterArrary(commandParameters, out var recyclingParameters), recyclingParameters, cancellationToken);
                 }
 
-                return cancellationToken.CanBeCanceled
-                    ? await cmd.ExecuteNonQueryAsync(cancellationToken)
-                    : await cmd.ExecuteNonQueryAsync();
+                return await cmd.ExecuteNonQueryAsync(cancellationToken);
             }
             finally
             {
@@ -791,9 +789,7 @@ namespace Sweety.Common.DataProvider.SqlServer
                     await PrepareCommandAsync(cmd, null, ConvertToSqlTransaction(transaction), commandType, commandText, ConvertToSqlParameterArrary(commandParameters, out var recyclingParameters), recyclingParameters, cancellationToken);
                 }
 
-                return cancellationToken.CanBeCanceled
-                    ? await cmd.ExecuteScalarAsync(cancellationToken)
-                    : await cmd.ExecuteScalarAsync();
+                return await cmd.ExecuteScalarAsync(cancellationToken);
             }
             finally
             {
@@ -904,12 +900,8 @@ namespace Sweety.Common.DataProvider.SqlServer
 
                 // 创建数据阅读器 
                 return await (connectionOwnership == SqlConnectionOwnership.External
-                    ? cancellationToken.CanBeCanceled
-                        ? cmd.ExecuteReaderAsync(cancellationToken)
-                        : cmd.ExecuteReaderAsync()
-                    : cancellationToken.CanBeCanceled
-                        ? cmd.ExecuteReaderAsync(CommandBehavior.CloseConnection, cancellationToken)
-                        : cmd.ExecuteReaderAsync(CommandBehavior.CloseConnection));
+                    ? cmd.ExecuteReaderAsync(cancellationToken)
+                    : cmd.ExecuteReaderAsync(CommandBehavior.CloseConnection, cancellationToken));
             }
             catch
             {
@@ -1138,14 +1130,7 @@ namespace Sweety.Common.DataProvider.SqlServer
 
                 if (connection.State != ConnectionState.Open)
                 {
-                    if (cancellationToken.CanBeCanceled)
-                    {
-                        await connection.OpenAsync(cancellationToken);
-                    }
-                    else
-                    {
-                        await connection.OpenAsync();
-                    }
+                    await connection.OpenAsync(cancellationToken);
                 }
             }
             else
