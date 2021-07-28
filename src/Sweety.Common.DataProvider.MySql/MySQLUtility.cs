@@ -803,11 +803,12 @@ namespace Sweety.Common.DataProvider.MySql
         /// <param name="commandText">存储过程名或 <c>T-SQL</c> 语句。</param> 
         /// <param name="commandParameters">参数数组，如果没有参数则为 <c>null</c>。</param> 
         /// <param name="connectionOwnership">标识数据库连接对象由调用者提供还是有此类或直接或间接子类提供。</param> 
+        /// <param name="command">返回执行命令的对象。用于在存储过程使用输出变量时，关闭 <see cref="IDataReader"/> 对象，输出参数被赋值后清除参数，达到参数对象重复使用的目的。</param>
         /// <returns>返回包含结果集的数据读取器。</returns> 
 #if NETSTANDARD2_0
-        protected override IDataReader ExecuteReader(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, SqlConnectionOwnership connectionOwnership)
+        protected override IDataReader ExecuteReader(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, SqlConnectionOwnership connectionOwnership, out IDbCommand command)
 #else
-        protected override IDataReader ExecuteReader(IDbConnection? connection, IDbTransaction? transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, SqlConnectionOwnership connectionOwnership)
+        protected override IDataReader ExecuteReader(IDbConnection? connection, IDbTransaction? transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, SqlConnectionOwnership connectionOwnership, out IDbCommand command)
 #endif // NETSTANDARD2_0
         {
             if (transaction != null)
@@ -821,6 +822,8 @@ namespace Sweety.Common.DataProvider.MySql
 
             bool mustCloseConnection = false;
             MySqlCommand cmd = new MySqlCommand();
+            command = cmd;
+
             try
             {
                 if (transaction == null)
@@ -845,10 +848,80 @@ namespace Sweety.Common.DataProvider.MySql
 
                 throw;
             }
+            /* 此方法的调用放通过 out command 参数在方法外部清空参数集合。
             finally
             {
                 cmd.Parameters.Clear();
+            }*/
+        }
+
+
+
+        /// <summary> 
+        /// 异步执行指定 T-SQL 命令，返回结果集的数据读取器。
+        /// </summary> 
+        /// <param name="command">一个有效的用于执行数据库命令的对象。</param> 
+        /// <param name="commandParameters">参数数组,如果没有参数则为<c>null</c></param> 
+        /// <param name="connectionOwnership">标识数据库连接对象由调用者提供还是有此类或直接或间接子类提供。</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <returns>返回包含结果集的数据读取器</returns> 
+        protected override async Task<IDataReader> ExecuteReaderAsync(IDbCommand command, IDataParameter[] commandParameters, SqlConnectionOwnership connectionOwnership, CancellationToken cancellationToken = default)
+        {
+            if (command == null) throw new ArgumentNullException(nameof(command));
+#if NET5_0_OR_GREATER
+            if (command is not MySqlCommand cmd)
+#else
+            if (!(command is MySqlCommand cmd))
+#endif
+            {
+                throw new InvalidCastException(String.Format(Properties.LocalizationResources.is_not_a_valid_object_of_type_XXX, nameof(command), typeof(MySqlCommand).FullName));
             }
+            if (cmd.Transaction != null)
+            {
+                // MySql 要获取 SqlTransaction 对象实例的话连接必须是打开的，所以如果传入 transaction 就可以忽略 connection 参数了。
+                // 这里做 connection 和 transaction.Connection 是不是同一实例的验证只是为了避免调用方胡乱传值产生疑惑。
+                if (cmd.Transaction.Connection == null) throw new ArgumentException(Properties.LocalizationResources.the_transaction_was_rollbacked_or_commited__please_provide_an_open_transaction, nameof(cmd.Transaction));
+                if (cmd.Connection != null && !Object.ReferenceEquals(cmd.Connection, cmd.Transaction.Connection)) throw new ArgumentException(Properties.LocalizationResources.the_database_connection_provided_and_the_database_connection_used_by_the_transaction_must_be_the_same_instance);
+            }
+            else if (cmd.Connection == null)
+            {
+                if (connectionOwnership != SqlConnectionOwnership.Internal) connectionOwnership = SqlConnectionOwnership.Internal;
+                cmd.Connection = BuildSqlConnection();
+            }
+
+            bool mustCloseConnection = false;
+
+            try
+            {
+                if (commandParameters != null && commandParameters.Length > 0)
+                {
+                    AttachParameters(cmd, ConvertToSqlParameterArrary(commandParameters, out var recyclingParameters), recyclingParameters);
+                }
+
+
+                if (cmd.Connection.State != ConnectionState.Open)
+                {
+                    mustCloseConnection = true;
+                    await cmd.Connection.OpenAsync(cancellationToken);
+                }
+
+
+                // 创建数据阅读器 
+                return await (connectionOwnership == SqlConnectionOwnership.External
+                    ? cmd.ExecuteReaderAsync(cancellationToken)
+                    : cmd.ExecuteReaderAsync(CommandBehavior.CloseConnection, cancellationToken));
+            }
+            catch
+            {
+                if (mustCloseConnection) cmd.Connection.Close();
+
+                throw;
+            }
+            /* 此方法的调用放通过 out command 参数在方法外部清空参数集合。
+            finally
+            {
+                ClearUsedParametersFromCommand(cmd);
+            }*/
         }
 
         /// <summary>

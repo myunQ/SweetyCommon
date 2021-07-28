@@ -97,6 +97,15 @@ namespace Sweety.Common.Properties {
         }
         
         /// <summary>
+        ///   查找类似 &quot;{0}&quot; is not a valid object of type &quot;{1}&quot;. 的本地化字符串。
+        /// </summary>
+        internal static string is_not_a_valid_object_of_type_XXX {
+            get {
+                return ResourceManager.GetString("is not a valid object of type XXX", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查找类似 Please call the static method {0} to initialize before constructing the instance. 的本地化字符串。
         /// </summary>
         internal static string please_call_the_static_method_XXX_to_initialize_before_constructing_the_instance {

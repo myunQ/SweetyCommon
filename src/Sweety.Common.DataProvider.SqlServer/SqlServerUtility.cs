@@ -808,11 +808,12 @@ namespace Sweety.Common.DataProvider.SqlServer
         /// <param name="commandText">存储过程名或 <c>T-SQL</c> 语句。</param> 
         /// <param name="commandParameters">参数数组，如果没有参数则为 <c>null</c>。</param> 
         /// <param name="connectionOwnership">标识数据库连接对象由调用者提供还是有此类或直接或间接子类提供。</param> 
+        /// <param name="command">返回执行命令的对象。用于在存储过程使用输出变量时，关闭 <see cref="IDataReader"/> 对象，输出参数被赋值后清除参数，达到参数对象重复使用的目的。</param>
         /// <returns>返回包含结果集的数据读取器。</returns> 
 #if NETSTANDARD2_0
-        protected override IDataReader ExecuteReader(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, SqlConnectionOwnership connectionOwnership)
+        protected override IDataReader ExecuteReader(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, SqlConnectionOwnership connectionOwnership, out IDbCommand command)
 #else
-        protected override IDataReader ExecuteReader(IDbConnection? connection, IDbTransaction? transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, SqlConnectionOwnership connectionOwnership)
+        protected override IDataReader ExecuteReader(IDbConnection? connection, IDbTransaction? transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, SqlConnectionOwnership connectionOwnership, out IDbCommand command)
 #endif // NETSTANDARD2_0
         {
             if (transaction != null)
@@ -826,6 +827,7 @@ namespace Sweety.Common.DataProvider.SqlServer
 
             bool mustCloseConnection = false;
             SqlCommand cmd = new SqlCommand();
+            command = cmd;
             try
             {
                 if (transaction == null)
@@ -850,15 +852,85 @@ namespace Sweety.Common.DataProvider.SqlServer
 
                 throw;
             }
+            /*finally
+            {
+                ClearUsedParametersFromCommand(cmd);
+            }*/
+        }
+
+        /// <summary> 
+        /// 异步执行指定 T-SQL 命令，返回结果集的数据读取器。
+        /// </summary> 
+        /// <param name="command">一个有效的用于执行数据库命令的对象。</param> 
+        /// <param name="commandParameters">参数数组,如果没有参数则为<c>null</c></param> 
+        /// <param name="connectionOwnership">标识数据库连接对象由调用者提供还是有此类或直接或间接子类提供。</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <returns>返回包含结果集的数据读取器</returns> 
+        protected override async Task<IDataReader> ExecuteReaderAsync(IDbCommand command, IDataParameter[] commandParameters, SqlConnectionOwnership connectionOwnership, CancellationToken cancellationToken = default)
+        {
+            if (command == null) throw new ArgumentNullException(nameof(command));
+#if NET5_0_OR_GREATER
+            if (command is not SqlCommand cmd)
+#else
+            if (!(command is SqlCommand cmd))
+#endif
+            {
+                throw new InvalidCastException(String.Format(Properties.LocalizationResources.is_not_a_valid_object_of_type_XXX, nameof(command), typeof(SqlCommand).FullName));
+            }
+            if (cmd.Transaction != null)
+            {
+                // SQL Server 要获取 SqlTransaction 对象实例的话连接必须是打开的，所以如果传入 transaction 就可以忽略 connection 参数了。
+                // 这里做 connection 和 transaction.Connection 是不是同一实例的验证只是为了避免调用方胡乱传值产生疑惑。
+                if (cmd.Transaction.Connection == null) throw new ArgumentException(Properties.LocalizationResources.the_transaction_was_rollbacked_or_commited__please_provide_an_open_transaction, nameof(cmd.Transaction));
+                if (cmd.Connection != null && !Object.ReferenceEquals(cmd.Connection, cmd.Transaction.Connection)) throw new ArgumentException(Properties.LocalizationResources.the_database_connection_provided_and_the_database_connection_used_by_the_transaction_must_be_the_same_instance);
+            }
+            else if (cmd.Connection == null)
+            {
+                if (connectionOwnership != SqlConnectionOwnership.Internal) connectionOwnership = SqlConnectionOwnership.Internal;
+                cmd.Connection = BuildSqlConnection();
+            }
+
+            bool mustCloseConnection = false;
+
+            try
+            {
+                if (commandParameters != null && commandParameters.Length > 0)
+                {
+                    AttachParameters(cmd, ConvertToSqlParameterArrary(commandParameters, out var recyclingParameters), recyclingParameters);
+                }
+
+
+                if (cmd.Connection.State != ConnectionState.Open)
+                {
+                    mustCloseConnection = true;
+                    await cmd.Connection.OpenAsync(cancellationToken);
+                }
+
+
+                // 创建数据阅读器 
+                return await (connectionOwnership == SqlConnectionOwnership.External
+                    ? cmd.ExecuteReaderAsync(cancellationToken)
+                    : cmd.ExecuteReaderAsync(CommandBehavior.CloseConnection, cancellationToken));
+            }
+            catch
+            {
+                if (mustCloseConnection) cmd.Connection.Close();
+
+                throw;
+            }
+            /* 此方法的调用放通过 out command 参数在方法外部清空参数集合。
             finally
             {
-                cmd.Parameters.Clear();
-            }
+                ClearUsedParametersFromCommand(cmd);
+            }*/
         }
 
         /// <summary>
         /// 异步执行指定 <c>T-SQL</c> 命令，返回结果集的数据读取器。
         /// </summary>
+        /// <remarks>
+        /// 这个方法是不能获取存储过程的输出参数的，如果要获取存储过程输出参数的值请使用 <see cref="ExecuteReaderAsync(IDbCommand, IDataParameter[], SqlConnectionOwnership, CancellationToken)"/> 或 <see cref="ExecuteReader(IDbConnection?, IDbTransaction?, CommandType, string, IDataParameter[], SqlConnectionOwnership, out IDbCommand)"/> 方法。
+        /// </remarks>
         /// <param name="connection">一个有效的数据库连接对象。</param> 
         /// <param name="transaction">一个有效的事务或 <c>null</c>。</param> 
         /// <param name="commandType">命令类型 (存储过程，文本命令或其它)。</param> 
@@ -1140,6 +1212,37 @@ namespace Sweety.Common.DataProvider.SqlServer
                 command.Transaction = transaction;
             }
         }
+
+
+
+        /*/// <summary>
+        /// 清除参数,以便再次使用。
+        /// 如果没有输出参数，则调用 <see cref="SqlCommand.Parameters.Clear()"/> 方法。
+        /// 只有使用 <see cref="SqlDataReader"/> 对象时才需要使用此方法。否则直接调用 <see cref="SqlCommand.Parameters.Clear()"/> 方法即可。
+        /// </summary>
+        /// <remarks>
+        /// 当 <see cref="SqlDataReader"/> 关闭时输出参数值会被提取，所以如果参数与 <see cref="SqlCommand"/> 分离，那么 <see cref="SqlDataReader"/> 无法设置其值。
+        /// 
+        /// 发生这种情况时，参数不能在其他命令中再次使用。
+        /// </remarks>
+        /// <param name="cmd">命令对象。</param>
+        private static void ClearUsedParametersFromCommand(SqlCommand cmd)
+        {
+            bool canClear = true;
+            foreach (SqlParameter commandParameter in cmd.Parameters)
+            {
+                if (commandParameter.Direction != ParameterDirection.Input)
+                {
+                    canClear = false;
+                    break;
+                }
+            }
+
+            if (canClear)
+            {
+                cmd.Parameters.Clear();
+            }
+        }*/
         #endregion SqlHelper
     }
 }

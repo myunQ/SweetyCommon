@@ -925,22 +925,58 @@ namespace Sweety.Common.DataProvider
 
         public virtual IDataReader GetReader(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
         {
-            return ExecuteReader(BuildConnection(), null, cmdType, cmdText, parameters, SqlConnectionOwnership.Internal);
+#if NETSTANDARD2_0
+            IDbCommand cmd = null;
+#else
+            IDbCommand? cmd = null;
+#endif
+            try
+            {
+                return ExecuteReader(BuildConnection(), null, cmdType, cmdText, parameters, SqlConnectionOwnership.Internal, out cmd);
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+            }
         }
 
         public virtual IDataReader GetReader(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
         {
-            return ExecuteReader(tran.Connection, tran, cmdType, cmdText, parameters, SqlConnectionOwnership.External);
+#if NETSTANDARD2_0
+            IDbCommand cmd = null;
+#else
+            IDbCommand? cmd = null;
+#endif
+            try
+            {
+                return ExecuteReader(null, tran, cmdType, cmdText, parameters, SqlConnectionOwnership.External, out cmd);
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+            }
         }
 
         public virtual IDataReader GetReader(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
         {
-            return ExecuteReader(conn, null, cmdType, cmdText, parameters, SqlConnectionOwnership.External);
+#if NETSTANDARD2_0
+            IDbCommand cmd = null;
+#else
+            IDbCommand? cmd = null;
+#endif
+            try
+            {
+                return ExecuteReader(conn, null, cmdType, cmdText, parameters, SqlConnectionOwnership.External, out cmd);
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+            }
         }
 
         public virtual Task<IDataReader> GetReaderAsync(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
         {
-            return ExecuteReaderAsync(BuildConnection(), null, cmdType, cmdText, parameters, SqlConnectionOwnership.External, cancellationToken);
+            return ExecuteReaderAsync(BuildConnection(), null, cmdType, cmdText, parameters, SqlConnectionOwnership.Internal, cancellationToken);
         }
 
         public virtual Task<IDataReader> GetReaderAsync(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
@@ -995,9 +1031,21 @@ namespace Sweety.Common.DataProvider
         public virtual IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where TKey : notnull
 #endif //NETSTANDARD2_0
         {
-            using (var reader = GetReader(cmdText, cmdType, parameters))
+#if NETSTANDARD2_0
+            IDbCommand cmd = null;
+#else
+            IDbCommand? cmd = null;
+#endif
+            try
             {
-                return ReadToDictionary<TKey, TValue>(reader);
+                using (var reader = ExecuteReader(BuildConnection(), null, cmdType, cmdText, parameters, SqlConnectionOwnership.Internal, out cmd))
+                {
+                    return ReadToDictionary<TKey, TValue>(reader);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
             }
         }
 
@@ -1009,9 +1057,21 @@ namespace Sweety.Common.DataProvider
         public virtual IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where TKey : notnull
 #endif //NETSTANDARD2_0
         {
-            using (var reader = GetReader(tran, cmdText, cmdType, parameters))
+#if NETSTANDARD2_0
+            IDbCommand cmd = null;
+#else
+            IDbCommand? cmd = null;
+#endif
+            try
             {
-                return ReadToDictionary<TKey, TValue>(reader);
+                using (var reader = ExecuteReader(null, tran, cmdType, cmdText, parameters, SqlConnectionOwnership.External, out cmd))
+                {
+                    return ReadToDictionary<TKey, TValue>(reader);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
             }
         }
 
@@ -1023,9 +1083,21 @@ namespace Sweety.Common.DataProvider
         public virtual IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where TKey : notnull
 #endif //NETSTANDARD2_0
         {
-            using (var reader = GetReader(conn, cmdText, cmdType, parameters))
+#if NETSTANDARD2_0
+            IDbCommand cmd = null;
+#else
+            IDbCommand? cmd = null;
+#endif
+            try
             {
-                return ReadToDictionary<TKey, TValue>(reader);
+                using (var reader = ExecuteReader(conn, null, cmdType, cmdText, parameters, SqlConnectionOwnership.External, out cmd))
+                {
+                    return ReadToDictionary<TKey, TValue>(reader);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
             }
         }
 
@@ -1037,9 +1109,20 @@ namespace Sweety.Common.DataProvider
         public virtual async Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where TKey : notnull
 #endif //NETSTANDARD2_0
         {
-            using (var reader = (DbDataReader)await GetReaderAsync(cmdText, cmdType, cancellationToken, parameters))
+            IDbCommand cmd = BuildCommand();
+            cmd.CommandType = cmdType;
+            cmd.CommandText = cmdText;
+
+            try
             {
-                return await ReadToDictionaryAsync<TKey, TValue>(reader, cancellationToken);
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, SqlConnectionOwnership.Internal, cancellationToken))
+                {
+                    return await ReadToDictionaryAsync<TKey, TValue>(reader, cancellationToken);
+                }
+            }
+            finally
+            {
+                cmd.Parameters.Clear();
             }
         }
 
@@ -1051,9 +1134,21 @@ namespace Sweety.Common.DataProvider
         public virtual async Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where TKey : notnull
 #endif //NETSTANDARD2_0
         {
-            using (var reader = (DbDataReader)await GetReaderAsync(tran, cmdText, cmdType, cancellationToken, parameters))
+            IDbCommand cmd = BuildCommand(tran.Connection);
+            cmd.CommandType = cmdType;
+            cmd.CommandText = cmdText;
+            cmd.Transaction = tran;
+
+            try
             {
-                return await ReadToDictionaryAsync<TKey, TValue>(reader, cancellationToken);
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, SqlConnectionOwnership.External, cancellationToken))
+                {
+                    return await ReadToDictionaryAsync<TKey, TValue>(reader, cancellationToken);
+                }
+            }
+            finally
+            {
+                cmd.Parameters.Clear();
             }
         }
 
@@ -1065,9 +1160,20 @@ namespace Sweety.Common.DataProvider
         public virtual async Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where TKey : notnull
 #endif //NETSTANDARD2_0
         {
-            using (var reader = (DbDataReader)await GetReaderAsync(conn, cmdText, cmdType, cancellationToken, parameters))
+            IDbCommand cmd = BuildCommand(conn);
+            cmd.CommandType = cmdType;
+            cmd.CommandText = cmdText;
+
+            try
             {
-                return await ReadToDictionaryAsync<TKey, TValue>(reader, cancellationToken);
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, SqlConnectionOwnership.External, cancellationToken))
+                {
+                    return await ReadToDictionaryAsync<TKey, TValue>(reader, cancellationToken);
+                }
+            }
+            finally
+            {
+                cmd.Parameters.Clear();
             }
         }
 
@@ -1079,9 +1185,21 @@ namespace Sweety.Common.DataProvider
         public virtual T? GetSingle<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
 #endif //NETSTANDARD2_0
         {
-            using (var reader = GetReader(cmdText, cmdType, parameters))
+#if NETSTANDARD2_0
+            IDbCommand cmd = null;
+#else
+            IDbCommand? cmd = null;
+#endif
+            try
             {
-                return ReadToModel<T>(reader);
+                using (var reader = ExecuteReader(BuildConnection(), null, cmdType, cmdText, parameters, SqlConnectionOwnership.Internal, out cmd))
+                {
+                    return ReadToModel<T>(reader);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
             }
         }
 
@@ -1091,9 +1209,21 @@ namespace Sweety.Common.DataProvider
         public virtual T? GetSingle<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
 #endif //NETSTANDARD2_0
         {
-            using (var reader = GetReader(tran, cmdText, cmdType, parameters))
+#if NETSTANDARD2_0
+            IDbCommand cmd = null;
+#else
+            IDbCommand? cmd = null;
+#endif
+            try
             {
-                return ReadToModel<T>(reader);
+                using (var reader = ExecuteReader(null, tran, cmdType, cmdText, parameters, SqlConnectionOwnership.External, out cmd))
+                {
+                    return ReadToModel<T>(reader);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
             }
         }
 
@@ -1103,9 +1233,21 @@ namespace Sweety.Common.DataProvider
         public virtual T? GetSingle<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
 #endif //NETSTANDARD2_0
         {
-            using (var reader = GetReader(conn, cmdText, cmdType, parameters))
+#if NETSTANDARD2_0
+            IDbCommand cmd = null;
+#else
+            IDbCommand? cmd = null;
+#endif
+            try
             {
-                return ReadToModel<T>(reader);
+                using (var reader = ExecuteReader(conn, null, cmdType, cmdText, parameters, SqlConnectionOwnership.External, out cmd))
+                {
+                    return ReadToModel<T>(reader);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
             }
         }
 
@@ -1115,9 +1257,20 @@ namespace Sweety.Common.DataProvider
         public virtual async Task<T?> GetSingleAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
 #endif //NETSTANDARD2_0
         {
-            using (var reader = (DbDataReader)await GetReaderAsync(cmdText, cmdType, cancellationToken, parameters))
+            IDbCommand cmd = BuildCommand();
+            cmd.CommandType = cmdType;
+            cmd.CommandText = cmdText;
+
+            try
             {
-                return await ReadToModelAsync<T>(reader, cancellationToken);
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, SqlConnectionOwnership.Internal, cancellationToken))
+                {
+                    return await ReadToModelAsync<T>(reader, cancellationToken);
+                }
+            }
+            finally
+            {
+                cmd.Parameters.Clear();
             }
         }
 
@@ -1127,9 +1280,21 @@ namespace Sweety.Common.DataProvider
         public virtual async Task<T?> GetSingleAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
 #endif //NETSTANDARD2_0
         {
-            using (var reader = (DbDataReader)await GetReaderAsync(tran, cmdText, cmdType, cancellationToken, parameters))
+            IDbCommand cmd = BuildCommand(tran.Connection);
+            cmd.CommandType = cmdType;
+            cmd.CommandText = cmdText;
+            cmd.Transaction = tran;
+
+            try
             {
-                return await ReadToModelAsync<T>(reader, cancellationToken);
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, SqlConnectionOwnership.External, cancellationToken))
+                {
+                    return await ReadToModelAsync<T>(reader, cancellationToken);
+                }
+            }
+            finally
+            {
+                cmd.Parameters.Clear();
             }
         }
 
@@ -1139,9 +1304,20 @@ namespace Sweety.Common.DataProvider
         public virtual async Task<T?> GetSingleAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
 #endif //NETSTANDARD2_0
         {
-            using (var reader = (DbDataReader)await GetReaderAsync(conn, cmdText, cmdType, cancellationToken, parameters))
+            IDbCommand cmd = BuildCommand(conn);
+            cmd.CommandType = cmdType;
+            cmd.CommandText = cmdText;
+
+            try
             {
-                return await ReadToModelAsync<T>(reader, cancellationToken);
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, SqlConnectionOwnership.External, cancellationToken))
+                {
+                    return await ReadToModelAsync<T>(reader, cancellationToken);
+                }
+            }
+            finally
+            {
+                cmd.Parameters.Clear();
             }
         }
 
@@ -1181,37 +1357,71 @@ namespace Sweety.Common.DataProvider
 
 #if NETSTANDARD2_0
         public virtual IList<T> GetList<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+            IDbCommand cmd = null;
+
 #else
         public virtual IList<T>? GetList<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
-#endif //NETSTANDARD2_0
         {
-            using (var reader = GetReader(cmdText, cmdType, parameters))
+            IDbCommand? cmd = null;
+#endif //NETSTANDARD2_0
+
+            try
             {
-                return ReadToList<T>(reader);
+                using (var reader = ExecuteReader(BuildConnection(), null, cmdType, cmdText, parameters, SqlConnectionOwnership.Internal, out cmd))
+                {
+                    return ReadToList<T>(reader);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
             }
         }
 
 #if NETSTANDARD2_0
         public virtual IList<T> GetList<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+            IDbCommand cmd = null;
 #else
         public virtual IList<T>? GetList<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
-#endif //NETSTANDARD2_0
         {
-            using (var reader = GetReader(tran, cmdText, cmdType, parameters))
+            IDbCommand? cmd = null;
+#endif //NETSTANDARD2_0
+
+            try
             {
-                return ReadToList<T>(reader);
+                using (var reader = ExecuteReader(null, tran, cmdType, cmdText, parameters, SqlConnectionOwnership.External, out cmd))
+                {
+                    return ReadToList<T>(reader);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
             }
         }
 
 #if NETSTANDARD2_0
         public virtual IList<T> GetList<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+            IDbCommand cmd = null;
 #else
         public virtual IList<T>? GetList<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
-#endif //NETSTANDARD2_0
         {
-            using (var reader = GetReader(conn, cmdText, cmdType, parameters))
+            IDbCommand? cmd = null;
+#endif //NETSTANDARD2_0
+
+            try
             {
-                return ReadToList<T>(reader);
+                using (var reader = ExecuteReader(conn, null, cmdType, cmdText, parameters, SqlConnectionOwnership.External, out cmd))
+                {
+                    return ReadToList<T>(reader);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
             }
         }
 
@@ -1221,9 +1431,20 @@ namespace Sweety.Common.DataProvider
         public virtual async Task<IList<T>?> GetListAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
 #endif //NETSTANDARD2_0
         {
-            using (var reader = (DbDataReader)await GetReaderAsync(cmdText, cmdType, cancellationToken, parameters))
+            IDbCommand cmd = BuildCommand();
+            cmd.CommandType = cmdType;
+            cmd.CommandText = cmdText;
+
+            try
             {
-                return await ReadToListAsync<T>(reader, cancellationToken);
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, SqlConnectionOwnership.Internal, cancellationToken))
+                {
+                    return await ReadToListAsync<T>(reader, cancellationToken);
+                }
+            }
+            finally
+            {
+                cmd.Parameters.Clear();
             }
         }
 
@@ -1233,9 +1454,21 @@ namespace Sweety.Common.DataProvider
         public virtual async Task<IList<T>?> GetListAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
 #endif //NETSTANDARD2_0
         {
-            using (var reader = (DbDataReader)await GetReaderAsync(tran, cmdText, cmdType, cancellationToken, parameters))
+            IDbCommand cmd = BuildCommand(tran.Connection);
+            cmd.CommandType = cmdType;
+            cmd.CommandText = cmdText;
+            cmd.Transaction = tran;
+
+            try
             {
-                return await ReadToListAsync<T>(reader, cancellationToken);
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, SqlConnectionOwnership.External, cancellationToken))
+                {
+                    return await ReadToListAsync<T>(reader, cancellationToken);
+                }
+            }
+            finally
+            {
+                cmd.Parameters.Clear();
             }
         }
 
@@ -1245,9 +1478,20 @@ namespace Sweety.Common.DataProvider
         public virtual async Task<IList<T>?> GetListAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
 #endif //NETSTANDARD2_0
         {
-            using (var reader = (DbDataReader)await GetReaderAsync(conn, cmdText, cmdType, cancellationToken, parameters))
+            IDbCommand cmd = BuildCommand(conn);
+            cmd.CommandType = cmdType;
+            cmd.CommandText = cmdText;
+
+            try
             {
-                return await ReadToListAsync<T>(reader, cancellationToken);
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, SqlConnectionOwnership.External, cancellationToken))
+                {
+                    return await ReadToListAsync<T>(reader, cancellationToken);
+                }
+            }
+            finally
+            {
+                cmd.Parameters.Clear();
             }
         }
 
@@ -1255,37 +1499,70 @@ namespace Sweety.Common.DataProvider
 
 #if NETSTANDARD2_0
         public virtual ISet<T> GetSet<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+            IDbCommand cmd = null;
 #else
         public virtual ISet<T>? GetSet<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
-#endif //NETSTANDARD2_0
         {
-            using (var reader = GetReader(cmdText, cmdType, parameters))
+            IDbCommand? cmd = null;
+#endif //NETSTANDARD2_0
+
+            try
             {
-                return ReadToSet<T>(reader);
+                using (var reader = ExecuteReader(BuildConnection(), null, cmdType, cmdText, parameters, SqlConnectionOwnership.Internal, out cmd))
+                {
+                    return ReadToSet<T>(reader);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
             }
         }
 
 #if NETSTANDARD2_0
         public virtual ISet<T> GetSet<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+            IDbCommand cmd = null;
 #else
         public virtual ISet<T>? GetSet<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
-#endif //NETSTANDARD2_0
         {
-            using (var reader = GetReader(tran, cmdText, cmdType, parameters))
+            IDbCommand? cmd = null;
+#endif //NETSTANDARD2_0
+
+            try
             {
-                return ReadToSet<T>(reader);
+                using (var reader = ExecuteReader(null, tran, cmdType, cmdText, parameters, SqlConnectionOwnership.External, out cmd))
+                {
+                    return ReadToSet<T>(reader);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
             }
         }
 
 #if NETSTANDARD2_0
         public virtual ISet<T> GetSet<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+            IDbCommand cmd = null;
 #else
         public virtual ISet<T>? GetSet<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
-#endif //NETSTANDARD2_0
         {
-            using (var reader = GetReader(conn, cmdText, cmdType, parameters))
+            IDbCommand? cmd = null;
+#endif //NETSTANDARD2_0
+
+            try
             {
-                return ReadToSet<T>(reader);
+                using (var reader = ExecuteReader(conn, null, cmdType, cmdText, parameters, SqlConnectionOwnership.External, out cmd))
+                {
+                    return ReadToSet<T>(reader);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
             }
         }
 
@@ -1295,9 +1572,20 @@ namespace Sweety.Common.DataProvider
         public virtual async Task<ISet<T>?> GetSetAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
 #endif //NETSTANDARD2_0
         {
-            using (var reader = (DbDataReader)await GetReaderAsync(cmdText, cmdType, cancellationToken, parameters))
+            IDbCommand cmd = BuildCommand();
+            cmd.CommandType = cmdType;
+            cmd.CommandText = cmdText;
+
+            try
             {
-                return await ReadToSetAsync<T>(reader, cancellationToken);
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, SqlConnectionOwnership.Internal, cancellationToken))
+                {
+                    return await ReadToSetAsync<T>(reader, cancellationToken);
+                }
+            }
+            finally
+            {
+                cmd.Parameters.Clear();
             }
         }
 
@@ -1307,9 +1595,21 @@ namespace Sweety.Common.DataProvider
         public virtual async Task<ISet<T>?> GetSetAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
 #endif //NETSTANDARD2_0
         {
-            using (var reader = (DbDataReader)await GetReaderAsync(tran, cmdText, cmdType, cancellationToken, parameters))
+            IDbCommand cmd = BuildCommand(tran.Connection);
+            cmd.CommandType = cmdType;
+            cmd.CommandText = cmdText;
+            cmd.Transaction = tran;
+
+            try
             {
-                return await ReadToSetAsync<T>(reader, cancellationToken);
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, SqlConnectionOwnership.External, cancellationToken))
+                {
+                    return await ReadToSetAsync<T>(reader, cancellationToken);
+                }
+            }
+            finally
+            {
+                cmd.Parameters.Clear();
             }
         }
 
@@ -1319,9 +1619,20 @@ namespace Sweety.Common.DataProvider
         public virtual async Task<ISet<T>?> GetSetAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
 #endif //NETSTANDARD2_0
         {
-            using (var reader = (DbDataReader)await GetReaderAsync(conn, cmdText, cmdType, cancellationToken, parameters))
+            IDbCommand cmd = BuildCommand(conn);
+            cmd.CommandType = cmdType;
+            cmd.CommandText = cmdText;
+
+            try
             {
-                return await ReadToSetAsync<T>(reader, cancellationToken);
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, SqlConnectionOwnership.External, cancellationToken))
+                {
+                    return await ReadToSetAsync<T>(reader, cancellationToken);
+                }
+            }
+            finally
+            {
+                cmd.Parameters.Clear();
             }
         }
 
@@ -1329,37 +1640,70 @@ namespace Sweety.Common.DataProvider
 
 #if NETSTANDARD2_0
         public virtual ICollection<T> GetCollection<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+            IDbCommand cmd = null;
 #else
         public virtual ICollection<T>? GetCollection<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
-#endif //NETSTANDARD2_0
         {
-            using (var reader = GetReader(cmdText, cmdType, parameters))
+            IDbCommand? cmd = null;
+#endif //NETSTANDARD2_0
+
+            try
             {
-                return ReadToCollection<T>(reader);
+                using (var reader = ExecuteReader(BuildConnection(), null, cmdType, cmdText, parameters, SqlConnectionOwnership.Internal, out cmd))
+                {
+                    return ReadToCollection<T>(reader);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
             }
         }
 
 #if NETSTANDARD2_0
         public virtual ICollection<T> GetCollection<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+            IDbCommand cmd = null;
 #else
         public virtual ICollection<T>? GetCollection<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
-#endif //NETSTANDARD2_0
         {
-            using (var reader = GetReader(tran, cmdText, cmdType, parameters))
+            IDbCommand? cmd = null;
+#endif //NETSTANDARD2_0
+
+            try
             {
-                return ReadToCollection<T>(reader);
+                using (var reader = ExecuteReader(null, tran, cmdType, cmdText, parameters, SqlConnectionOwnership.External, out cmd))
+                {
+                    return ReadToCollection<T>(reader);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
             }
         }
 
 #if NETSTANDARD2_0
         public virtual ICollection<T> GetCollection<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+            IDbCommand cmd = null;
 #else
         public virtual ICollection<T>? GetCollection<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
-#endif //NETSTANDARD2_0
         {
-            using (var reader = GetReader(conn, cmdText, cmdType, parameters))
+            IDbCommand? cmd = null;
+#endif //NETSTANDARD2_0
+
+            try
             {
-                return ReadToCollection<T>(reader);
+                using (var reader = ExecuteReader(conn, null, cmdType, cmdText, parameters, SqlConnectionOwnership.External, out cmd))
+                {
+                    return ReadToCollection<T>(reader);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
             }
         }
 
@@ -1369,9 +1713,20 @@ namespace Sweety.Common.DataProvider
         public virtual async Task<ICollection<T>?> GetCollectionAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
 #endif //NETSTANDARD2_0
         {
-            using (var reader = (DbDataReader)await GetReaderAsync(cmdText, cmdType, cancellationToken, parameters))
+            IDbCommand cmd = BuildCommand();
+            cmd.CommandType = cmdType;
+            cmd.CommandText = cmdText;
+
+            try
             {
-                return await ReadToCollectionAsync<T>(reader, cancellationToken);
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, SqlConnectionOwnership.Internal, cancellationToken))
+                {
+                    return await ReadToCollectionAsync<T>(reader, cancellationToken);
+                }
+            }
+            finally
+            {
+                cmd.Parameters.Clear();
             }
         }
 
@@ -1382,9 +1737,21 @@ namespace Sweety.Common.DataProvider
         public virtual async Task<ICollection<T>?> GetCollectionAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
 #endif //NETSTANDARD2_0
         {
-            using (var reader = (DbDataReader)await GetReaderAsync(tran, cmdText, cmdType, cancellationToken, parameters))
+            IDbCommand cmd = BuildCommand(tran.Connection);
+            cmd.CommandType = cmdType;
+            cmd.CommandText = cmdText;
+            cmd.Transaction = tran;
+
+            try
             {
-                return await ReadToCollectionAsync<T>(reader, cancellationToken);
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, SqlConnectionOwnership.External, cancellationToken))
+                {
+                    return await ReadToCollectionAsync<T>(reader, cancellationToken);
+                }
+            }
+            finally
+            {
+                cmd.Parameters.Clear();
             }
         }
 
@@ -1394,9 +1761,20 @@ namespace Sweety.Common.DataProvider
         public virtual async Task<ICollection<T>?> GetCollectionAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
 #endif //NETSTANDARD2_0
         {
-            using (var reader = (DbDataReader)await GetReaderAsync(conn, cmdText, cmdType, cancellationToken, parameters))
+            IDbCommand cmd = BuildCommand(conn);
+            cmd.CommandType = cmdType;
+            cmd.CommandText = cmdText;
+
+            try
             {
-                return await ReadToCollectionAsync<T>(reader, cancellationToken);
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, SqlConnectionOwnership.External, cancellationToken))
+                {
+                    return await ReadToCollectionAsync<T>(reader, cancellationToken);
+                }
+            }
+            finally
+            {
+                cmd.Parameters.Clear();
             }
         }
         #endregion IRelationalDBUtility interface implementation.
@@ -1464,6 +1842,7 @@ namespace Sweety.Common.DataProvider
         protected abstract Task<object> ExecuteScalarAsync(IDbConnection? connection, IDbTransaction? transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, CancellationToken cancellationToken = default);
 #endif //NETSTANDARD2_0
 
+
         /// <summary> 
         /// 执行指定 T-SQL 命令，返回结果集的数据读取器。
         /// </summary> 
@@ -1473,15 +1852,28 @@ namespace Sweety.Common.DataProvider
         /// <param name="commandText">存储过程名或T-SQL语句</param> 
         /// <param name="commandParameters">参数数组,如果没有参数则为<c>null</c></param> 
         /// <param name="connectionOwnership">标识数据库连接对象由调用者提供还是有此类或直接或间接子类提供。</param> 
+        /// <param name="command">返回执行命令的对象。用于在存储过程使用输出变量时，关闭 <see cref="IDataReader"/> 对象，输出参数被赋值后清除参数，达到参数对象重复使用的目的。</param>
         /// <returns>返回包含结果集的数据读取器</returns> 
 #if NETSTANDARD2_0
-        protected abstract IDataReader ExecuteReader(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, SqlConnectionOwnership connectionOwnership);
+        protected abstract IDataReader ExecuteReader(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, SqlConnectionOwnership connectionOwnership, out IDbCommand command);
 #else
-        protected abstract IDataReader ExecuteReader(IDbConnection? connection, IDbTransaction? transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, SqlConnectionOwnership connectionOwnership);
+        protected abstract IDataReader ExecuteReader(IDbConnection? connection, IDbTransaction? transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, SqlConnectionOwnership connectionOwnership, out IDbCommand command);
 #endif //NETSTANDARD2_0
         /// <summary> 
         /// 异步执行指定 T-SQL 命令，返回结果集的数据读取器。
         /// </summary> 
+        /// <param name="command">一个有效的用于执行数据库命令的对象。</param> 
+        /// <param name="commandParameters">参数数组,如果没有参数则为<c>null</c></param> 
+        /// <param name="connectionOwnership">标识数据库连接对象由调用者提供还是有此类或直接或间接子类提供。</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <returns>返回包含结果集的数据读取器</returns> 
+        protected abstract Task<IDataReader> ExecuteReaderAsync(IDbCommand command, IDataParameter[] commandParameters, SqlConnectionOwnership connectionOwnership, CancellationToken cancellationToken = default);
+        /// <summary> 
+        /// 异步执行指定 T-SQL 命令，返回结果集的数据读取器。
+        /// </summary> 
+        /// <remarks>
+        /// 这个方法是不能获取存储过程的输出参数的，如果要获取存储过程输出参数的值请使用 <see cref="ExecuteReaderAsync(IDbCommand, IDataParameter[], SqlConnectionOwnership, CancellationToken)"/> 或 <see cref="ExecuteReader(IDbConnection?, IDbTransaction?, CommandType, string, IDataParameter[], SqlConnectionOwnership, out IDbCommand)"/> 方法。
+        /// </remarks>
         /// <param name="connection">一个有效的数据库连接对象</param> 
         /// <param name="transaction">一个有效的事务,或者为<c>null</c></param> 
         /// <param name="commandType">命令类型 (存储过程,命令文本或其它)</param> 

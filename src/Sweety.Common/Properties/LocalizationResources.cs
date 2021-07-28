@@ -58,6 +58,8 @@ namespace Sweety.Common.Properties
         public static string the_value_ranges_from_XXX_to_XXX => Localization.the_value_ranges_from_XXX_to_XXX;
 
         public static string the_value_ranges_from_XXX_to_XXX_milliseconds => Localization.the_value_ranges_from_XXX_to_XXX_milliseconds;
+
+        public static string is_not_a_valid_object_of_type_XXX => Localization.is_not_a_valid_object_of_type_XXX;
         #endregion 同步 Sweety.Common.Properties.Localization 里自动生成的属性。
     }
 }

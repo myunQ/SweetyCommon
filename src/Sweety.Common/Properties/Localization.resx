@@ -228,4 +228,7 @@
   <data name="invalid value XXX" xml:space="preserve">
     <value>invalid value '{0}'.</value>
   </data>
+  <data name="is not a valid object of type XXX" xml:space="preserve">
+    <value>"{0}" is not a valid object of type "{1}".</value>
+  </data>
 </root>

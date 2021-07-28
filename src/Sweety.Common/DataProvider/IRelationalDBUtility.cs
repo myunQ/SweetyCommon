@@ -574,9 +574,11 @@ namespace Sweety.Common.DataProvider
         /// <returns>返回<see cref="System.Data.IDataReader"/>对象实例</returns>
         IDataReader GetReader(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
 
+
         /// <summary>
         /// 异步执行T-SQL命令，并生成<see cref="System.Data.IDataReader"/>。
         /// </summary>
+        /// <remarks>如果在方法返回的<see cref="IDataReader"/>关闭之后才会对<see cref="IDbCommand.Parameters"/>关联的输出参数赋值的话，那么此方法不会对存储过程的输出参数赋值。因为在方法返回的<see cref="IDataReader"/>关闭之前就已将<see cref="IDbCommand.Parameters"/>集合清空。</remarks>
         /// <param name="cmdText">T-SQL命令</param>
         /// <param name="cmdType">命令类型</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
@@ -586,6 +588,7 @@ namespace Sweety.Common.DataProvider
         /// <summary>
         /// 异步执行T-SQL命令，并生成<see cref="System.Data.IDataReader"/>。
         /// </summary>
+        /// <remarks>如果在方法返回的<see cref="IDataReader"/>关闭之后才会对<see cref="IDbCommand.Parameters"/>关联的输出参数赋值的话，那么此方法不会对存储过程的输出参数赋值。因为在方法返回的<see cref="IDataReader"/>关闭之前就已将<see cref="IDbCommand.Parameters"/>集合清空。</remarks>
         /// <param name="tran">数据库事务对象实例。</param>
         /// <param name="cmdText">T-SQL命令</param>
         /// <param name="cmdType">命令类型</param>
@@ -596,6 +599,7 @@ namespace Sweety.Common.DataProvider
         /// <summary>
         /// 异步执行T-SQL命令，并生成<see cref="System.Data.IDataReader"/>。
         /// </summary>
+        /// <remarks>如果在方法返回的<see cref="IDataReader"/>关闭之后才会对<see cref="IDbCommand.Parameters"/>关联的输出参数赋值的话，那么此方法不会对存储过程的输出参数赋值。因为在方法返回的<see cref="IDataReader"/>关闭之前就已将<see cref="IDbCommand.Parameters"/>集合清空。</remarks>
         /// <param name="conn">数据库链接对象</param>
         /// <param name="cmdText">T-SQL命令</param>
         /// <param name="cmdType">命令类型</param>

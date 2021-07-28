@@ -228,4 +228,7 @@
   <data name="invalid value XXX" xml:space="preserve">
     <value>无效的值 ‘{0}’。</value>
   </data>
+  <data name="is not a valid object of type XXX" xml:space="preserve">
+    <value>“{0}”不是有效的“{B}”类型的对象。</value>
+  </data>
 </root>
