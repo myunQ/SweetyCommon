@@ -103,6 +103,13 @@ namespace Sweety.Common.DataProvider
         }
 
         /// <summary>
+        /// 回到新实例时的状态。
+        /// </summary>
+        public void Reset() => _paramArrayIndex = 0;
+
+
+
+        /// <summary>
         /// 
         /// </summary>
         public void Dispose()

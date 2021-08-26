@@ -233,7 +233,7 @@ namespace Sweety.Common.DataProvider
         /// <summary>
         /// 一条SQL语句中IN运算符中最多放置多少个值。值的多数量取决于是否能使用索引和整体SQL语句有没有超过最大长度。
         /// </summary>
-        protected virtual int SqlInParameterMaximumLength => 50;
+        public virtual int SqlInParameterMaximumLength => 50;
 
 
 

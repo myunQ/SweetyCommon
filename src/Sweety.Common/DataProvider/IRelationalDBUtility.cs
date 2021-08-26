@@ -43,6 +43,11 @@ namespace Sweety.Common.DataProvider
         int ServerIndex { get; }
 
         /// <summary>
+        /// 一条SQL语句中IN运算符中最多放置多少个值。值的多数量取决于是否能使用索引和整体SQL语句有没有超过最大长度。
+        /// </summary>
+        int SqlInParameterMaximumLength { get; }
+
+        /// <summary>
         /// 使用指定模型对象实例接收<see cref="GetSingle{T}(string, CommandType, IDataParameter[])"/>方法及其重载方法读取到的数据并返回此实例。
         /// </summary>
         /// <typeparam name="T">模型类型，此类型必须与<see cref="GetSingle{T}(string, CommandType, IDataParameter[])"/>方法中的泛型类型一致或是它的父类型。</typeparam>

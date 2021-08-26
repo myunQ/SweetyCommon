@@ -132,8 +132,26 @@ namespace Sweety.Common.DataProvider
                 blockade = null;
             }
 
-            // 这里时先对左侧进行运算，所以不能将 _paramArrayIndex++ 放在左侧。
+            // 这里是先对左侧进行运算，所以不能将 _paramArrayIndex++ 放在左侧。
             _paramArray[_paramArrayIndex] = (T)_dbUtility.ResetOrBuildParameter(_paramArray[_paramArrayIndex++], parameterName, value, parameterType, size, direction);
+        }
+
+        /// <summary>
+        /// 回到新实例时的状态。
+        /// </summary>
+        public void Reset()
+        {
+#if NET5_0_OR_GREATER
+            if (blockade is not null)
+#else
+            if (blockade != null)
+#endif
+            {
+                _paramArray[_paramArrayIndex] = blockade;
+                blockade = null;
+            }
+
+            _paramArrayIndex = 0;
         }
 
         /// <summary>
