@@ -1937,7 +1937,7 @@ namespace Sweety.Common.DataProvider
 
                 do
                 {
-                    result.Add((TKey)reader[0], reader.IsDBNull(1) ? default : (TValue)reader[1]);
+                    result.Add((TKey)reader[0], reader.IsDBNull(1) ? default : (TValue)InternalConvertUtility.HackType(reader[1], typeof(TValue)));
                 }
                 while (reader.Read());
             }
@@ -1967,7 +1967,7 @@ namespace Sweety.Common.DataProvider
 
                 do
                 {
-                    result.Add((TKey)reader[0], reader.IsDBNull(1) ? default : (TValue)reader[1]);
+                    result.Add((TKey)reader[0], reader.IsDBNull(1) ? default : (TValue)InternalConvertUtility.HackType(reader[1], typeof(TValue)));
                 }
                 while (reader.Read());
             }
@@ -1997,7 +1997,7 @@ namespace Sweety.Common.DataProvider
 
                 do
                 {
-                    result.Add((TKey)reader[0], reader.IsDBNull(1) ? default : (TValue)reader[1]);
+                    result.Add((TKey)reader[0], reader.IsDBNull(1) ? default : (TValue)InternalConvertUtility.HackType(reader[1], typeof(TValue)));
                 }
                 while (reader.Read());
             }
@@ -2036,7 +2036,7 @@ namespace Sweety.Common.DataProvider
 
                 do
                 {
-                    result.Add((TKey)reader[0], await reader.IsDBNullAsync(1, cancellationToken) ? default : (TValue)reader[1]);
+                    result.Add((TKey)reader[0], await reader.IsDBNullAsync(1, cancellationToken) ? default : (TValue)InternalConvertUtility.HackType(reader[1], typeof(TValue)));
                 }
                 while (await reader.ReadAsync(cancellationToken));
             }
@@ -2066,7 +2066,7 @@ namespace Sweety.Common.DataProvider
 
                 do
                 {    
-                    result.Add((TKey)reader[0], await reader.IsDBNullAsync(1, cancellationToken) ? default : (TValue)reader[1]);
+                    result.Add((TKey)reader[0], await reader.IsDBNullAsync(1, cancellationToken) ? default : (TValue)InternalConvertUtility.HackType(reader[1], typeof(TValue)));
                 }
                 while (await reader.ReadAsync(cancellationToken));
             }
@@ -2096,8 +2096,7 @@ namespace Sweety.Common.DataProvider
 
                 do
                 {
-
-                    result.Add((TKey)reader[0], await reader.IsDBNullAsync(1, cancellationToken) ? default : (TValue)reader[1]);
+                    result.Add((TKey)reader[0], await reader.IsDBNullAsync(1, cancellationToken) ? default : (TValue)InternalConvertUtility.HackType(reader[1], typeof(TValue)));
                 }
                 while (await reader.ReadAsync(cancellationToken));
             }
@@ -2196,7 +2195,7 @@ namespace Sweety.Common.DataProvider
                         }
                         else
                         {
-                            collection.Add((T)reader[0]);
+                            collection.Add((T)InternalConvertUtility.HackType(reader[0], typeof(T)));
                         }
                     } while (reader.Read());
                 }
@@ -2257,7 +2256,7 @@ namespace Sweety.Common.DataProvider
                         }
                         else
                         {
-                            collection.Add((T)reader[0]);
+                            collection.Add((T)InternalConvertUtility.HackType(reader[0], typeof(T)));
                         }
                     } while (await reader.ReadAsync(cancellationToken));
 
