@@ -109,6 +109,27 @@ namespace Sweety.Common.DataProvider
         /// <summary>
         /// 添加SQL参数对象到<see cref="Parameters"/>属性返回的数组中。
         /// </summary>
+        /// <param name="parameter">要添加的参数对象。</param>
+        public void Add(T parameter)
+        {
+            if (_paramArrayIndex == _capacity) throw new InvalidOperationException($"超出初始化时设定的参数数量：{_capacity}。");
+
+#if NET5_0_OR_GREATER
+            if (blockade is not null)
+#else
+            if (blockade != null)
+#endif
+            {
+                _paramArray[_paramArrayIndex] = blockade;
+                blockade = null;
+            }
+
+            _paramArray[_paramArrayIndex++] = parameter;
+        }
+
+        /// <summary>
+        /// 添加SQL参数对象到<see cref="Parameters"/>属性返回的数组中。
+        /// </summary>
         /// <param name="parameterName">参数名称。</param>
         /// <param name="value">参数值。</param>
         /// <param name="parameterType">参数类型。值为各数据库客户端提供的数据库参数类型枚举值。</param>

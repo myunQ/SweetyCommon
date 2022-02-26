@@ -673,7 +673,7 @@ namespace Sweety.Common.Verification
         /// 验证字符串是否是 <c>GUID</c>（xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx）字符串。
         /// </summary>
         /// <param name="str">需要验证的字符串，不区分大小写。</param>
-        /// <returns>字符传符合 <c>GUID</c> 的字符表现形式则返回 <c>true</c>，否则返回 <c>false</c>。</returns>
+        /// <returns>字符串符合 <c>GUID</c> 的字符表现形式则返回 <c>true</c>，否则返回 <c>false</c>。</returns>
         public static bool IsGUID(this string str)
         {
             if (String.IsNullOrEmpty(str) || str.Length != 36) return false;
@@ -699,7 +699,38 @@ namespace Sweety.Common.Verification
                     }
                 }
 
-                if ((c < 'a' || c > 'f') && (c < 'A' || c > 'f') && (c < '0' || c > '9'))
+#if NET5_0_OR_GREATER
+                if (c is (< 'a' or > 'f') and (< 'A' or > 'F') and (< '0' or > '9'))
+#else
+                if ((c < 'a' || c > 'f') && (c < 'A' || c > 'F') && (c < '0' || c > '9'))
+#endif
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// 验证字符串是否是十六进制字符串。
+        /// </summary>
+        /// <param name="str">需要验证的字符串，不区分大小写。</param>
+        /// <returns>字符串是有效的十六进制字符串则返回 <c>true</c>，否则返回 <c>false</c>。</returns>
+        public static bool IsHex(this string str)
+        {
+            if (String.IsNullOrEmpty(str)) return false;
+
+            if (str.Length % 2 != 0) return false;
+
+            for (int i = str.Length - 1; i > -1; i--)
+            {
+                char c = str[i];
+#if NET5_0_OR_GREATER
+                if (c is (< 'a' or > 'f') and (< 'A' or > 'F') and (< '0' or > '9'))
+#else
+                if ((c < 'a' || c > 'f') && (c < 'A' || c > 'F') && (c < '0' || c > '9'))
+#endif
                 {
                     return false;
                 }

@@ -56,7 +56,11 @@ namespace Sweety.Common.DataProvider.MySql
         /// <param name="polling">表示应使用的数据库连接字符串索引，辅助实现数据库服务器轮询。</param>
         /// <param name="masterConnStr">主数据库服务器链接字符串集合。</param>
         /// <param name="slaveConnStr">从数据库服务器链接字符串集合。</param>
+#if NETSTANDARD2_0
         public MySQLUtility(ServersPolling polling, string[] masterConnStr, string[] slaveConnStr)
+#else
+        public MySQLUtility(ServersPolling polling, string[] masterConnStr, string[]? slaveConnStr)
+#endif //NETSTANDARD2_0
             : base(polling, masterConnStr, slaveConnStr)
         { }
 
@@ -77,7 +81,11 @@ namespace Sweety.Common.DataProvider.MySql
         /// <param name="role">要使用什么角色的数据库服务器。</param>
         /// <param name="masterConnStr">主数据库服务器链接字符串集合。</param>
         /// <param name="slaveConnStr">从数据库服务器链接字符串集合。</param>
+#if NETSTANDARD2_0
         public MySQLUtility(ServersPolling polling, DatabaseServerRole role, string[] masterConnStr, string[] slaveConnStr)
+#else
+        public MySQLUtility(ServersPolling polling, DatabaseServerRole role, string[] masterConnStr, string[]? slaveConnStr)
+#endif //NETSTANDARD2_0
             : base(polling, role, masterConnStr, slaveConnStr)
         { }
 

@@ -609,7 +609,7 @@ namespace Sweety.Common.Extensions
         /// <summary>
         /// 将 十六进制 的字符串转换为 <c>byte</c> 数组。
         /// </summary>
-        /// <param name="hexString">十六进制字符串，长度应为偶数。</param>
+        /// <param name="value">十六进制字符串，长度应为偶数。</param>
         /// <returns>十六进制字符串对应的 <c>byte</c> 数组，如果字符串为空则返回零长度的 <c>byte</c>数组。</returns>
         public static byte[] HexToBytes(this string value)
         {

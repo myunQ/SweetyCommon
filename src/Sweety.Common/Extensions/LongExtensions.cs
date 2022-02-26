@@ -98,7 +98,7 @@ namespace Sweety.Common.Extensions
 #if NETSTANDARD2_0
             return new String(buf, charPos, (65 - charPos));
 #else
-            return new String(buf.Slice(charPos, (65 - charPos)));
+            return new String(buf[charPos..^0]);
 #endif
         }
 

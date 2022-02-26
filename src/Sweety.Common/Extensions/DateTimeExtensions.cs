@@ -119,7 +119,7 @@ namespace Sweety.Common.Extensions
         /// 获取月份属于哪个季度。
         /// </summary>
         /// <param name="date">日期。</param>
-        /// <returns>月份所属季度。</returns>
+        /// <returns>月份所属季度。取值范围：1、2、3、4。其中 1 表示第一季度，以此类推。</returns>
         public static int GetQuarter(this DateTime date)
         {
             var q = date.Month / 3f;
