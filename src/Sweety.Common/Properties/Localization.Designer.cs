@@ -155,8 +155,7 @@ namespace Sweety.Common.Properties {
         /// </summary>
         internal static string the_database_connection_provided_and_the_database_connection_used_by_the_transaction_must_be_the_same_instance {
             get {
-                return ResourceManager.GetString("the database connection provided and the database connection used by the transact" +
-                        "ion must be the same instance", resourceCulture);
+                return ResourceManager.GetString("the database connection provided and the database connection used by the transaction must be the same instance", resourceCulture);
             }
         }
         
@@ -174,8 +173,7 @@ namespace Sweety.Common.Properties {
         /// </summary>
         internal static string the_element_of_the_master_database_connection_string_index_XXX_is_a_null_or_empty_string {
             get {
-                return ResourceManager.GetString("the element of the master database connection string index XXX is a null or empty" +
-                        " string", resourceCulture);
+                return ResourceManager.GetString("the element of the master database connection string index XXX is a null or empty string", resourceCulture);
             }
         }
         
@@ -184,8 +182,7 @@ namespace Sweety.Common.Properties {
         /// </summary>
         internal static string the_element_of_the_slave_database_connection_string_index_XXX_is_a_null_or_empty_string {
             get {
-                return ResourceManager.GetString("the element of the slave database connection string index XXX is a null or empty " +
-                        "string", resourceCulture);
+                return ResourceManager.GetString("the element of the slave database connection string index XXX is a null or empty string", resourceCulture);
             }
         }
         
@@ -203,8 +200,7 @@ namespace Sweety.Common.Properties {
         /// </summary>
         internal static string the_length_of_bytes_after_the_intercepted_string_plus_the_appended_string_exceeds_the_expected_length {
             get {
-                return ResourceManager.GetString("the length of bytes after the intercepted string plus the appended string exceeds" +
-                        " the expected length", resourceCulture);
+                return ResourceManager.GetString("the length of bytes after the intercepted string plus the appended string exceeds the expected length", resourceCulture);
             }
         }
         
@@ -222,8 +218,7 @@ namespace Sweety.Common.Properties {
         /// </summary>
         internal static string the_length_of_the_string_to_be_appended_to_the_end_exceeds_the_length_to_be_intercepted_or_equal_to_the_length_to_be_intercepted {
             get {
-                return ResourceManager.GetString("the length of the string to be appended to the end exceeds the length to be inter" +
-                        "cepted or equal to the length to be intercepted", resourceCulture);
+                return ResourceManager.GetString("the length of the string to be appended to the end exceeds the length to be intercepted or equal to the length to be intercepted", resourceCulture);
             }
         }
         
@@ -268,8 +263,7 @@ namespace Sweety.Common.Properties {
         /// </summary>
         internal static string the_specified_initialization_vector_does_not_match_the_block_size_of_this_algorithm {
             get {
-                return ResourceManager.GetString("the specified initialization vector does not match the block size of this algorit" +
-                        "hm", resourceCulture);
+                return ResourceManager.GetString("the specified initialization vector does not match the block size of this algorithm", resourceCulture);
             }
         }
         
@@ -359,8 +353,7 @@ namespace Sweety.Common.Properties {
         /// </summary>
         internal static string the_value_XXX_of_type_XXXType_cannot_be_converted_to_a_value_of_type_IPAddressType {
             get {
-                return ResourceManager.GetString("the value XXX of type XXXType cannot be converted to a value of type IPAddressTyp" +
-                        "e", resourceCulture);
+                return ResourceManager.GetString("the value XXX of type XXXType cannot be converted to a value of type IPAddressType", resourceCulture);
             }
         }
         
@@ -369,8 +362,7 @@ namespace Sweety.Common.Properties {
         /// </summary>
         internal static string the_XXX_property_of_the_encryption_algorithm_instance_contains_XXX_elements__not_just_one_element {
             get {
-                return ResourceManager.GetString("the XXX property of the encryption algorithm instance contains XXX elements, not " +
-                        "just one element", resourceCulture);
+                return ResourceManager.GetString("the XXX property of the encryption algorithm instance contains XXX elements, not just one element", resourceCulture);
             }
         }
         

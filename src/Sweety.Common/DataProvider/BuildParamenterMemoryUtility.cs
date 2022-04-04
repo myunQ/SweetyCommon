@@ -12,17 +12,17 @@ namespace Sweety.Common.DataProvider
     /// <h2>创建三个SQL参数对象：</h2>
     /// <per>
     /// IRelationalDBUtility _db = RelationalDBUtilityFactory.Create("npsql"); //这一行是伪代码。
-    /// using BuildParamenterMemoryUtility<Npgsql.NpgsqlParameter> buildParamUtil = new(_db, 5);
+    /// using BuildParamenterMemoryUtility&lt;Npgsql.NpgsqlParameter&gt; buildParamUtil = new(_db, 5);
     /// buildParamUtil.Add("@param-1", "Paramenter Value", (int)NpgsqlTypes.NpgsqlDbType.Varchar, 100);
-    /// buildParamUtil.Add("@param-2", 20210721, (int)NpgsqlTypes.NpgsqlDbType.Integer);
-    /// buildParamUtil.Add("@param-3", null, (int)NpgsqlTypes.NpgsqlDbType.Integer, default, ParameterDirection.Output);
+    ///     .Add("@param-2", 20210721, (int)NpgsqlTypes.NpgsqlDbType.Integer);
+    ///     .Add("@param-3", null, (int)NpgsqlTypes.NpgsqlDbType.Integer, default, ParameterDirection.Output);
     /// ReadOnlyMemory&lt;IDbDataParamenter&gt; paramMemory = buildParamUtil.Parameters;
     /// </per>
     /// 下面的代码和上面的代码作用是相同的：
     /// <per>
     /// IRelationalDBUtility _db = RelationalDBUtilityFactory.Create("npsql"); //这一行是伪代码。
     /// int paramArryIndex = 0;
-    /// IDbDataParamenter[] paramArry = System.Buffers.ArrayPool<Npgsql.NpgsqlParameter>.Shared.Rent(5);
+    /// IDbDataParamenter[] paramArry = System.Buffers.ArrayPool&lt;Npgsql.NpgsqlParameter&gt;.Shared.Rent(5);
     /// try
     /// {
     ///     paramArr[paramArryIndex] = _db.ResetOrBuildParameter(paramArr[paramArryIndex++], "@param-1", "Paramenter Value", (int)NpgsqlTypes.NpgsqlDbType.Varchar, 100);
@@ -33,7 +33,7 @@ namespace Sweety.Common.DataProvider
     /// }
     /// finally
     /// {
-    ///     System.Buffers.ArrayPool<Npgsql.NpgsqlParameter>.Shared.Return((Npgsql.NpgsqlParameter[])paramArr);
+    ///     System.Buffers.ArrayPool&lt;Npgsql.NpgsqlParameter&gt;.Shared.Return((Npgsql.NpgsqlParameter[])paramArr);
     /// }
     /// </per>
     /// </example>
@@ -86,11 +86,13 @@ namespace Sweety.Common.DataProvider
         /// 添加SQL参数对象到<see cref="Parameters"/>属性返回的数组中。
         /// </summary>
         /// <param name="parameter">要添加的参数对象。</param>
-        public void Add(T parameter)
+        public BuildParamenterMemoryUtility<T> Add(T parameter)
         {
             if (_paramArrayIndex == _capacity) throw new InvalidOperationException($"超出初始化时设定的参数数量：{_capacity}。");
 
             _paramArray[_paramArrayIndex++] = parameter;
+
+            return this;
         }
 
 
@@ -103,21 +105,28 @@ namespace Sweety.Common.DataProvider
         /// <param name="size">参数的空间大小。</param>
         /// <param name="direction">参数的方向。</param>
 #if NETSTANDARD2_0
-        public void Add(string parameterName, object value, int parameterType, int size = default, ParameterDirection direction = ParameterDirection.Input)
+        public BuildParamenterMemoryUtility<T> Add(string parameterName, object value, int parameterType, int size = default, ParameterDirection direction = ParameterDirection.Input)
 #else
-        public void Add(string parameterName, object? value, int parameterType, int size = default, ParameterDirection direction = ParameterDirection.Input)
+        public BuildParamenterMemoryUtility<T> Add(string parameterName, object? value, int parameterType, int size = default, ParameterDirection direction = ParameterDirection.Input)
 #endif
         {
             if (_paramArrayIndex == _capacity) throw new InvalidOperationException($"超出初始化时设定的参数数量：{_capacity}。");
 
             // 这里是先对左侧进行运算，所以不能将 _paramArrayIndex++ 放在左侧。
             _paramArray[_paramArrayIndex] = _dbUtility.ResetOrBuildParameter(_paramArray[_paramArrayIndex++], parameterName, value, parameterType, size, direction);
+
+            return this;
         }
 
         /// <summary>
         /// 回到新实例时的状态。
         /// </summary>
-        public void Reset() => _paramArrayIndex = 0;
+        public BuildParamenterMemoryUtility<T> Reset()
+        {
+            _paramArrayIndex = 0;
+            return this;
+        }
+        
 
 
 

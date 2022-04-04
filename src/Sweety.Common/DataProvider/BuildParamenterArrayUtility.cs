@@ -13,10 +13,10 @@ namespace Sweety.Common.DataProvider
     /// <h2>创建三个SQL参数对象：</h2>
     /// <per>
     /// IRelationalDBUtility _db = RelationalDBUtilityFactory.Create("npsql"); //这一行是伪代码。
-    /// using BuildParamenterArrayUtility<Npgsql.NpgsqlParameter> buildParamUtil = new(_db, 3);
-    /// buildParamUtil.Add("@param-1", "Paramenter Value", (int)NpgsqlTypes.NpgsqlDbType.Varchar, 100);
-    /// buildParamUtil.Add("@param-2", 20210721, (int)NpgsqlTypes.NpgsqlDbType.Integer);
-    /// buildParamUtil.Add("@param-3", null, (int)NpgsqlTypes.NpgsqlDbType.Integer, default, ParameterDirection.Output);
+    /// using BuildParamenterArrayUtility&lt;Npgsql.NpgsqlParameter&gt; buildParamUtil = new(_db, 3);
+    /// buildParamUtil.Add("@param-1", "Paramenter Value", (int)NpgsqlTypes.NpgsqlDbType.Varchar, 100)
+    ///     .Add("@param-2", 20210721, (int)NpgsqlTypes.NpgsqlDbType.Integer);
+    ///     .Add("@param-3", null, (int)NpgsqlTypes.NpgsqlDbType.Integer, default, ParameterDirection.Output);
     /// Npgsql.NpgsqlParameter[] paramArray = buildParamUtil.Parameters;
     /// </per>
     /// 下面的代码和上面的代码作用是相同的：
@@ -24,7 +24,7 @@ namespace Sweety.Common.DataProvider
     /// IRelationalDBUtility _db = RelationalDBUtilityFactory.Create("npsql"); //这一行是伪代码。
     /// IDbDataParameter? blockade = null;
     /// int paramArryIndex = 0;
-    /// var paramArry = System.Buffers.ArrayPool<Npgsql.NpgsqlParameter>.Shared.Rent(3);
+    /// var paramArry = System.Buffers.ArrayPool&lt;Npgsql.NpgsqlParameter&gt;.Shared.Rent(3);
     /// if (paramArr.Length > 3)
     /// {
     ///     blockade = paramArr[3];
@@ -42,7 +42,7 @@ namespace Sweety.Common.DataProvider
     ///     {
     ///         paramArr[3] = blockade;
     ///     }
-    ///     System.Buffers.ArrayPool<Npgsql.NpgsqlParameter>.Shared.Return(paramArr);
+    ///     System.Buffers.ArrayPool&lt;Npgsql.NpgsqlParameter&gt;.Shared.Return(paramArr);
     /// }
     /// </per>
     /// </example>
@@ -110,7 +110,7 @@ namespace Sweety.Common.DataProvider
         /// 添加SQL参数对象到<see cref="Parameters"/>属性返回的数组中。
         /// </summary>
         /// <param name="parameter">要添加的参数对象。</param>
-        public void Add(T parameter)
+        public BuildParamenterArrayUtility<T> Add(T parameter)
         {
             if (_paramArrayIndex == _capacity) throw new InvalidOperationException($"超出初始化时设定的参数数量：{_capacity}。");
 
@@ -125,6 +125,8 @@ namespace Sweety.Common.DataProvider
             }
 
             _paramArray[_paramArrayIndex++] = parameter;
+
+            return this;
         }
 
         /// <summary>
@@ -136,9 +138,9 @@ namespace Sweety.Common.DataProvider
         /// <param name="size">参数的空间大小。</param>
         /// <param name="direction">参数的方向。</param>
 #if NETSTANDARD2_0
-        public void Add(string parameterName, object value, int parameterType, int size = default, ParameterDirection direction = ParameterDirection.Input)
+        public BuildParamenterArrayUtility<T> Add(string parameterName, object value, int parameterType, int size = default, ParameterDirection direction = ParameterDirection.Input)
 #else
-        public void Add(string parameterName, object? value, int parameterType, int size = default, ParameterDirection direction = ParameterDirection.Input)
+        public BuildParamenterArrayUtility<T> Add(string parameterName, object? value, int parameterType, int size = default, ParameterDirection direction = ParameterDirection.Input)
 #endif
         {
             if (_paramArrayIndex == _capacity) throw new InvalidOperationException($"超出初始化时设定的参数数量：{_capacity}。");
@@ -155,12 +157,14 @@ namespace Sweety.Common.DataProvider
 
             // 这里是先对左侧进行运算，所以不能将 _paramArrayIndex++ 放在左侧。
             _paramArray[_paramArrayIndex] = (T)_dbUtility.ResetOrBuildParameter(_paramArray[_paramArrayIndex++], parameterName, value, parameterType, size, direction);
+
+            return this;
         }
 
         /// <summary>
         /// 回到新实例时的状态。
         /// </summary>
-        public void Reset()
+        public BuildParamenterArrayUtility<T> Reset()
         {
 #if NET5_0_OR_GREATER
             if (blockade is not null)
@@ -173,6 +177,8 @@ namespace Sweety.Common.DataProvider
             }
 
             _paramArrayIndex = 0;
+
+            return this;
         }
 
         /// <summary>
@@ -190,6 +196,14 @@ namespace Sweety.Common.DataProvider
             }
             ArrayPool<T>.Shared.Return(_paramArray);
             GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        ~BuildParamenterArrayUtility()
+        {
+            Dispose();
         }
     }
 }

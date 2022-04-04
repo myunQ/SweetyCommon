@@ -555,63 +555,177 @@ namespace Sweety.Common.DataProvider
         /// <summary>
         /// 执行T-SQL命令，并生成<see cref="System.Data.IDataReader"/>。
         /// </summary>
+        /// <remarks>
+        /// 如果在方法返回的<see cref="IDataReader"/>关闭之后才会对<see cref="IDbCommand.Parameters"/>关联的输出参数赋值的话，那么此方法不会对存储过程的输出参数赋值。
+        /// 因为在方法返回的<see cref="IDataReader"/>关闭之前就已将<see cref="IDbCommand.Parameters"/>集合清空。
+        /// 如果要使用输出参数请使用 <see cref="GetReader(IDbCommand, CommandBehavior, IDataParameter[])"/> 或 <see cref="GetReader(string, CommandType, CommandBehavior, out IDbCommand, IDataParameter[])"/> 方法。
+        /// </remarks>
         /// <param name="cmdText">T-SQL命令</param>
         /// <param name="cmdType">命令类型</param>
+        /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
         /// <param name="parameters">SQL参数对象数组</param>
         /// <returns>返回<see cref="System.Data.IDataReader"/>对象实例</returns>
-        IDataReader GetReader(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        IDataReader GetReader(string cmdText, CommandType cmdType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, params IDataParameter[] parameters);
         /// <summary>
         /// 执行T-SQL命令，并生成<see cref="System.Data.IDataReader"/>。
         /// </summary>
+        /// <param name="cmdText">T-SQL命令</param>
+        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
+        /// <param name="command">返回执行命令的对象。用于在存储过程使用输出变量时，关闭 <see cref="IDataReader"/> 对象，输出参数被赋值后清除参数，达到参数对象重复使用的目的。</param>
+        /// <param name="parameters">SQL参数对象数组</param>
+        /// <returns>返回<see cref="System.Data.IDataReader"/>对象实例</returns>
+        IDataReader GetReader(string cmdText, CommandType cmdType, CommandBehavior commandBehavior, out IDbCommand command, params IDataParameter[] parameters);
+        /// <summary>
+        /// 执行T-SQL命令，并生成<see cref="System.Data.IDataReader"/>。
+        /// </summary>
+        /// <param name="command">一个有效的用于执行数据库命令的对象。</param> 
+        /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
+        /// <param name="parameters">SQL参数对象数组</param>
+        /// <returns>返回<see cref="System.Data.IDataReader"/>对象实例</returns>
+        IDataReader GetReader(IDbCommand command, CommandBehavior commandBehavior = CommandBehavior.Default, params IDataParameter[] parameters);
+        /// <summary>
+        /// 执行T-SQL命令，并生成<see cref="System.Data.IDataReader"/>。
+        /// </summary>
+        /// <remarks>
+        /// 如果在方法返回的<see cref="IDataReader"/>关闭之后才会对<see cref="IDbCommand.Parameters"/>关联的输出参数赋值的话，那么此方法不会对存储过程的输出参数赋值。
+        /// 因为在方法返回的<see cref="IDataReader"/>关闭之前就已将<see cref="IDbCommand.Parameters"/>集合清空。
+        /// 如果要使用输出参数请使用 <see cref="GetReader(IDbCommand, CommandBehavior, IDataParameter[])"/> 或 <see cref="GetReader(IDbConnection, string, CommandType, CommandBehavior, out IDbCommand, IDataParameter[])"/> 方法。
+        /// </remarks>
+        /// <param name="conn">数据库链接对象</param>
+        /// <param name="cmdText">T-SQL命令</param>
+        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
+        /// <param name="parameters">SQL参数对象数组</param>
+        /// <returns>返回<see cref="System.Data.IDataReader"/>对象实例</returns>
+        IDataReader GetReader(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, params IDataParameter[] parameters);
+        /// <summary>
+        /// 执行T-SQL命令，并生成<see cref="System.Data.IDataReader"/>。
+        /// </summary>
+        /// <remarks>
+        /// 如果在方法返回的<see cref="IDataReader"/>关闭之后才会对<see cref="IDbCommand.Parameters"/>关联的输出参数赋值的话，那么此方法不会对存储过程的输出参数赋值。
+        /// 因为在方法返回的<see cref="IDataReader"/>关闭之前就已将<see cref="IDbCommand.Parameters"/>集合清空。
+        /// 如果要使用输出参数请使用 <see cref="GetReader(IDbCommand, CommandBehavior, IDataParameter[])"/> 或 <see cref="GetReader(IDbTransaction, string, CommandType, CommandBehavior, out IDbCommand, IDataParameter[])"/> 方法。
+        /// </remarks>
         /// <param name="tran">数据库事务对象实例。</param>
         /// <param name="cmdText">T-SQL命令</param>
         /// <param name="cmdType">命令类型</param>
+        /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
         /// <param name="parameters">SQL参数对象数组</param>
         /// <returns>返回<see cref="System.Data.IDataReader"/>对象实例</returns>
-        IDataReader GetReader(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        IDataReader GetReader(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, params IDataParameter[] parameters);
         /// <summary>
         /// 执行T-SQL命令，并生成<see cref="System.Data.IDataReader"/>。
         /// </summary>
         /// <param name="conn">数据库链接对象</param>
         /// <param name="cmdText">T-SQL命令</param>
         /// <param name="cmdType">命令类型</param>
+        /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
+        /// <param name="command">返回执行命令的对象。用于在存储过程使用输出变量时，关闭 <see cref="IDataReader"/> 对象，输出参数被赋值后清除参数，达到参数对象重复使用的目的。</param>
         /// <param name="parameters">SQL参数对象数组</param>
         /// <returns>返回<see cref="System.Data.IDataReader"/>对象实例</returns>
-        IDataReader GetReader(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
-
-
+        IDataReader GetReader(IDbConnection conn, string cmdText, CommandType cmdType, CommandBehavior commandBehavior, out IDbCommand command, params IDataParameter[] parameters);
         /// <summary>
-        /// 异步执行T-SQL命令，并生成<see cref="System.Data.IDataReader"/>。
+        /// 执行T-SQL命令，并生成<see cref="System.Data.IDataReader"/>。
         /// </summary>
-        /// <remarks>如果在方法返回的<see cref="IDataReader"/>关闭之后才会对<see cref="IDbCommand.Parameters"/>关联的输出参数赋值的话，那么此方法不会对存储过程的输出参数赋值。因为在方法返回的<see cref="IDataReader"/>关闭之前就已将<see cref="IDbCommand.Parameters"/>集合清空。</remarks>
-        /// <param name="cmdText">T-SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
-        /// <param name="cancellationToken">通知任务取消的令牌。</param>
-        /// <param name="parameters">SQL参数对象数组</param>
-        /// <returns>返回<see cref="System.Data.IDataReader"/>对象实例</returns>
-        Task<IDataReader> GetReaderAsync(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
-        /// <summary>
-        /// 异步执行T-SQL命令，并生成<see cref="System.Data.IDataReader"/>。
-        /// </summary>
-        /// <remarks>如果在方法返回的<see cref="IDataReader"/>关闭之后才会对<see cref="IDbCommand.Parameters"/>关联的输出参数赋值的话，那么此方法不会对存储过程的输出参数赋值。因为在方法返回的<see cref="IDataReader"/>关闭之前就已将<see cref="IDbCommand.Parameters"/>集合清空。</remarks>
         /// <param name="tran">数据库事务对象实例。</param>
         /// <param name="cmdText">T-SQL命令</param>
         /// <param name="cmdType">命令类型</param>
-        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
+        /// <param name="command">返回执行命令的对象。用于在存储过程使用输出变量时，关闭 <see cref="IDataReader"/> 对象，输出参数被赋值后清除参数，达到参数对象重复使用的目的。</param>
         /// <param name="parameters">SQL参数对象数组</param>
         /// <returns>返回<see cref="System.Data.IDataReader"/>对象实例</returns>
-        Task<IDataReader> GetReaderAsync(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        IDataReader GetReader(IDbTransaction tran, string cmdText, CommandType cmdType, CommandBehavior commandBehavior, out IDbCommand command, params IDataParameter[] parameters);
+
+
         /// <summary>
         /// 异步执行T-SQL命令，并生成<see cref="System.Data.IDataReader"/>。
         /// </summary>
-        /// <remarks>如果在方法返回的<see cref="IDataReader"/>关闭之后才会对<see cref="IDbCommand.Parameters"/>关联的输出参数赋值的话，那么此方法不会对存储过程的输出参数赋值。因为在方法返回的<see cref="IDataReader"/>关闭之前就已将<see cref="IDbCommand.Parameters"/>集合清空。</remarks>
-        /// <param name="conn">数据库链接对象</param>
+        /// <remarks>
+        /// 如果在方法返回的<see cref="IDataReader"/>关闭之后才会对<see cref="IDbCommand.Parameters"/>关联的输出参数赋值的话，那么此方法不会对存储过程的输出参数赋值。
+        /// 因为在方法返回的<see cref="IDataReader"/>关闭之前就已将<see cref="IDbCommand.Parameters"/>集合清空。
+        /// 如果要使用输出参数请使用 <see cref="GetReaderAsync(IDbCommand, CommandBehavior, CancellationToken, IDataParameter[])"/> 或 <see cref="GetReaderAndOutParametersAsync(string, CommandType, CommandBehavior, CancellationToken, IDataParameter[])"/> 方法。
+        /// </remarks>
         /// <param name="cmdText">T-SQL命令</param>
         /// <param name="cmdType">命令类型</param>
+        /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">SQL参数对象数组</param>
         /// <returns>返回<see cref="System.Data.IDataReader"/>对象实例</returns>
-        Task<IDataReader> GetReaderAsync(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<IDataReader> GetReaderAsync(string cmdText, CommandType cmdType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        /// <summary>
+        /// 异步执行T-SQL命令，并生成<see cref="System.Data.IDataReader"/>。
+        /// </summary>
+        /// <param name="command">一个有效的用于执行数据库命令的对象。</param> 
+        /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">SQL参数对象数组</param>
+        /// <returns>返回<see cref="System.Data.IDataReader"/>对象实例</returns>
+        Task<IDataReader> GetReaderAsync(IDbCommand command, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        /// <summary>
+        /// 异步执行T-SQL命令，并生成<see cref="System.Data.IDataReader"/>。
+        /// </summary>
+        /// <remarks>
+        /// 如果在方法返回的<see cref="IDataReader"/>关闭之后才会对<see cref="IDbCommand.Parameters"/>关联的输出参数赋值的话，那么此方法不会对存储过程的输出参数赋值。
+        /// 因为在方法返回的<see cref="IDataReader"/>关闭之前就已将<see cref="IDbCommand.Parameters"/>集合清空。
+        /// 如果要使用输出参数请使用 <see cref="GetReaderAsync(IDbCommand, CommandBehavior, CancellationToken, IDataParameter[])"/> 或 <see cref="GetReaderAndOutParametersAsync(IDbConnection, string, CommandType, CommandBehavior, CancellationToken, IDataParameter[])"/> 方法。
+        /// </remarks>
+        /// <param name="conn">数据库链接对象</param>
+        /// <param name="cmdText">T-SQL命令</param>
+        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">SQL参数对象数组</param>
+        /// <returns>返回<see cref="System.Data.IDataReader"/>对象实例</returns>
+        Task<IDataReader> GetReaderAsync(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        /// <summary>
+        /// 异步执行T-SQL命令，并生成<see cref="System.Data.IDataReader"/>。
+        /// </summary>
+        /// <remarks>
+        /// 如果在方法返回的<see cref="IDataReader"/>关闭之后才会对<see cref="IDbCommand.Parameters"/>关联的输出参数赋值的话，那么此方法不会对存储过程的输出参数赋值。
+        /// 因为在方法返回的<see cref="IDataReader"/>关闭之前就已将<see cref="IDbCommand.Parameters"/>集合清空。
+        /// 如果要使用输出参数请使用 <see cref="GetReaderAsync(IDbCommand, CommandBehavior, CancellationToken, IDataParameter[])"/> 或 <see cref="GetReaderAndOutParametersAsync(IDbTransaction, string, CommandType, CommandBehavior, CancellationToken, IDataParameter[])"/> 方法。
+        /// </remarks>
+        /// <param name="tran">数据库事务对象实例。</param>
+        /// <param name="cmdText">T-SQL命令</param>
+        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">SQL参数对象数组</param>
+        /// <returns>返回<see cref="System.Data.IDataReader"/>对象实例</returns>
+        Task<IDataReader> GetReaderAsync(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        /// <summary>
+        /// 异步执行T-SQL命令，并生成<see cref="System.Data.IDataReader"/>。
+        /// </summary>
+        /// <param name="cmdText">T-SQL命令</param>
+        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">SQL参数对象数组</param>
+        /// <returns>返回<see cref="System.Data.IDataReader"/>对象实例和<see cref="IDbCommand"/>对象实例，用于在存储过程使用输出变量时，关闭 <see cref="IDataReader"/> 对象，输出参数被赋值后清除参数，达到参数对象重复使用的目的。</returns>
+        Task<(IDataReader, IDbCommand)> GetReaderAndOutParametersAsync(string cmdText, CommandType cmdType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        /// <summary>
+        /// 异步执行T-SQL命令，并生成<see cref="System.Data.IDataReader"/>。
+        /// </summary>
+        /// <param name="conn">数据库链接对象</param>
+        /// <param name="cmdText">T-SQL命令</param>
+        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">SQL参数对象数组</param>
+        /// <returns>返回<see cref="System.Data.IDataReader"/>对象实例和<see cref="IDbCommand"/>对象实例，用于在存储过程使用输出变量时，关闭 <see cref="IDataReader"/> 对象，输出参数被赋值后清除参数，达到参数对象重复使用的目的。</returns>
+        Task<(IDataReader, IDbCommand)> GetReaderAndOutParametersAsync(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        /// <summary>
+        /// 异步执行T-SQL命令，并生成<see cref="System.Data.IDataReader"/>。
+        /// </summary>
+        /// <param name="tran">数据库事务对象实例。</param>
+        /// <param name="cmdText">T-SQL命令</param>
+        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">SQL参数对象数组</param>
+        /// <returns>返回<see cref="System.Data.IDataReader"/>对象实例和<see cref="IDbCommand"/>对象实例，用于在存储过程使用输出变量时，关闭 <see cref="IDataReader"/> 对象，输出参数被赋值后清除参数，达到参数对象重复使用的目的。</returns>
+        Task<(IDataReader, IDbCommand)> GetReaderAndOutParametersAsync(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
 
 
 
