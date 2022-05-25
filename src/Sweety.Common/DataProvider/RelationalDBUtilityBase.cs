@@ -15,6 +15,7 @@
 namespace Sweety.Common.DataProvider
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Data;
     using System.Data.Common;
@@ -1024,11 +1025,15 @@ namespace Sweety.Common.DataProvider
 
 
 #if NETSTANDARD2_0
-        public virtual IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where TValue : new()
 #elif NETSTANDARD2_1
-        public virtual IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where TKey : notnull
+        public virtual IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+            where TKey : notnull
+            where TValue : new()
 #else
-        public virtual IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where TKey : notnull
+        public virtual IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+            where TKey : notnull
+            where TValue : new()
 #endif //NETSTANDARD2_0
         {
             IDbCommand cmd = BuildCommand();
@@ -1049,11 +1054,15 @@ namespace Sweety.Common.DataProvider
         }
 
 #if NETSTANDARD2_0
-        public virtual IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where TValue : new()
 #elif NETSTANDARD2_1
-        public virtual IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where TKey : notnull
+        public virtual IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+            where TKey : notnull
+            where TValue : new()
 #else
-        public virtual IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where TKey : notnull
+        public virtual IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+            where TKey : notnull
+            where TValue : new()
 #endif //NETSTANDARD2_0
         {
 #if NETSTANDARD2_0
@@ -1075,11 +1084,15 @@ namespace Sweety.Common.DataProvider
         }
 
 #if NETSTANDARD2_0
-        public virtual IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where TValue : new()
 #elif NETSTANDARD2_1
-        public virtual IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where TKey : notnull
+        public virtual IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+            where TKey : notnull
+            where TValue : new()
 #else
-        public virtual IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where TKey : notnull
+        public virtual IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+            where TKey : notnull
+            where TValue : new()
 #endif //NETSTANDARD2_0
         {
 #if NETSTANDARD2_0
@@ -1101,11 +1114,15 @@ namespace Sweety.Common.DataProvider
         }
 
 #if NETSTANDARD2_0
-        public virtual async Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual async Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where TValue : new()
 #elif NETSTANDARD2_1
-        public virtual async Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where TKey : notnull
+        public virtual async Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+            where TKey : notnull
+            where TValue : new()
 #else
-        public virtual async Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where TKey : notnull
+        public virtual async Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+            where TKey : notnull
+            where TValue : new()
 #endif //NETSTANDARD2_0
         {
             IDbCommand cmd = BuildCommand();
@@ -1126,11 +1143,15 @@ namespace Sweety.Common.DataProvider
         }
 
 #if NETSTANDARD2_0
-        public virtual async Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual async Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where TValue : new()
 #elif NETSTANDARD2_1
-        public virtual async Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where TKey : notnull
+        public virtual async Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+            where TKey : notnull
+            where TValue : new()
 #else
-        public virtual async Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where TKey : notnull
+        public virtual async Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+            where TKey : notnull
+            where TValue : new()
 #endif //NETSTANDARD2_0
         {
 #if NETSTANDARD2_0
@@ -1156,11 +1177,15 @@ namespace Sweety.Common.DataProvider
         }
 
 #if NETSTANDARD2_0
-        public virtual async Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual async Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where TValue : new()
 #elif NETSTANDARD2_1
-        public virtual async Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where TKey : notnull
+        public virtual async Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+            where TKey : notnull
+            where TValue : new()
 #else
-        public virtual async Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where TKey : notnull
+        public virtual async Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+            where TKey : notnull
+            where TValue : new()
 #endif //NETSTANDARD2_0
         {
 #if NETSTANDARD2_0
@@ -2017,7 +2042,7 @@ namespace Sweety.Common.DataProvider
         /// <param name="reader">数据读取器</param>
         /// <returns>如果读取器里有数据则返回这些数据的键值对集合。如果没有数据则返回<c>null</c>。</returns>
 #if NETSTANDARD2_0
-        protected virtual IDictionary<TKey, TValue> ReadToDictionary<TKey, TValue>(IDataReader reader)
+        protected virtual IDictionary<TKey, TValue> ReadToDictionary<TKey, TValue>(IDataReader reader) where TValue : new()
         {
             IDictionary<TKey, TValue> result = null;
 
@@ -2038,16 +2063,60 @@ namespace Sweety.Common.DataProvider
                     result = new Dictionary<TKey, TValue>();
                 }
 
-                do
+                Type tTalueType = typeof(TValue);
+                if (tTalueType.GetInterface(typeof(IList).FullName) == null)
                 {
-                    result.Add((TKey)reader[0], reader.IsDBNull(1) ? default : (TValue)InternalConvertUtility.HackType(reader[1], typeof(TValue)));
+                    do
+                    {
+                        result.Add((TKey)reader[0], reader.IsDBNull(1) ? default : (TValue)InternalConvertUtility.HackType(reader[1], tTalueType));
+                    }
+                    while (reader.Read());
                 }
-                while (reader.Read());
+                else
+                {
+                    Type conversionType;
+                    if (tTalueType.IsGenericType)
+                    {
+                        conversionType = tTalueType.GenericTypeArguments[0];
+                    }
+                    else
+                    {
+                        conversionType = default;
+                    }
+
+                    do
+                    {
+                        IList list;
+                        TKey key = (TKey)reader[0];
+                        if (result.TryGetValue(key, out var value))
+                        {
+                            list = (IList)value;
+                        }
+                        else
+                        {
+                            value = new TValue();
+                            list = (IList)value;
+                            result.Add(key, value);
+                        }
+
+                        if (conversionType == default)
+                        {
+                            list.Add(reader.IsDBNull(1) ? default : InternalConvertUtility.HackType(reader[1], tTalueType));
+                        }
+                        else
+                        {
+                            list.Add(reader.IsDBNull(1) ? default : reader[1]);
+                        }
+                    }
+                    while (reader.Read());
+                }
             }
             return result;
         }
 #elif NETSTANDARD2_1
-        protected virtual IDictionary<TKey, TValue>? ReadToDictionary<TKey, TValue>(IDataReader reader) where TKey : notnull
+        protected virtual IDictionary<TKey, TValue>? ReadToDictionary<TKey, TValue>(IDataReader reader)
+            where TKey : notnull
+            where TValue : new()
         {
             IDictionary<TKey, TValue>? result = null;
 
@@ -2068,16 +2137,60 @@ namespace Sweety.Common.DataProvider
                     result = new Dictionary<TKey, TValue>();
                 }
 
-                do
+                Type tTalueType = typeof(TValue);
+                if (tTalueType.GetInterface(typeof(IList).FullName!) == null)
                 {
-                    result.Add((TKey)reader[0], reader.IsDBNull(1) ? default : (TValue)InternalConvertUtility.HackType(reader[1], typeof(TValue)));
+                    do
+                    {
+                        result.Add((TKey)reader[0], reader.IsDBNull(1) ? default : (TValue)InternalConvertUtility.HackType(reader[1], tTalueType));
+                    }
+                    while (reader.Read());
                 }
-                while (reader.Read());
+                else
+                {
+                    Type? conversionType;
+                    if (tTalueType.IsGenericType)
+                    {
+                        conversionType = tTalueType.GenericTypeArguments[0];
+                    }
+                    else
+                    {
+                        conversionType = default;
+                    }
+
+                    do
+                    {
+                        IList list;
+                        TKey key = (TKey)reader[0];
+                        if (result.TryGetValue(key, out var value))
+                        {
+                            list = (IList)value!;
+                        }
+                        else
+                        {
+                            value = new TValue();
+                            list = (IList)value;
+                            result.Add(key, value);
+                        }
+
+                        if (conversionType == default)
+                        {
+                            list.Add(reader.IsDBNull(1) ? default : InternalConvertUtility.HackType(reader[1], tTalueType));
+                        }
+                        else
+                        {
+                            list.Add(reader.IsDBNull(1) ? default : reader[1]);
+                        }
+                    }
+                    while (reader.Read());
+                }
             }
             return result;
         }
 #else
-        protected virtual IDictionary<TKey, TValue?>? ReadToDictionary<TKey, TValue>(IDataReader reader) where TKey : notnull
+        protected virtual IDictionary<TKey, TValue?>? ReadToDictionary<TKey, TValue>(IDataReader reader)
+            where TKey : notnull
+            where TValue : new()
         {
             IDictionary<TKey, TValue?>? result = null;
 
@@ -2098,11 +2211,54 @@ namespace Sweety.Common.DataProvider
                     result = new Dictionary<TKey, TValue?>();
                 }
 
-                do
+                Type tTalueType = typeof(TValue);
+                if (tTalueType.GetInterface(typeof(IList).FullName!) == null)
                 {
-                    result.Add((TKey)reader[0], reader.IsDBNull(1) ? default : (TValue)InternalConvertUtility.HackType(reader[1], typeof(TValue)));
+                    do
+                    {
+                        result.Add((TKey)reader[0], reader.IsDBNull(1) ? default : (TValue)InternalConvertUtility.HackType(reader[1], tTalueType));
+                    }
+                    while (reader.Read());
                 }
-                while (reader.Read());
+                else
+                {
+                    Type? conversionType;
+                    if (tTalueType.IsGenericType)
+                    {
+                        conversionType = tTalueType.GenericTypeArguments[0];
+                    }
+                    else
+                    {
+                        conversionType = default;
+                    }
+
+                    do
+                    {
+                        IList list;
+                        TKey key = (TKey)reader[0];
+                        if (result.TryGetValue(key, out var value))
+                        {
+                            list = (IList)value!;
+                        }
+                        else
+                        {
+                            value = new TValue();
+                            list = (IList)value;
+                            result.Add(key, value);
+                        }
+
+                        if (conversionType == default)
+                        {
+                            list.Add(reader.IsDBNull(1) ? default : InternalConvertUtility.HackType(reader[1], tTalueType));
+                        }
+                        else
+                        {
+                            list.Add(reader.IsDBNull(1) ? default : reader[1]);
+                        }
+                    }
+                    while (reader.Read());
+                }
+                
             }
             return result;
         }
@@ -2116,7 +2272,7 @@ namespace Sweety.Common.DataProvider
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <returns>如果读取器里有数据则返回这些数据的键值对集合。如果没有数据则返回<c>null</c>。</returns>
 #if NETSTANDARD2_0
-        protected virtual async Task<IDictionary<TKey, TValue>> ReadToDictionaryAsync<TKey, TValue>(DbDataReader reader, CancellationToken cancellationToken = default)
+        protected virtual async Task<IDictionary<TKey, TValue>> ReadToDictionaryAsync<TKey, TValue>(DbDataReader reader, CancellationToken cancellationToken = default) where TValue : new()
         {
             IDictionary<TKey, TValue> result = null;
 
@@ -2137,16 +2293,60 @@ namespace Sweety.Common.DataProvider
                     result = new Dictionary<TKey, TValue>();
                 }
 
-                do
+                Type tTalueType = typeof(TValue);
+                if (tTalueType.GetInterface(typeof(IList).FullName) == null)
                 {
-                    result.Add((TKey)reader[0], await reader.IsDBNullAsync(1, cancellationToken) ? default : (TValue)InternalConvertUtility.HackType(reader[1], typeof(TValue)));
+                    do
+                    {
+                        result.Add((TKey)reader[0], reader.IsDBNull(1) ? default : (TValue)InternalConvertUtility.HackType(reader[1], tTalueType));
+                    }
+                    while (await reader.ReadAsync(cancellationToken));
                 }
-                while (await reader.ReadAsync(cancellationToken));
+                else
+                {
+                    Type conversionType;
+                    if (tTalueType.IsGenericType)
+                    {
+                        conversionType = tTalueType.GenericTypeArguments[0];
+                    }
+                    else
+                    {
+                        conversionType = default;
+                    }
+
+                    do
+                    {
+                        IList list;
+                        TKey key = (TKey)reader[0];
+                        if (result.TryGetValue(key, out var value))
+                        {
+                            list = (IList)value;
+                        }
+                        else
+                        {
+                            value = new TValue();
+                            list = (IList)value;
+                            result.Add(key, value);
+                        }
+
+                        if (conversionType == default)
+                        {
+                            list.Add(reader.IsDBNull(1) ? default : InternalConvertUtility.HackType(reader[1], tTalueType));
+                        }
+                        else
+                        {
+                            list.Add(reader.IsDBNull(1) ? default : reader[1]);
+                        }
+                    }
+                    while (await reader.ReadAsync(cancellationToken));
+                }
             }
             return result;
         }
 #elif NETSTANDARD2_1
-        protected virtual async Task<IDictionary<TKey, TValue>?> ReadToDictionaryAsync<TKey, TValue>(DbDataReader reader, CancellationToken cancellationToken = default) where TKey : notnull
+        protected virtual async Task<IDictionary<TKey, TValue>?> ReadToDictionaryAsync<TKey, TValue>(DbDataReader reader, CancellationToken cancellationToken = default)
+            where TKey : notnull
+            where TValue : new()
         {
             IDictionary<TKey, TValue>? result = null;
 
@@ -2167,16 +2367,60 @@ namespace Sweety.Common.DataProvider
                     result = new Dictionary<TKey, TValue>();
                 }
 
-                do
-                {    
-                    result.Add((TKey)reader[0], await reader.IsDBNullAsync(1, cancellationToken) ? default : (TValue)InternalConvertUtility.HackType(reader[1], typeof(TValue)));
+                Type tTalueType = typeof(TValue);
+                if (tTalueType.GetInterface(typeof(IList).FullName!) == null)
+                {
+                    do
+                    {
+                        result.Add((TKey)reader[0], reader.IsDBNull(1) ? default : (TValue)InternalConvertUtility.HackType(reader[1], tTalueType));
+                    }
+                    while (await reader.ReadAsync(cancellationToken));
                 }
-                while (await reader.ReadAsync(cancellationToken));
+                else
+                {
+                    Type? conversionType;
+                    if (tTalueType.IsGenericType)
+                    {
+                        conversionType = tTalueType.GenericTypeArguments[0];
+                    }
+                    else
+                    {
+                        conversionType = default;
+                    }
+
+                    do
+                    {
+                        IList list;
+                        TKey key = (TKey)reader[0];
+                        if (result.TryGetValue(key, out var value))
+                        {
+                            list = (IList)value!;
+                        }
+                        else
+                        {
+                            value = new TValue();
+                            list = (IList)value;
+                            result.Add(key, value);
+                        }
+
+                        if (conversionType == default)
+                        {
+                            list.Add(reader.IsDBNull(1) ? default : InternalConvertUtility.HackType(reader[1], tTalueType));
+                        }
+                        else
+                        {
+                            list.Add(reader.IsDBNull(1) ? default : reader[1]);
+                        }
+                    }
+                    while (await reader.ReadAsync(cancellationToken));
+                }
             }
             return result;
         }
 #else
-        protected virtual async Task<IDictionary<TKey, TValue?>?> ReadToDictionaryAsync<TKey, TValue>(DbDataReader reader, CancellationToken cancellationToken = default) where TKey : notnull
+        protected virtual async Task<IDictionary<TKey, TValue?>?> ReadToDictionaryAsync<TKey, TValue>(DbDataReader reader, CancellationToken cancellationToken = default)
+            where TKey : notnull
+            where TValue : new()
         {
             IDictionary<TKey, TValue?>? result = null;
 
@@ -2197,11 +2441,54 @@ namespace Sweety.Common.DataProvider
                     result = new Dictionary<TKey, TValue?>();
                 }
 
-                do
+                
+                Type tTalueType = typeof(TValue);
+                if (tTalueType.GetInterface(typeof(IList).FullName!) == null)
                 {
-                    result.Add((TKey)reader[0], await reader.IsDBNullAsync(1, cancellationToken) ? default : (TValue)InternalConvertUtility.HackType(reader[1], typeof(TValue)));
+                    do
+                    {
+                        result.Add((TKey)reader[0], reader.IsDBNull(1) ? default : (TValue)InternalConvertUtility.HackType(reader[1], tTalueType));
+                    }
+                    while (await reader.ReadAsync(cancellationToken));
                 }
-                while (await reader.ReadAsync(cancellationToken));
+                else
+                {
+                    Type? conversionType;
+                    if (tTalueType.IsGenericType)
+                    {
+                        conversionType = tTalueType.GenericTypeArguments[0];
+                    }
+                    else
+                    {
+                        conversionType = default;
+                    }
+
+                    do
+                    {
+                        IList list;
+                        TKey key = (TKey)reader[0];
+                        if (result.TryGetValue(key, out var value))
+                        {
+                            list = (IList)value!;
+                        }
+                        else
+                        {
+                            value = new TValue();
+                            list = (IList)value;
+                            result.Add(key, value);
+                        }
+
+                        if (conversionType == default)
+                        {
+                            list.Add(reader.IsDBNull(1) ? default : InternalConvertUtility.HackType(reader[1], tTalueType));
+                        }
+                        else
+                        {
+                            list.Add(reader.IsDBNull(1) ? default : reader[1]);
+                        }
+                    }
+                    while (await reader.ReadAsync(cancellationToken));
+                }
             }
             return result;
         }
