@@ -750,12 +750,14 @@ namespace Sweety.Common.DataProvider
         /// 使用默认数据库链接对象创建数据库事务对象实例。
         /// </summary>
         /// <returns>数据库事务对象实例。</returns>
+        [Obsolete("这个方法即将在新的版本中被移除。因为使用词方法极为容易导致数据库链接未关闭的情况。除非您主动从事务对象中获取链接对象并确保在不使用时关闭。")]
         public abstract IDbTransaction BuildTransaction();
         /// <summary>
         /// 使用默认数据库链接对象和指定的事务隔离级别创建数据库事务对象实例。
         /// </summary>
         /// <param name="level">事务隔离级别。</param>
         /// <returns>数据库事务对象实例。</returns>
+        [Obsolete("这个方法即将在新的版本中被移除。因为使用词方法极为容易导致数据库链接未关闭的情况。除非您主动从事务对象中获取链接对象并确保在不使用时关闭。")]
         public abstract IDbTransaction BuildTransaction(IsolationLevel level);
 
         /// <summary>
@@ -763,6 +765,7 @@ namespace Sweety.Common.DataProvider
         /// </summary>
         /// <param name="cancellationToken">表示异步任务是否取消的令牌。</param>
         /// <returns>数据库事务对象实例。</returns>
+        [Obsolete("这个方法即将在新的版本中被移除。因为使用词方法极为容易导致数据库链接未关闭的情况。除非您主动从事务对象中获取链接对象并确保在不使用时关闭。")]
         public abstract Task<IDbTransaction> BuildTransactionAsync(CancellationToken cancellationToken = default);
         /// <summary>
         /// 使用默认数据库链接对象和指定的事务隔离级别创建数据库事务对象实例。
@@ -770,6 +773,7 @@ namespace Sweety.Common.DataProvider
         /// <param name="level">事务隔离级别。</param>
         /// <param name="cancellationToken">表示异步任务是否取消的令牌。</param>
         /// <returns>数据库事务对象实例。</returns>
+        [Obsolete("这个方法即将在新的版本中被移除。因为使用词方法极为容易导致数据库链接未关闭的情况。除非您主动从事务对象中获取链接对象并确保在不使用时关闭。")]
         public abstract Task<IDbTransaction> BuildTransactionAsync(IsolationLevel level, CancellationToken cancellationToken = default);
 
 

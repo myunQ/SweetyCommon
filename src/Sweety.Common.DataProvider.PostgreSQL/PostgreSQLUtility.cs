@@ -430,6 +430,7 @@ namespace Sweety.Common.DataProvider.PostgreSQL
         /// 使用默认数据库链接对象创建数据库事务对象实例。
         /// </summary>
         /// <returns>数据库事务对象实例。</returns>
+        [Obsolete("这个方法即将在新的版本中被移除。因为使用词方法极为容易导致数据库链接未关闭的情况。除非您主动从事务对象中获取链接对象并确保在不使用时关闭。")]
         public override IDbTransaction BuildTransaction()
         {
             return BuildSqlTransaction();
@@ -439,6 +440,7 @@ namespace Sweety.Common.DataProvider.PostgreSQL
         /// </summary>
         /// <param name="level">事务隔离级别。</param>
         /// <returns>数据库事务对象实例。</returns>
+        [Obsolete("这个方法即将在新的版本中被移除。因为使用词方法极为容易导致数据库链接未关闭的情况。除非您主动从事务对象中获取链接对象并确保在不使用时关闭。")]
         public override IDbTransaction BuildTransaction(IsolationLevel level)
         {
             return BuildSqlTransaction(level);
@@ -449,6 +451,7 @@ namespace Sweety.Common.DataProvider.PostgreSQL
         /// </summary>
         /// <param name="cancellationToken">表示异步任务是否取消的令牌。</param>
         /// <returns>数据库事务对象实例。</returns>
+        [Obsolete("这个方法即将在新的版本中被移除。因为使用词方法极为容易导致数据库链接未关闭的情况。除非您主动从事务对象中获取链接对象并确保在不使用时关闭。")]
         public override async Task<IDbTransaction> BuildTransactionAsync(CancellationToken cancellationToken = default)
         {
             return await BuildSqlTransactionAsync(cancellationToken);
@@ -459,6 +462,7 @@ namespace Sweety.Common.DataProvider.PostgreSQL
         /// <param name="level">事务隔离级别。</param>
         /// <param name="cancellationToken">表示异步任务是否取消的令牌。</param>
         /// <returns>数据库事务对象实例。</returns>
+        [Obsolete("这个方法即将在新的版本中被移除。因为使用词方法极为容易导致数据库链接未关闭的情况。除非您主动从事务对象中获取链接对象并确保在不使用时关闭。")]
         public override async Task<IDbTransaction> BuildTransactionAsync(IsolationLevel level, CancellationToken cancellationToken = default)
         {
             return await BuildSqlTransactionAsync(level, cancellationToken);
