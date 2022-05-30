@@ -1283,6 +1283,154 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+
+
+#if NETSTANDARD2_0
+        public virtual T GetSingle<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+#else
+        public virtual T? GetSingle<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+#endif //NETSTANDARD2_0
+        {
+            IDbCommand cmd = BuildCommand();
+            cmd.CommandText = cmdText;
+            cmd.CommandType = cmdType;
+
+            try
+            {
+                using (var reader = ExecuteReader(cmd, parameters, CommandBehavior.SingleRow | CommandBehavior.CloseConnection))
+                {
+                    return ReadToModel<T>(reader, ignoreFieldName, customAssignMethod);
+                }
+            }
+            finally
+            {
+                cmd.Parameters.Clear();
+            }
+        }
+
+#if NETSTANDARD2_0
+        public virtual T GetSingle<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+#else
+        public virtual T? GetSingle<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+#endif //NETSTANDARD2_0
+        {
+#if NETSTANDARD2_0
+            IDbCommand cmd = null;
+#else
+            IDbCommand? cmd = null;
+#endif
+            try
+            {
+                using (var reader = ExecuteReader(tran, CommandBehavior.SingleRow, cmdType, cmdText, parameters, out cmd))
+                {
+                    return ReadToModel<T>(reader, ignoreFieldName, customAssignMethod);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+            }
+        }
+
+#if NETSTANDARD2_0
+        public virtual T GetSingle<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+#else
+        public virtual T? GetSingle<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+#endif //NETSTANDARD2_0
+        {
+#if NETSTANDARD2_0
+            IDbCommand cmd = null;
+#else
+            IDbCommand? cmd = null;
+#endif
+            try
+            {
+                using (var reader = ExecuteReader(conn, CommandBehavior.SingleRow, cmdType, cmdText, parameters, out cmd))
+                {
+                    return ReadToModel<T>(reader, ignoreFieldName, customAssignMethod);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+            }
+        }
+
+
+
+#if NETSTANDARD2_0
+        public virtual T GetSingle<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+#else
+        public virtual T? GetSingle<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+#endif //NETSTANDARD2_0
+        {
+            IDbCommand cmd = BuildCommand();
+            cmd.CommandText = cmdText;
+            cmd.CommandType = cmdType;
+
+            try
+            {
+                using (var reader = ExecuteReader(cmd, parameters, CommandBehavior.SingleRow | CommandBehavior.CloseConnection))
+                {
+                    return ReadToModel<T>(reader, ignoreFieldNames, customAssignMethod);
+                }
+            }
+            finally
+            {
+                cmd.Parameters.Clear();
+            }
+        }
+
+#if NETSTANDARD2_0
+        public virtual T GetSingle<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+#else
+        public virtual T? GetSingle<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+#endif //NETSTANDARD2_0
+        {
+#if NETSTANDARD2_0
+            IDbCommand cmd = null;
+#else
+            IDbCommand? cmd = null;
+#endif
+            try
+            {
+                using (var reader = ExecuteReader(tran, CommandBehavior.SingleRow, cmdType, cmdText, parameters, out cmd))
+                {
+                    return ReadToModel<T>(reader, ignoreFieldNames, customAssignMethod);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+            }
+        }
+
+#if NETSTANDARD2_0
+        public virtual T GetSingle<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+#else
+        public virtual T? GetSingle<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+#endif //NETSTANDARD2_0
+        {
+#if NETSTANDARD2_0
+            IDbCommand cmd = null;
+#else
+            IDbCommand? cmd = null;
+#endif
+            try
+            {
+                using (var reader = ExecuteReader(conn, CommandBehavior.SingleRow, cmdType, cmdText, parameters, out cmd))
+                {
+                    return ReadToModel<T>(reader, ignoreFieldNames, customAssignMethod);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+            }
+        }
+
+
+
 #if NETSTANDARD2_0
         public virtual async Task<T> GetSingleAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
 #else
@@ -1358,36 +1506,387 @@ namespace Sweety.Common.DataProvider
             }
         }
 
-        public virtual ref T? GetSingle<T>(ref T? structure, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct
+
+
+
+#if NETSTANDARD2_0
+        public virtual async Task<T> GetSingleAsync<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
+#else
+        public virtual async Task<T?> GetSingleAsync<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
+#endif //NETSTANDARD2_0
         {
-            throw new NotImplementedException();
+            IDbCommand cmd = BuildCommand();
+            cmd.CommandType = cmdType;
+            cmd.CommandText = cmdText;
+
+            try
+            {
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, CommandBehavior.SingleRow | CommandBehavior.CloseConnection, cancellationToken))
+                {
+                    return await ReadToModelAsync<T>(reader, ignoreFieldName, customAssignMethod, cancellationToken);
+                }
+            }
+            finally
+            {
+                cmd.Parameters.Clear();
+            }
         }
 
-        public virtual ref T? GetSingle<T>(ref T? structure, IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct
+#if NETSTANDARD2_0
+        public virtual async Task<T> GetSingleAsync<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
+#else
+        public virtual async Task<T?> GetSingleAsync<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
+#endif //NETSTANDARD2_0
         {
-            throw new NotImplementedException();
+#if NETSTANDARD2_0
+            IDbCommand cmd = null;
+            IDataReader reader = null;
+#else
+            IDbCommand? cmd = null;
+            IDataReader? reader = null;
+#endif
+
+            try
+            {
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(tran, CommandBehavior.SingleRow, cmdType, cmdText, parameters, cancellationToken);
+
+                return await ReadToModelAsync<T>((DbDataReader)reader, ignoreFieldName, customAssignMethod, cancellationToken);
+
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+                reader?.Dispose();
+            }
         }
 
-        public virtual ref T? GetSingle<T>(ref T? structure, IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct
+#if NETSTANDARD2_0
+        public virtual async Task<T> GetSingleAsync<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
         {
-            throw new NotImplementedException();
+            IDbCommand cmd = null;
+            IDataReader reader = null;
+#else
+        public virtual async Task<T?> GetSingleAsync<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
+        {
+            IDbCommand? cmd = null;
+            IDataReader? reader = null;
+#endif //NETSTANDARD2_0
+
+            try
+            {
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(conn, CommandBehavior.SingleRow, cmdType, cmdText, parameters, cancellationToken);
+                return await ReadToModelAsync<T>((DbDataReader)reader, ignoreFieldName, customAssignMethod, cancellationToken);
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+                reader?.Dispose();
+            }
         }
 
 
 
-        public virtual bool TryGetSingle<T>(ref T? structure, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct
+
+#if NETSTANDARD2_0
+        public virtual async Task<T> GetSingleAsync<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
+#else
+        public virtual async Task<T?> GetSingleAsync<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
+#endif //NETSTANDARD2_0
         {
-            throw new NotImplementedException();
+            IDbCommand cmd = BuildCommand();
+            cmd.CommandType = cmdType;
+            cmd.CommandText = cmdText;
+
+            try
+            {
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, CommandBehavior.SingleRow | CommandBehavior.CloseConnection, cancellationToken))
+                {
+                    return await ReadToModelAsync<T>(reader, ignoreFieldNames, customAssignMethod, cancellationToken);
+                }
+            }
+            finally
+            {
+                cmd.Parameters.Clear();
+            }
         }
 
-        public virtual bool TryGetSingle<T>(ref T? structure, IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct
+#if NETSTANDARD2_0
+        public virtual async Task<T> GetSingleAsync<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
+#else
+        public virtual async Task<T?> GetSingleAsync<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
+#endif //NETSTANDARD2_0
         {
-            throw new NotImplementedException();
+#if NETSTANDARD2_0
+            IDbCommand cmd = null;
+            IDataReader reader = null;
+#else
+            IDbCommand? cmd = null;
+            IDataReader? reader = null;
+#endif
+
+            try
+            {
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(tran, CommandBehavior.SingleRow, cmdType, cmdText, parameters, cancellationToken);
+
+                return await ReadToModelAsync<T>((DbDataReader)reader, ignoreFieldNames, customAssignMethod, cancellationToken);
+
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+                reader?.Dispose();
+            }
         }
 
-        public virtual bool TryGetSingle<T>(ref T? structure, IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct
+#if NETSTANDARD2_0
+        public virtual async Task<T> GetSingleAsync<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
         {
-            throw new NotImplementedException();
+            IDbCommand cmd = null;
+            IDataReader reader = null;
+#else
+        public virtual async Task<T?> GetSingleAsync<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
+        {
+            IDbCommand? cmd = null;
+            IDataReader? reader = null;
+#endif //NETSTANDARD2_0
+
+            try
+            {
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(conn, CommandBehavior.SingleRow, cmdType, cmdText, parameters, cancellationToken);
+                return await ReadToModelAsync<T>((DbDataReader)reader, ignoreFieldNames, customAssignMethod, cancellationToken);
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+                reader?.Dispose();
+            }
+        }
+
+
+        public virtual bool TryGetSingle<T>(ref T structure, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct
+        {
+            IDbCommand cmd = BuildCommand();
+            cmd.CommandText = cmdText;
+            cmd.CommandType = cmdType;
+
+            try
+            {
+                using (var reader = ExecuteReader(cmd, parameters, CommandBehavior.SingleRow | CommandBehavior.CloseConnection))
+                {
+                    if (reader.Read())
+                    {
+                        reader.ToModel(ref structure);
+                        return true;
+                    }
+                    return false;
+                }
+            }
+            finally
+            {
+                cmd.Parameters.Clear();
+            }
+        }
+
+        public virtual bool TryGetSingle<T>(ref T structure, IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct
+        {
+#if NETSTANDARD2_0
+            IDbCommand cmd = null;
+#else
+            IDbCommand? cmd = null;
+#endif
+            try
+            {
+                using (var reader = ExecuteReader(tran, CommandBehavior.SingleRow, cmdType, cmdText, parameters, out cmd))
+                {
+                    if (reader.Read())
+                    {
+                        reader.ToModel(ref structure);
+                        return true;
+                    }
+                    return false;
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+            }
+        }
+
+        public virtual bool TryGetSingle<T>(ref T structure, IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct
+        {
+#if NETSTANDARD2_0
+            IDbCommand cmd = null;
+#else
+            IDbCommand? cmd = null;
+#endif
+            try
+            {
+                using (var reader = ExecuteReader(conn, CommandBehavior.SingleRow, cmdType, cmdText, parameters, out cmd))
+                {
+                    if (reader.Read())
+                    {
+                        reader.ToModel(ref structure);
+                        return true;
+                    }
+                    return false;
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+            }
+        }
+
+
+
+        public virtual bool TryGetSingle<T>(ref T structure, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct
+        {
+            IDbCommand cmd = BuildCommand();
+            cmd.CommandText = cmdText;
+            cmd.CommandType = cmdType;
+
+            try
+            {
+                using (var reader = ExecuteReader(cmd, parameters, CommandBehavior.SingleRow | CommandBehavior.CloseConnection))
+                {
+                    if (reader.Read())
+                    {
+                        reader.ToModel(ref structure, ignoreFieldName, customAssignMethod);
+                        return true;
+                    }
+                    return false;
+                }
+            }
+            finally
+            {
+                cmd.Parameters.Clear();
+            }
+        }
+
+        public virtual bool TryGetSingle<T>(ref T structure, IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct
+        {
+#if NETSTANDARD2_0
+            IDbCommand cmd = null;
+#else
+            IDbCommand? cmd = null;
+#endif
+            try
+            {
+                using (var reader = ExecuteReader(tran, CommandBehavior.SingleRow, cmdType, cmdText, parameters, out cmd))
+                {
+                    if (reader.Read())
+                    {
+                        reader.ToModel(ref structure, ignoreFieldName, customAssignMethod);
+                        return true;
+                    }
+                    return false;
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+            }
+        }
+
+        public virtual bool TryGetSingle<T>(ref T structure, IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct
+        {
+#if NETSTANDARD2_0
+            IDbCommand cmd = null;
+#else
+            IDbCommand? cmd = null;
+#endif
+            try
+            {
+                using (var reader = ExecuteReader(conn, CommandBehavior.SingleRow, cmdType, cmdText, parameters, out cmd))
+                {
+                    if (reader.Read())
+                    {
+                        reader.ToModel(ref structure, ignoreFieldName, customAssignMethod);
+                        return true;
+                    }
+                    return false;
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+            }
+        }
+
+
+
+        public virtual bool TryGetSingle<T>(ref T structure, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct
+        {
+            IDbCommand cmd = BuildCommand();
+            cmd.CommandText = cmdText;
+            cmd.CommandType = cmdType;
+
+            try
+            {
+                using (var reader = ExecuteReader(cmd, parameters, CommandBehavior.SingleRow | CommandBehavior.CloseConnection))
+                {
+                    if (reader.Read())
+                    {
+                        reader.ToModel(ref structure, ignoreFieldNames, customAssignMethod);
+                        return true;
+                    }
+                    return false;
+                }
+            }
+            finally
+            {
+                cmd.Parameters.Clear();
+            }
+        }
+
+        public virtual bool TryGetSingle<T>(ref T structure, IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct
+        {
+#if NETSTANDARD2_0
+            IDbCommand cmd = null;
+#else
+            IDbCommand? cmd = null;
+#endif
+            try
+            {
+                using (var reader = ExecuteReader(tran, CommandBehavior.SingleRow, cmdType, cmdText, parameters, out cmd))
+                {
+                    if (reader.Read())
+                    {
+                        reader.ToModel(ref structure, ignoreFieldNames, customAssignMethod);
+                        return true;
+                    }
+                    return false;
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+            }
+        }
+
+        public virtual bool TryGetSingle<T>(ref T structure, IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct
+        {
+#if NETSTANDARD2_0
+            IDbCommand cmd = null;
+#else
+            IDbCommand? cmd = null;
+#endif
+            try
+            {
+                using (var reader = ExecuteReader(conn, CommandBehavior.SingleRow, cmdType, cmdText, parameters, out cmd))
+                {
+                    if (reader.Read())
+                    {
+                        reader.ToModel(ref structure, ignoreFieldNames, customAssignMethod);
+                        return true;
+                    }
+                    return false;
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+            }
         }
 
 
@@ -1463,6 +1962,148 @@ namespace Sweety.Common.DataProvider
         }
 
 #if NETSTANDARD2_0
+        public virtual IList<T> GetList<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+#else
+        public virtual IList<T>? GetList<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+#endif //NETSTANDARD2_0
+            IDbCommand cmd = BuildCommand();
+            cmd.CommandText = cmdText;
+            cmd.CommandType = cmdType;
+
+            try
+            {
+                using (var reader = ExecuteReader(cmd, parameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection))
+                {
+                    return ReadToList<T>(reader);
+                }
+            }
+            finally
+            {
+                cmd.Parameters.Clear();
+            }
+        }
+
+#if NETSTANDARD2_0
+        public virtual IList<T> GetList<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+            IDbCommand cmd = null;
+#else
+        public virtual IList<T>? GetList<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+            IDbCommand? cmd = null;
+#endif //NETSTANDARD2_0
+
+            try
+            {
+                using (var reader = ExecuteReader(tran, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
+                {
+                    return ReadToList<T>(reader);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+            }
+        }
+
+#if NETSTANDARD2_0
+        public virtual IList<T> GetList<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+            IDbCommand cmd = null;
+#else
+        public virtual IList<T>? GetList<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+            IDbCommand? cmd = null;
+#endif //NETSTANDARD2_0
+
+            try
+            {
+                using (var reader = ExecuteReader(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
+                {
+                    return ReadToList<T>(reader);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+            }
+        }
+
+#if NETSTANDARD2_0
+        public virtual IList<T> GetList<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+#else
+        public virtual IList<T>? GetList<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+#endif //NETSTANDARD2_0
+            IDbCommand cmd = BuildCommand();
+            cmd.CommandText = cmdText;
+            cmd.CommandType = cmdType;
+
+            try
+            {
+                using (var reader = ExecuteReader(cmd, parameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection))
+                {
+                    return ReadToList<T>(reader);
+                }
+            }
+            finally
+            {
+                cmd.Parameters.Clear();
+            }
+        }
+
+#if NETSTANDARD2_0
+        public virtual IList<T> GetList<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+            IDbCommand cmd = null;
+#else
+        public virtual IList<T>? GetList<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+            IDbCommand? cmd = null;
+#endif //NETSTANDARD2_0
+
+            try
+            {
+                using (var reader = ExecuteReader(tran, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
+                {
+                    return ReadToList<T>(reader);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+            }
+        }
+
+#if NETSTANDARD2_0
+        public virtual IList<T> GetList<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+            IDbCommand cmd = null;
+#else
+        public virtual IList<T>? GetList<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+            IDbCommand? cmd = null;
+#endif //NETSTANDARD2_0
+
+            try
+            {
+                using (var reader = ExecuteReader(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
+                {
+                    return ReadToList<T>(reader);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+            }
+        }
+
+
+
+#if NETSTANDARD2_0
         public virtual async Task<IList<T>> GetListAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
 #else
         public virtual async Task<IList<T>?> GetListAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
@@ -1528,6 +2169,158 @@ namespace Sweety.Common.DataProvider
                 (reader, cmd) = await ExecuteReaderAndGetCommandAsync(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, cancellationToken);
                 
                 return await ReadToListAsync<T>((DbDataReader)reader, cancellationToken);
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+                reader?.Dispose();
+            }
+        }
+
+
+
+#if NETSTANDARD2_0
+        public virtual async Task<IList<T>> GetListAsync<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+#else
+        public virtual async Task<IList<T>?> GetListAsync<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+#endif //NETSTANDARD2_0
+        {
+            IDbCommand cmd = BuildCommand();
+            cmd.CommandType = cmdType;
+            cmd.CommandText = cmdText;
+
+            try
+            {
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection, cancellationToken))
+                {
+                    return await ReadToListAsync<T>(reader, ignoreFieldName, customAssignMethod, cancellationToken);
+                }
+            }
+            finally
+            {
+                cmd.Parameters.Clear();
+            }
+        }
+
+#if NETSTANDARD2_0
+        public virtual async Task<IList<T>> GetListAsync<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        {
+            IDbCommand cmd = null;
+            IDataReader reader = null;
+#else
+        public virtual async Task<IList<T>?> GetListAsync<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        {
+            IDbCommand? cmd = null;
+            IDataReader? reader = null;
+#endif //NETSTANDARD2_0
+
+            try
+            {
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(tran, CommandBehavior.SingleResult, cmdType, cmdText, parameters, cancellationToken);
+
+                return await ReadToListAsync<T>((DbDataReader)reader, ignoreFieldName, customAssignMethod, cancellationToken);
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+                reader?.Dispose();
+            }
+        }
+
+#if NETSTANDARD2_0
+        public virtual async Task<IList<T>> GetListAsync<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        {
+            IDbCommand cmd = null;
+            IDataReader reader = null;
+#else
+        public virtual async Task<IList<T>?> GetListAsync<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        {
+            IDbCommand? cmd = null;
+            IDataReader? reader = null;
+
+#endif //NETSTANDARD2_0
+
+            try
+            {
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, cancellationToken);
+
+                return await ReadToListAsync<T>((DbDataReader)reader, ignoreFieldName, customAssignMethod, cancellationToken);
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+                reader?.Dispose();
+            }
+        }
+
+
+
+#if NETSTANDARD2_0
+        public virtual async Task<IList<T>> GetListAsync<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+#else
+        public virtual async Task<IList<T>?> GetListAsync<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+#endif //NETSTANDARD2_0
+        {
+            IDbCommand cmd = BuildCommand();
+            cmd.CommandType = cmdType;
+            cmd.CommandText = cmdText;
+
+            try
+            {
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection, cancellationToken))
+                {
+                    return await ReadToListAsync<T>(reader, ignoreFieldNames, customAssignMethod, cancellationToken);
+                }
+            }
+            finally
+            {
+                cmd.Parameters.Clear();
+            }
+        }
+
+#if NETSTANDARD2_0
+        public virtual async Task<IList<T>> GetListAsync<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        {
+            IDbCommand cmd = null;
+            IDataReader reader = null;
+#else
+        public virtual async Task<IList<T>?> GetListAsync<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        {
+            IDbCommand? cmd = null;
+            IDataReader? reader = null;
+#endif //NETSTANDARD2_0
+
+            try
+            {
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(tran, CommandBehavior.SingleResult, cmdType, cmdText, parameters, cancellationToken);
+
+                return await ReadToListAsync<T>((DbDataReader)reader, ignoreFieldNames, customAssignMethod, cancellationToken);
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+                reader?.Dispose();
+            }
+        }
+
+#if NETSTANDARD2_0
+        public virtual async Task<IList<T>> GetListAsync<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        {
+            IDbCommand cmd = null;
+            IDataReader reader = null;
+#else
+        public virtual async Task<IList<T>?> GetListAsync<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        {
+            IDbCommand? cmd = null;
+            IDataReader? reader = null;
+
+#endif //NETSTANDARD2_0
+
+            try
+            {
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, cancellationToken);
+
+                return await ReadToListAsync<T>((DbDataReader)reader, ignoreFieldNames, customAssignMethod, cancellationToken);
             }
             finally
             {
@@ -1607,6 +2400,150 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+
+
+#if NETSTANDARD2_0
+        public virtual ISet<T> GetSet<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+#else
+        public virtual ISet<T>? GetSet<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+#endif //NETSTANDARD2_0
+        {
+            IDbCommand cmd = BuildCommand();
+            cmd.CommandText = cmdText;
+            cmd.CommandType = cmdType;
+
+            try
+            {
+                using (var reader = ExecuteReader(cmd, parameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection))
+                {
+                    return ReadToSet<T>(reader, ignoreFieldName, customAssignMethod);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+            }
+        }
+
+#if NETSTANDARD2_0
+        public virtual ISet<T> GetSet<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+            IDbCommand cmd = null;
+#else
+        public virtual ISet<T>? GetSet<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+            IDbCommand? cmd = null;
+#endif //NETSTANDARD2_0
+
+            try
+            {
+                using (var reader = ExecuteReader(tran, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
+                {
+                    return ReadToSet<T>(reader, ignoreFieldName, customAssignMethod);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+            }
+        }
+
+#if NETSTANDARD2_0
+        public virtual ISet<T> GetSet<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+            IDbCommand cmd = null;
+#else
+        public virtual ISet<T>? GetSet<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+            IDbCommand? cmd = null;
+#endif //NETSTANDARD2_0
+
+            try
+            {
+                using (var reader = ExecuteReader(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
+                {
+                    return ReadToSet<T>(reader, ignoreFieldName, customAssignMethod);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+            }
+        }
+
+
+
+
+#if NETSTANDARD2_0
+        public virtual ISet<T> GetSet<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+#else
+        public virtual ISet<T>? GetSet<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+#endif //NETSTANDARD2_0
+        {
+            IDbCommand cmd = BuildCommand();
+            cmd.CommandText = cmdText;
+            cmd.CommandType = cmdType;
+
+            try
+            {
+                using (var reader = ExecuteReader(cmd, parameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection))
+                {
+                    return ReadToSet<T>(reader, ignoreFieldNames, customAssignMethod);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+            }
+        }
+
+#if NETSTANDARD2_0
+        public virtual ISet<T> GetSet<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+            IDbCommand cmd = null;
+#else
+        public virtual ISet<T>? GetSet<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+            IDbCommand? cmd = null;
+#endif //NETSTANDARD2_0
+
+            try
+            {
+                using (var reader = ExecuteReader(tran, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
+                {
+                    return ReadToSet<T>(reader, ignoreFieldNames, customAssignMethod);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+            }
+        }
+
+#if NETSTANDARD2_0
+        public virtual ISet<T> GetSet<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+            IDbCommand cmd = null;
+#else
+        public virtual ISet<T>? GetSet<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+            IDbCommand? cmd = null;
+#endif //NETSTANDARD2_0
+
+            try
+            {
+                using (var reader = ExecuteReader(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
+                {
+                    return ReadToSet<T>(reader, ignoreFieldNames, customAssignMethod);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+            }
+        }
+
+
 #if NETSTANDARD2_0
         public virtual async Task<ISet<T>> GetSetAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
 #else
@@ -1672,6 +2609,156 @@ namespace Sweety.Common.DataProvider
                 (reader, cmd) = await ExecuteReaderAndGetCommandAsync(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, cancellationToken);
                 
                 return await ReadToSetAsync<T>((DbDataReader)reader, cancellationToken);
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+                reader?.Dispose();
+            }
+        }
+
+
+
+#if NETSTANDARD2_0
+        public virtual async Task<ISet<T>> GetSetAsync<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+#else
+        public virtual async Task<ISet<T>?> GetSetAsync<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+#endif //NETSTANDARD2_0
+        {
+            IDbCommand cmd = BuildCommand();
+            cmd.CommandType = cmdType;
+            cmd.CommandText = cmdText;
+
+            try
+            {
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection, cancellationToken))
+                {
+                    return await ReadToSetAsync<T>(reader, ignoreFieldName, customAssignMethod, cancellationToken);
+                }
+            }
+            finally
+            {
+                cmd.Parameters.Clear();
+            }
+        }
+
+#if NETSTANDARD2_0
+        public virtual async Task<ISet<T>> GetSetAsync<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        {
+            IDbCommand cmd = null;
+            IDataReader reader = null;
+#else
+        public virtual async Task<ISet<T>?> GetSetAsync<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        {
+            IDbCommand? cmd = null;
+            IDataReader? reader = null;
+#endif //NETSTANDARD2_0
+
+            try
+            {
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(tran, CommandBehavior.SingleResult, cmdType, cmdText, parameters, cancellationToken);
+
+                return await ReadToSetAsync<T>((DbDataReader)reader, ignoreFieldName, customAssignMethod, cancellationToken);
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+                reader?.Dispose();
+            }
+        }
+
+#if NETSTANDARD2_0
+        public virtual async Task<ISet<T>> GetSetAsync<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        {
+            IDbCommand cmd = null;
+            IDataReader reader = null;
+#else
+        public virtual async Task<ISet<T>?> GetSetAsync<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        {
+            IDbCommand? cmd = null;
+            IDataReader? reader = null;
+#endif //NETSTANDARD2_0
+
+            try
+            {
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, cancellationToken);
+
+                return await ReadToSetAsync<T>((DbDataReader)reader, ignoreFieldName, customAssignMethod, cancellationToken);
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+                reader?.Dispose();
+            }
+        }
+
+
+
+#if NETSTANDARD2_0
+        public virtual async Task<ISet<T>> GetSetAsync<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+#else
+        public virtual async Task<ISet<T>?> GetSetAsync<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+#endif //NETSTANDARD2_0
+        {
+            IDbCommand cmd = BuildCommand();
+            cmd.CommandType = cmdType;
+            cmd.CommandText = cmdText;
+
+            try
+            {
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection, cancellationToken))
+                {
+                    return await ReadToSetAsync<T>(reader, ignoreFieldNames, customAssignMethod, cancellationToken);
+                }
+            }
+            finally
+            {
+                cmd.Parameters.Clear();
+            }
+        }
+
+#if NETSTANDARD2_0
+        public virtual async Task<ISet<T>> GetSetAsync<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        {
+            IDbCommand cmd = null;
+            IDataReader reader = null;
+#else
+        public virtual async Task<ISet<T>?> GetSetAsync<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        {
+            IDbCommand? cmd = null;
+            IDataReader? reader = null;
+#endif //NETSTANDARD2_0
+
+            try
+            {
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(tran, CommandBehavior.SingleResult, cmdType, cmdText, parameters, cancellationToken);
+
+                return await ReadToSetAsync<T>((DbDataReader)reader, ignoreFieldNames, customAssignMethod, cancellationToken);
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+                reader?.Dispose();
+            }
+        }
+
+#if NETSTANDARD2_0
+        public virtual async Task<ISet<T>> GetSetAsync<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        {
+            IDbCommand cmd = null;
+            IDataReader reader = null;
+#else
+        public virtual async Task<ISet<T>?> GetSetAsync<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        {
+            IDbCommand? cmd = null;
+            IDataReader? reader = null;
+#endif //NETSTANDARD2_0
+
+            try
+            {
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, cancellationToken);
+
+                return await ReadToSetAsync<T>((DbDataReader)reader, ignoreFieldNames, customAssignMethod, cancellationToken);
             }
             finally
             {
@@ -1751,6 +2838,150 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+
+
+
+#if NETSTANDARD2_0
+        public virtual ICollection<T> GetCollection<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+#else
+        public virtual ICollection<T>? GetCollection<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+#endif //NETSTANDARD2_0
+        {
+            IDbCommand cmd = BuildCommand();
+            cmd.CommandText = cmdText;
+            cmd.CommandType = cmdType;
+
+            try
+            {
+                using (var reader = ExecuteReader(cmd, parameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection))
+                {
+                    return ReadToCollection<T>(reader, ignoreFieldName, customAssignMethod);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+            }
+        }
+
+#if NETSTANDARD2_0
+        public virtual ICollection<T> GetCollection<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+            IDbCommand cmd = null;
+#else
+        public virtual ICollection<T>? GetCollection<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+            IDbCommand? cmd = null;
+#endif //NETSTANDARD2_0
+
+            try
+            {
+                using (var reader = ExecuteReader(tran, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
+                {
+                    return ReadToCollection<T>(reader, ignoreFieldName, customAssignMethod);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+            }
+        }
+
+#if NETSTANDARD2_0
+        public virtual ICollection<T> GetCollection<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+            IDbCommand cmd = null;
+#else
+        public virtual ICollection<T>? GetCollection<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+            IDbCommand? cmd = null;
+#endif //NETSTANDARD2_0
+
+            try
+            {
+                using (var reader = ExecuteReader(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
+                {
+                    return ReadToCollection<T>(reader, ignoreFieldName, customAssignMethod);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+            }
+        }
+
+
+
+
+#if NETSTANDARD2_0
+        public virtual ICollection<T> GetCollection<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+#else
+        public virtual ICollection<T>? GetCollection<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+#endif //NETSTANDARD2_0
+        {
+            IDbCommand cmd = BuildCommand();
+            cmd.CommandText = cmdText;
+            cmd.CommandType = cmdType;
+
+            try
+            {
+                using (var reader = ExecuteReader(cmd, parameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection))
+                {
+                    return ReadToCollection<T>(reader, ignoreFieldNames, customAssignMethod);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+            }
+        }
+
+#if NETSTANDARD2_0
+        public virtual ICollection<T> GetCollection<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+            IDbCommand cmd = null;
+#else
+        public virtual ICollection<T>? GetCollection<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+            IDbCommand? cmd = null;
+#endif //NETSTANDARD2_0
+
+            try
+            {
+                using (var reader = ExecuteReader(tran, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
+                {
+                    return ReadToCollection<T>(reader, ignoreFieldNames, customAssignMethod);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+            }
+        }
+
+#if NETSTANDARD2_0
+        public virtual ICollection<T> GetCollection<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+            IDbCommand cmd = null;
+#else
+        public virtual ICollection<T>? GetCollection<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        {
+            IDbCommand? cmd = null;
+#endif //NETSTANDARD2_0
+
+            try
+            {
+                using (var reader = ExecuteReader(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
+                {
+                    return ReadToCollection<T>(reader, ignoreFieldNames, customAssignMethod);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+            }
+        }
+
 #if NETSTANDARD2_0
         public virtual async Task<ICollection<T>> GetCollectionAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
 #else
@@ -1817,6 +3048,156 @@ namespace Sweety.Common.DataProvider
                 (reader, cmd) = await ExecuteReaderAndGetCommandAsync(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, cancellationToken);
                 
                 return await ReadToCollectionAsync<T>((DbDataReader)reader, cancellationToken);
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+                reader?.Dispose();
+            }
+        }
+
+
+#if NETSTANDARD2_0
+        public virtual async Task<ICollection<T>> GetCollectionAsync<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+#else
+        public virtual async Task<ICollection<T>?> GetCollectionAsync<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+#endif //NETSTANDARD2_0
+        {
+            IDbCommand cmd = BuildCommand();
+            cmd.CommandType = cmdType;
+            cmd.CommandText = cmdText;
+
+            try
+            {
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection, cancellationToken))
+                {
+                    return await ReadToCollectionAsync<T>(reader, ignoreFieldName, customAssignMethod, cancellationToken);
+                }
+            }
+            finally
+            {
+                cmd.Parameters.Clear();
+            }
+        }
+
+
+#if NETSTANDARD2_0
+        public virtual async Task<ICollection<T>> GetCollectionAsync<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        {
+            IDbCommand cmd = null;
+            IDataReader reader = null;
+#else
+        public virtual async Task<ICollection<T>?> GetCollectionAsync<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        {
+            IDbCommand? cmd = null;
+            IDataReader? reader = null;
+#endif //NETSTANDARD2_0
+
+            try
+            {
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(tran, CommandBehavior.SingleResult, cmdType, cmdText, parameters, cancellationToken);
+
+                return await ReadToCollectionAsync<T>((DbDataReader)reader, ignoreFieldName, customAssignMethod, cancellationToken);
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+                reader?.Dispose();
+            }
+        }
+
+#if NETSTANDARD2_0
+        public virtual async Task<ICollection<T>> GetCollectionAsync<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        {
+            IDbCommand cmd = null;
+            IDataReader reader = null;
+#else
+        public virtual async Task<ICollection<T>?> GetCollectionAsync<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        {
+            IDbCommand? cmd = null;
+            IDataReader? reader = null;
+#endif //NETSTANDARD2_0
+
+            try
+            {
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, cancellationToken);
+
+                return await ReadToCollectionAsync<T>((DbDataReader)reader, ignoreFieldName, customAssignMethod, cancellationToken);
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+                reader?.Dispose();
+            }
+        }
+
+
+#if NETSTANDARD2_0
+        public virtual async Task<ICollection<T>> GetCollectionAsync<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+#else
+        public virtual async Task<ICollection<T>?> GetCollectionAsync<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+#endif //NETSTANDARD2_0
+        {
+            IDbCommand cmd = BuildCommand();
+            cmd.CommandType = cmdType;
+            cmd.CommandText = cmdText;
+
+            try
+            {
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection, cancellationToken))
+                {
+                    return await ReadToCollectionAsync<T>(reader, ignoreFieldNames, customAssignMethod, cancellationToken);
+                }
+            }
+            finally
+            {
+                cmd.Parameters.Clear();
+            }
+        }
+
+
+#if NETSTANDARD2_0
+        public virtual async Task<ICollection<T>> GetCollectionAsync<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        {
+            IDbCommand cmd = null;
+            IDataReader reader = null;
+#else
+        public virtual async Task<ICollection<T>?> GetCollectionAsync<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        {
+            IDbCommand? cmd = null;
+            IDataReader? reader = null;
+#endif //NETSTANDARD2_0
+
+            try
+            {
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(tran, CommandBehavior.SingleResult, cmdType, cmdText, parameters, cancellationToken);
+
+                return await ReadToCollectionAsync<T>((DbDataReader)reader, ignoreFieldNames, customAssignMethod, cancellationToken);
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+                reader?.Dispose();
+            }
+        }
+
+#if NETSTANDARD2_0
+        public virtual async Task<ICollection<T>> GetCollectionAsync<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        {
+            IDbCommand cmd = null;
+            IDataReader reader = null;
+#else
+        public virtual async Task<ICollection<T>?> GetCollectionAsync<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        {
+            IDbCommand? cmd = null;
+            IDataReader? reader = null;
+#endif //NETSTANDARD2_0
+
+            try
+            {
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, cancellationToken);
+
+                return await ReadToCollectionAsync<T>((DbDataReader)reader, ignoreFieldNames, customAssignMethod, cancellationToken);
             }
             finally
             {
@@ -2526,6 +3907,76 @@ namespace Sweety.Common.DataProvider
 
             return reader.ToModel<T>();
         }
+
+
+        /// <summary>
+        /// 将<paramref name="reader"/>里的数据按照列明与属性名对应，读取到类型<typeparamref name="T"/>的对象实例的各个属性。
+        /// </summary>
+        /// <typeparam name="T">模型类型</typeparam>
+        /// <param name="reader">数据读取器</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <returns>如果读取器里有数据则将这些数据写入类型<typeparamref name="T"/>的实例并返回此实例。如果没有数据则返回<c>null</c>。</returns>
+#if NETSTANDARD2_0
+        protected virtual T ReadToModel<T>(IDataReader reader, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod) where T : class
+#else
+        protected virtual T? ReadToModel<T>(IDataReader reader, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod) where T : class
+#endif //NETSTANDARD2_0
+        {
+            if (!reader.Read()) return default;
+
+            if (_modelInstance != null)
+            {
+                T model = (T)_modelInstance;
+                _modelInstance = null;
+                reader.ToModel<T>(ref model, ignoreFieldName, customAssignMethod);
+                return model;
+            }
+            else if (_funBuildModelInstance != null)
+            {
+                T model = ((Func<T>)_funBuildModelInstance)();
+                _funBuildModelInstance = null;
+                reader.ToModel<T>(ref model, ignoreFieldName, customAssignMethod);
+                return model;
+            }
+
+            return reader.ToModel<T>(ignoreFieldName, customAssignMethod);
+        }
+
+        /// <summary>
+        /// 将<paramref name="reader"/>里的数据按照列明与属性名对应，读取到类型<typeparamref name="T"/>的对象实例的各个属性。
+        /// </summary>
+        /// <typeparam name="T">模型类型</typeparam>
+        /// <param name="reader">数据读取器</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <returns>如果读取器里有数据则将这些数据写入类型<typeparamref name="T"/>的实例并返回此实例。如果没有数据则返回<c>null</c>。</returns>
+#if NETSTANDARD2_0
+        protected virtual T ReadToModel<T>(IDataReader reader, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod) where T : class
+#else
+        protected virtual T? ReadToModel<T>(IDataReader reader, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod) where T : class
+#endif //NETSTANDARD2_0
+        {
+            if (!reader.Read()) return default;
+
+            if (_modelInstance != null)
+            {
+                T model = (T)_modelInstance;
+                _modelInstance = null;
+                reader.ToModel<T>(ref model, ignoreFieldNames, customAssignMethod);
+                return model;
+            }
+            else if (_funBuildModelInstance != null)
+            {
+                T model = ((Func<T>)_funBuildModelInstance)();
+                _funBuildModelInstance = null;
+                reader.ToModel<T>(ref model, ignoreFieldNames, customAssignMethod);
+                return model;
+            }
+
+            return reader.ToModel<T>(ignoreFieldNames, customAssignMethod);
+        }
+
         /// <summary>
         /// 异步将<paramref name="reader"/>里的数据按照列明与属性名对应，读取到类型<typeparamref name="T"/>的对象实例的各个属性。
         /// </summary>
@@ -2557,6 +4008,78 @@ namespace Sweety.Common.DataProvider
             }
 
             return reader.ToModel<T>();
+        }
+
+
+        /// <summary>
+        /// 异步将<paramref name="reader"/>里的数据按照列明与属性名对应，读取到类型<typeparamref name="T"/>的对象实例的各个属性。
+        /// </summary>
+        /// <typeparam name="T">模型类型</typeparam>
+        /// <param name="reader">数据读取器</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <returns>如果读取器里有数据则将这些数据写入类型<typeparamref name="T"/>的实例并返回此实例。如果没有数据则返回<c>null</c>。</returns>
+#if NETSTANDARD2_0
+        protected virtual async Task<T> ReadToModelAsync<T>(DbDataReader reader, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CancellationToken cancellationToken) where T : class
+#else
+        protected virtual async Task<T?> ReadToModelAsync<T>(DbDataReader reader, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CancellationToken cancellationToken) where T : class
+#endif //NETSTANDARD2_0
+        {
+            if (!await reader.ReadAsync(cancellationToken)) return default;
+
+            if (_modelInstance != null)
+            {
+                T model = (T)_modelInstance;
+                _modelInstance = null;
+                reader.ToModel<T>(ref model, ignoreFieldName, customAssignMethod);
+                return model;
+            }
+            else if (_funBuildModelInstance != null)
+            {
+                T model = ((Func<T>)_funBuildModelInstance)();
+                _funBuildModelInstance = null;
+                reader.ToModel<T>(ref model, ignoreFieldName, customAssignMethod);
+                return model;
+            }
+
+            return reader.ToModel<T>(ignoreFieldName, customAssignMethod);
+        }
+
+
+        /// <summary>
+        /// 异步将<paramref name="reader"/>里的数据按照列明与属性名对应，读取到类型<typeparamref name="T"/>的对象实例的各个属性。
+        /// </summary>
+        /// <typeparam name="T">模型类型</typeparam>
+        /// <param name="reader">数据读取器</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <returns>如果读取器里有数据则将这些数据写入类型<typeparamref name="T"/>的实例并返回此实例。如果没有数据则返回<c>null</c>。</returns>
+#if NETSTANDARD2_0
+        protected virtual async Task<T> ReadToModelAsync<T>(DbDataReader reader, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CancellationToken cancellationToken) where T : class
+#else
+        protected virtual async Task<T?> ReadToModelAsync<T>(DbDataReader reader, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CancellationToken cancellationToken) where T : class
+#endif //NETSTANDARD2_0
+        {
+            if (!await reader.ReadAsync(cancellationToken)) return default;
+
+            if (_modelInstance != null)
+            {
+                T model = (T)_modelInstance;
+                _modelInstance = null;
+                reader.ToModel<T>(ref model, ignoreFieldNames, customAssignMethod);
+                return model;
+            }
+            else if (_funBuildModelInstance != null)
+            {
+                T model = ((Func<T>)_funBuildModelInstance)();
+                _funBuildModelInstance = null;
+                reader.ToModel<T>(ref model, ignoreFieldNames, customAssignMethod);
+                return model;
+            }
+
+            return reader.ToModel<T>(ignoreFieldNames, customAssignMethod);
         }
 
 
@@ -2608,6 +4131,90 @@ namespace Sweety.Common.DataProvider
                     do
                     {
                         reader.ToCollection<T>(collection, fun);
+                    }
+                    while (reader.NextResult() && reader.Read());
+                }
+            }
+        }
+
+        /// <summary>
+        /// 将<paramref name="reader"/>里的数据读取到<paramref name="collection"/>对象实例中。
+        /// </summary>
+        /// <typeparam name="T">数据类型</typeparam>
+        /// <param name="reader">数据读取器</param>
+        /// <param name="collection">存储数据的集合。</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <exception cref="NotSupportedException">此方法不支持<typeparamref name="T"/>为简单的值类型。</exception>
+        private void FillToCollection<T>(IDataReader reader, ICollection<T> collection, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod)
+        {
+            Type t = typeof(T);
+            TypeCode typeCode = Type.GetTypeCode(t);
+            //struct 类型的 t.IsValueType 等于 true，typeCode 等于 TypeCode.Object。
+            if ((t.IsValueType && typeCode != TypeCode.Object) || typeCode == TypeCode.String || t == ValueTypeConstants.GuidType)
+            {
+                //此方法不支持简单的值类型。
+                throw new NotSupportedException();
+            }
+            else
+            {
+                if (_funBuildModelInstance == null)
+                {
+                    do
+                    {
+                        reader.ToCollection<T>(collection, ignoreFieldName, customAssignMethod);
+                    }
+                    while (reader.NextResult() && reader.Read());
+                }
+                else
+                {
+                    Func<T> fun = (Func<T>)_funBuildModelInstance;
+                    _funBuildModelInstance = null;
+                    do
+                    {
+                        reader.ToCollection<T>(collection, ignoreFieldName, customAssignMethod, fun);
+                    }
+                    while (reader.NextResult() && reader.Read());
+                }
+            }
+        }
+
+        /// <summary>
+        /// 将<paramref name="reader"/>里的数据读取到<paramref name="collection"/>对象实例中。
+        /// </summary>
+        /// <typeparam name="T">数据类型</typeparam>
+        /// <param name="reader">数据读取器</param>
+        /// <param name="collection">存储数据的集合。</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <exception cref="NotSupportedException">此方法不支持<typeparamref name="T"/>为简单的值类型。</exception>
+        private void FillToCollection<T>(IDataReader reader, ICollection<T> collection, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod)
+        {
+            Type t = typeof(T);
+            TypeCode typeCode = Type.GetTypeCode(t);
+            //struct 类型的 t.IsValueType 等于 true，typeCode 等于 TypeCode.Object。
+            if ((t.IsValueType && typeCode != TypeCode.Object) || typeCode == TypeCode.String || t == ValueTypeConstants.GuidType)
+            {
+                //此方法不支持简单的值类型。
+                throw new NotSupportedException();
+            }
+            else
+            {
+                if (_funBuildModelInstance == null)
+                {
+                    do
+                    {
+                        reader.ToCollection<T>(collection, ignoreFieldNames, customAssignMethod);
+                    }
+                    while (reader.NextResult() && reader.Read());
+                }
+                else
+                {
+                    Func<T> fun = (Func<T>)_funBuildModelInstance;
+                    _funBuildModelInstance = null;
+                    do
+                    {
+                        reader.ToCollection<T>(collection, ignoreFieldNames, customAssignMethod, fun);
                     }
                     while (reader.NextResult() && reader.Read());
                 }
@@ -2685,6 +4292,159 @@ namespace Sweety.Common.DataProvider
         }
 
         /// <summary>
+        /// 异步将<paramref name="reader"/>里的数据读取到<paramref name="collection"/>对象实例中。
+        /// </summary>
+        /// <typeparam name="T">数据类型</typeparam>
+        /// <param name="reader">数据读取器</param>
+        /// <param name="collection">存储数据的集合。</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <exception cref="NotSupportedException">此方法不支持<typeparamref name="T"/>为简单的值类型。</exception>
+#if NETSTANDARD2_0
+        private async Task FillToCollectionAsync<T>(DbDataReader reader, ICollection<T>collection, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CancellationToken cancellationToken)
+#else
+        private async ValueTask FillToCollectionAsync<T>(DbDataReader reader, ICollection<T> collection, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CancellationToken cancellationToken)
+#endif
+        {
+            Task<bool> nextResult;
+            Task<bool> readResult;
+            Type t = typeof(T);
+            TypeCode typeCode = Type.GetTypeCode(t);
+            //struct 类型的 t.IsValueType 等于 true，typeCode 等于 TypeCode.Object。
+            if ((t.IsValueType && typeCode != TypeCode.Object) || typeCode == TypeCode.String || t == typeof(Guid))
+            {
+                //此方法不支持简单的值类型。
+                throw new NotSupportedException();
+            }
+            else
+            {
+                if (_funBuildModelInstance == null)
+                {
+                    do
+                    {
+                        await reader.ToCollectionAsync<T>(collection, ignoreFieldName, customAssignMethod, cancellationToken);
+
+                        nextResult = reader.NextResultAsync(cancellationToken);
+                        readResult = reader.ReadAsync(cancellationToken);
+                    }
+                    while (await nextResult && await readResult);
+                }
+                else
+                {
+                    Func<T> fun = (Func<T>)_funBuildModelInstance;
+                    _funBuildModelInstance = null;
+                    do
+                    {
+                        await reader.ToCollectionAsync<T>(collection, ignoreFieldName, customAssignMethod, cancellationToken, fun);
+
+                        nextResult = reader.NextResultAsync(cancellationToken);
+                        readResult = reader.ReadAsync(cancellationToken);
+                    }
+                    while (await nextResult && await readResult);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 异步将<paramref name="reader"/>里的数据读取到<paramref name="collection"/>对象实例中。
+        /// </summary>
+        /// <typeparam name="T">数据类型</typeparam>
+        /// <param name="reader">数据读取器</param>
+        /// <param name="collection">存储数据的集合。</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <exception cref="NotSupportedException">此方法不支持<typeparamref name="T"/>为简单的值类型。</exception>
+#if NETSTANDARD2_0
+        private async Task FillToCollectionAsync<T>(DbDataReader reader, ICollection<T>collection, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CancellationToken cancellationToken)
+#else
+        private async ValueTask FillToCollectionAsync<T>(DbDataReader reader, ICollection<T> collection, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CancellationToken cancellationToken)
+#endif
+        {
+            Task<bool> nextResult;
+            Task<bool> readResult;
+            Type t = typeof(T);
+            TypeCode typeCode = Type.GetTypeCode(t);
+            //struct 类型的 t.IsValueType 等于 true，typeCode 等于 TypeCode.Object。
+            if ((t.IsValueType && typeCode != TypeCode.Object) || typeCode == TypeCode.String || t == typeof(Guid))
+            {
+                //此方法不支持简单的值类型。
+                throw new NotSupportedException();
+            }
+            else
+            {
+                if (_funBuildModelInstance == null)
+                {
+                    do
+                    {
+                        await reader.ToCollectionAsync<T>(collection, ignoreFieldNames, customAssignMethod, cancellationToken);
+
+                        nextResult = reader.NextResultAsync(cancellationToken);
+                        readResult = reader.ReadAsync(cancellationToken);
+                    }
+                    while (await nextResult && await readResult);
+                }
+                else
+                {
+                    Func<T> fun = (Func<T>)_funBuildModelInstance;
+                    _funBuildModelInstance = null;
+                    do
+                    {
+                        await reader.ToCollectionAsync<T>(collection, ignoreFieldNames, customAssignMethod, cancellationToken, fun);
+
+                        nextResult = reader.NextResultAsync(cancellationToken);
+                        readResult = reader.ReadAsync(cancellationToken);
+                    }
+                    while (await nextResult && await readResult);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 构建一个<typeparamref name="T1"/>类型的集合实例。
+        /// 优先使用<paramref name="instance"/>、<paramref name="funBuildListInstance"/>进行构造，如果两个变量都为<c>null</c>则构造一个<typeparamref name="T2"/>类型的默认实例。
+        /// </summary>
+        /// <typeparam name="T1">要构造的集合类型。可以是接口、基类、具体类型。</typeparam>
+        /// <typeparam name="T2">默认实例的类型。如果<paramref name="instance"/>、<paramref name="funBuildListInstance"/>均为<c>null</c>则使用该类型的无参构造函数来构造实例并返回。</typeparam>
+        /// <param name="instance">优先返回的实例。该实例必须是<typeparamref name="T1"/>类型或可以转换成该类型的实例。</param>
+        /// <param name="funBuildListInstance">如果<paramref name="instance"/>为<c>null</c>，则使用该委托构造实例并返回。该委托必须返回<typeparamref name="T1"/>类型或可以转换成该类型的实例。</param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        private T1 GetOrBuildCollectionInstance<T1, T2>(ref object instance, ref object funBuildListInstance)
+#else
+        private T1 GetOrBuildCollectionInstance<T1, T2>(ref object? instance, ref object? funBuildListInstance)
+#endif
+            where T2 : T1, new()
+        {
+            T1 result;
+            
+            if (instance != null)
+            {
+                result = (T1)instance;
+                instance = null;
+            }
+            else if (funBuildListInstance != null)
+            {
+                result = ((Func<T1>)funBuildListInstance)();
+                funBuildListInstance = null;
+            }
+            else
+            {
+                result = new T2();
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// 构建列表实例。优先使用<see cref="_listInstance"/>、<see cref="_funBuildListInstance"/>进行构造，如果两个变量都为<c>null</c>则构造一个默认实例。
+        /// </summary>
+        /// <typeparam name="T">列表里的元素数据类型。</typeparam>
+        /// <returns>列表实例。</returns>
+        private IList<T> GetOrBuildListInstance<T>() => GetOrBuildCollectionInstance<IList<T>, List<T>>(ref _listInstance, ref _funBuildListInstance);
+        
+        /// <summary>
         /// 将<paramref name="reader"/>里的数据读取到列表对象实例里。
         /// </summary>
         /// <typeparam name="T">数据类型</typeparam>
@@ -2702,25 +4462,69 @@ namespace Sweety.Common.DataProvider
 
             if (reader.Read())
             {
-                if (_listInstance != null)
-                {
-                    result = (IList<T>)_listInstance;
-                    _listInstance = null;
-                }
-                else if (_funBuildListInstance != null)
-                {
-                    result = ((Func<IList<T>>)_funBuildListInstance)();
-                    _funBuildListInstance = null;
-                }
-                else
-                {
-                    result = new List<T>();
-                }
+                result = GetOrBuildListInstance<T>();
 
                 FillToCollection<T>(reader, result);
             }
             return result;
         }
+
+        /// <summary>
+        /// 将<paramref name="reader"/>里的数据读取到列表对象实例里。
+        /// </summary>
+        /// <typeparam name="T">数据类型</typeparam>
+        /// <param name="reader">数据读取器</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <returns>承载<paramref name="reader"/>数据的对象列表。</returns>
+#if NETSTANDARD2_0
+        protected virtual IList<T> ReadToList<T>(IDataReader reader, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod)
+        {
+            IList<T> result = null;
+#else
+        protected virtual IList<T>? ReadToList<T>(IDataReader reader, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod)
+        {
+            IList<T>? result = null;
+#endif //NETSTANDARD2_0
+
+            if (reader.Read())
+            {
+                result = GetOrBuildListInstance<T>();
+
+                FillToCollection<T>(reader, result, ignoreFieldName, customAssignMethod);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// 将<paramref name="reader"/>里的数据读取到列表对象实例里。
+        /// </summary>
+        /// <typeparam name="T">数据类型</typeparam>
+        /// <param name="reader">数据读取器</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <returns>承载<paramref name="reader"/>数据的对象列表。</returns>
+#if NETSTANDARD2_0
+        protected virtual IList<T> ReadToList<T>(IDataReader reader, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod)
+        {
+            IList<T> result = null;
+#else
+        protected virtual IList<T>? ReadToList<T>(IDataReader reader, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod)
+        {
+            IList<T>? result = null;
+#endif //NETSTANDARD2_0
+
+            if (reader.Read())
+            {
+                result = GetOrBuildListInstance<T>();
+
+                FillToCollection<T>(reader, result, ignoreFieldNames, customAssignMethod);
+            }
+            return result;
+        }
+
+
+
         /// <summary>
         /// 异步将<paramref name="reader"/>里的数据读取到列表对象实例里。
         /// </summary>
@@ -2740,20 +4544,7 @@ namespace Sweety.Common.DataProvider
 
             if (await reader.ReadAsync(cancellationToken))
             {
-                if (_listInstance != null)
-                {
-                    result = (IList<T>)_listInstance;
-                    _listInstance = null;
-                }
-                else if (_funBuildListInstance != null)
-                {
-                    result = ((Func<IList<T>>)_funBuildListInstance)();
-                    _funBuildListInstance = null;
-                }
-                else
-                {
-                    result = new List<T>();
-                }
+                result = GetOrBuildListInstance<T>();
 
                 await FillToCollectionAsync<T>(reader, result, cancellationToken);
 
@@ -2761,6 +4552,71 @@ namespace Sweety.Common.DataProvider
             return result;
         }
 
+        /// <summary>
+        /// 异步将<paramref name="reader"/>里的数据读取到列表对象实例里。
+        /// </summary>
+        /// <typeparam name="T">数据类型</typeparam>
+        /// <param name="reader">数据读取器</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <returns>承载<paramref name="reader"/>数据的对象列表。</returns>
+#if NETSTANDARD2_0
+        protected virtual async Task<IList<T>> ReadToListAsync<T>(DbDataReader reader, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CancellationToken cancellationToken = default)
+        {
+            IList<T> result = null;
+#else
+        protected virtual async Task<IList<T>?> ReadToListAsync<T>(DbDataReader reader, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CancellationToken cancellationToken = default)
+        {
+            IList<T>? result = null;
+#endif //NETSTANDARD2_0
+
+            if (await reader.ReadAsync(cancellationToken))
+            {
+                result = GetOrBuildListInstance<T>();
+
+                await FillToCollectionAsync<T>(reader, result, ignoreFieldName, customAssignMethod, cancellationToken);
+
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// 异步将<paramref name="reader"/>里的数据读取到列表对象实例里。
+        /// </summary>
+        /// <typeparam name="T">数据类型</typeparam>
+        /// <param name="reader">数据读取器</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <returns>承载<paramref name="reader"/>数据的对象列表。</returns>
+#if NETSTANDARD2_0
+        protected virtual async Task<IList<T>> ReadToListAsync<T>(DbDataReader reader, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CancellationToken cancellationToken = default)
+        {
+            IList<T> result = null;
+#else
+        protected virtual async Task<IList<T>?> ReadToListAsync<T>(DbDataReader reader, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CancellationToken cancellationToken = default)
+        {
+            IList<T>? result = null;
+#endif //NETSTANDARD2_0
+
+            if (await reader.ReadAsync(cancellationToken))
+            {
+                result = GetOrBuildListInstance<T>();
+
+                await FillToCollectionAsync<T>(reader, result, ignoreFieldNames, customAssignMethod, cancellationToken);
+
+            }
+            return result;
+        }
+
+
+        /// <summary>
+        /// 构建集实例。优先使用<see cref="_setInstance"/>、<see cref="_funBuildSetInstance"/>进行构造，如果两个变量都为<c>null</c>则构造一个默认实例。
+        /// </summary>
+        /// <typeparam name="T">集的元素数据类型。</typeparam>
+        /// <returns>集实例。</returns>
+        private ISet<T> GetOrBuildSetInstance<T>() => GetOrBuildCollectionInstance<ISet<T>, HashSet<T>>(ref _setInstance, ref _funBuildSetInstance);
 
         /// <summary>
         /// 将<paramref name="reader"/>里的数据读取到数据集对象实例里。
@@ -2780,25 +4636,66 @@ namespace Sweety.Common.DataProvider
 
             if (reader.Read())
             {
-                if (_setInstance != null)
-                {
-                    result = (ISet<T>)_setInstance;
-                    _setInstance = null;
-                }
-                else if (_funBuildSetInstance != null)
-                {
-                    result = ((Func<ISet<T>>)_funBuildSetInstance)();
-                    _funBuildSetInstance = null;
-                }
-                else
-                {
-                    result = new HashSet<T>();
-                }
+                result = GetOrBuildSetInstance<T>();
 
                 FillToCollection<T>(reader, result);
             }
             return result;
         }
+        /// <summary>
+        /// 将<paramref name="reader"/>里的数据读取到数据集对象实例里。
+        /// </summary>
+        /// <typeparam name="T">数据类型</typeparam>
+        /// <param name="reader">数据读取器</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <returns>承载<paramref name="reader"/>数据的对象集。</returns>
+#if NETSTANDARD2_0
+        protected virtual ISet<T> ReadToSet<T>(IDataReader reader, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod)
+        {
+            ISet<T> result = null;
+#else
+        protected virtual ISet<T>? ReadToSet<T>(IDataReader reader, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod)
+        {
+            ISet<T>? result = null;
+#endif //NETSTANDARD2_0
+
+            if (reader.Read())
+            {
+                result = GetOrBuildSetInstance<T>();
+
+                FillToCollection<T>(reader, result, ignoreFieldName, customAssignMethod);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// 将<paramref name="reader"/>里的数据读取到数据集对象实例里。
+        /// </summary>
+        /// <typeparam name="T">数据类型</typeparam>
+        /// <param name="reader">数据读取器</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <returns>承载<paramref name="reader"/>数据的对象集。</returns>
+#if NETSTANDARD2_0
+        protected virtual ISet<T> ReadToSet<T>(IDataReader reader, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod)
+        {
+            ISet<T> result = null;
+#else
+        protected virtual ISet<T>? ReadToSet<T>(IDataReader reader, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod)
+        {
+            ISet<T>? result = null;
+#endif //NETSTANDARD2_0
+
+            if (reader.Read())
+            {
+                result = GetOrBuildSetInstance<T>();
+
+                FillToCollection<T>(reader, result, ignoreFieldNames, customAssignMethod);
+            }
+            return result;
+        }
+        
         /// <summary>
         /// 异步将<paramref name="reader"/>里的数据读取到数据集对象实例里。
         /// </summary>
@@ -2818,26 +4715,74 @@ namespace Sweety.Common.DataProvider
 
             if (await reader.ReadAsync(cancellationToken))
             {
-                if (_setInstance != null)
-                {
-                    result = (ISet<T>)_setInstance;
-                    _setInstance = null;
-                }
-                else if (_funBuildSetInstance != null)
-                {
-                    result = ((Func<ISet<T>>)_funBuildSetInstance)();
-                    _funBuildSetInstance = null;
-                }
-                else
-                {
-                    result = new HashSet<T>();
-                }
+                result = GetOrBuildSetInstance<T>();
 
                 await FillToCollectionAsync<T>(reader, result, cancellationToken);
             }
             return result;
         }
+        /// <summary>
+        /// 异步将<paramref name="reader"/>里的数据读取到数据集对象实例里。
+        /// </summary>
+        /// <typeparam name="T">数据类型</typeparam>
+        /// <param name="reader">数据读取器</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <returns>承载<paramref name="reader"/>数据的对象集。</returns>
+#if NETSTANDARD2_0
+        protected virtual async Task<ISet<T>> ReadToSetAsync<T>(DbDataReader reader, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CancellationToken cancellationToken)
+        {
+            ISet<T> result = null;
+#else
+        protected virtual async Task<ISet<T>?> ReadToSetAsync<T>(DbDataReader reader, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CancellationToken cancellationToken)
+        {
+            ISet<T>? result = null;
+#endif //NETSTANDARD2_0
 
+            if (await reader.ReadAsync(cancellationToken))
+            {
+                result = GetOrBuildSetInstance<T>();
+
+                await FillToCollectionAsync<T>(reader, result, ignoreFieldName, customAssignMethod, cancellationToken);
+            }
+            return result;
+        }
+        /// <summary>
+        /// 异步将<paramref name="reader"/>里的数据读取到数据集对象实例里。
+        /// </summary>
+        /// <typeparam name="T">数据类型</typeparam>
+        /// <param name="reader">数据读取器</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <returns>承载<paramref name="reader"/>数据的对象集。</returns>
+#if NETSTANDARD2_0
+        protected virtual async Task<ISet<T>> ReadToSetAsync<T>(DbDataReader reader, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CancellationToken cancellationToken)
+        {
+            ISet<T> result = null;
+#else
+        protected virtual async Task<ISet<T>?> ReadToSetAsync<T>(DbDataReader reader, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CancellationToken cancellationToken)
+        {
+            ISet<T>? result = null;
+#endif //NETSTANDARD2_0
+
+            if (await reader.ReadAsync(cancellationToken))
+            {
+                result = GetOrBuildSetInstance<T>();
+
+                await FillToCollectionAsync<T>(reader, result, ignoreFieldNames, customAssignMethod, cancellationToken);
+            }
+            return result;
+        }
+
+
+        /// <summary>
+        /// 构建集合实例。优先使用<see cref="_collectionInstance"/>、<see cref="_funBuildCollectionInstance"/>进行构造，如果两个变量都为<c>null</c>则构造一个默认实例。
+        /// </summary>
+        /// <typeparam name="T">集合元素数据类型。</typeparam>
+        /// <returns>集合实例。</returns>
+        private ICollection<T> GetOrBuildCollectionInstance<T>() => GetOrBuildCollectionInstance<ICollection<T>, List<T>>(ref _collectionInstance, ref _funBuildCollectionInstance);
 
         /// <summary>
         /// 将<paramref name="reader"/>里的数据读取到集合对象实例里。
@@ -2857,25 +4802,65 @@ namespace Sweety.Common.DataProvider
 
             if (reader.Read())
             {
-                if (_collectionInstance != null)
-                {
-                    result = (ICollection<T>)_collectionInstance;
-                    _collectionInstance = null;
-                }
-                else if (_funBuildCollectionInstance != null)
-                {
-                    result = ((Func<ICollection<T>>)_funBuildCollectionInstance)();
-                    _funBuildCollectionInstance = null;
-                }
-                else
-                {
-                    result = new List<T>();
-                }
+                result = GetOrBuildCollectionInstance<T>();
 
                 FillToCollection<T>(reader, result);
             }
             return result;
         }
+        /// <summary>
+        /// 将<paramref name="reader"/>里的数据读取到集合对象实例里。
+        /// </summary>
+        /// <typeparam name="T">数据类型</typeparam>
+        /// <param name="reader">数据读取器</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <returns>承载<paramref name="reader"/>数据的对象集合。</returns>
+#if NETSTANDARD2_0
+        protected virtual ICollection<T> ReadToCollection<T>(IDataReader reader, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod)
+        {
+            ICollection<T> result = null;
+#else
+        protected virtual ICollection<T>? ReadToCollection<T>(IDataReader reader, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod)
+        {
+            ICollection<T>? result = null;
+#endif //NETSTANDARD2_0
+
+            if (reader.Read())
+            {
+                result = GetOrBuildCollectionInstance<T>();
+
+                FillToCollection<T>(reader, result, ignoreFieldName, customAssignMethod);
+            }
+            return result;
+        }
+        /// <summary>
+        /// 将<paramref name="reader"/>里的数据读取到集合对象实例里。
+        /// </summary>
+        /// <typeparam name="T">数据类型</typeparam>
+        /// <param name="reader">数据读取器</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <returns>承载<paramref name="reader"/>数据的对象集合。</returns>
+#if NETSTANDARD2_0
+        protected virtual ICollection<T> ReadToCollection<T>(IDataReader reader, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod)
+        {
+            ICollection<T> result = null;
+#else
+        protected virtual ICollection<T>? ReadToCollection<T>(IDataReader reader, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod)
+        {
+            ICollection<T>? result = null;
+#endif //NETSTANDARD2_0
+
+            if (reader.Read())
+            {
+                result = GetOrBuildCollectionInstance<T>();
+
+                FillToCollection<T>(reader, result, ignoreFieldNames, customAssignMethod);
+            }
+            return result;
+        }
+
         /// <summary>
         /// 将<paramref name="reader"/>里的数据读取到集合对象实例里。
         /// </summary>
@@ -2895,22 +4880,63 @@ namespace Sweety.Common.DataProvider
 
             if (await reader.ReadAsync(cancellationToken))
             {
-                if (_collectionInstance != null)
-                {
-                    result = (ICollection<T>)_collectionInstance;
-                    _collectionInstance = null;
-                }
-                else if (_funBuildCollectionInstance != null)
-                {
-                    result = ((Func<ICollection<T>>)_funBuildCollectionInstance)();
-                    _funBuildCollectionInstance = null;
-                }
-                else
-                {
-                    result = new List<T>();
-                }
+                result = GetOrBuildCollectionInstance<T>();
 
                 await FillToCollectionAsync<T>(reader, result, cancellationToken);
+            }
+            return result;
+        }
+        /// <summary>
+        /// 将<paramref name="reader"/>里的数据读取到集合对象实例里。
+        /// </summary>
+        /// <typeparam name="T">数据类型</typeparam>
+        /// <param name="reader">数据读取器</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <returns>承载<paramref name="reader"/>数据的对象集合。</returns>
+#if NETSTANDARD2_0
+        protected virtual async Task<ICollection<T>> ReadToCollectionAsync<T>(DbDataReader reader, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CancellationToken cancellationToken)
+        {
+            ICollection<T> result = null;
+#else
+        protected virtual async Task<ICollection<T>?> ReadToCollectionAsync<T>(DbDataReader reader, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CancellationToken cancellationToken)
+        {
+            ICollection<T>? result = null;
+#endif //NETSTANDARD2_0
+
+            if (await reader.ReadAsync(cancellationToken))
+            {
+                result = GetOrBuildCollectionInstance<T>();
+
+                await FillToCollectionAsync<T>(reader, result, ignoreFieldName, customAssignMethod, cancellationToken);
+            }
+            return result;
+        }
+        /// <summary>
+        /// 将<paramref name="reader"/>里的数据读取到集合对象实例里。
+        /// </summary>
+        /// <typeparam name="T">数据类型</typeparam>
+        /// <param name="reader">数据读取器</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <returns>承载<paramref name="reader"/>数据的对象集合。</returns>
+#if NETSTANDARD2_0
+        protected virtual async Task<ICollection<T>> ReadToCollectionAsync<T>(DbDataReader reader, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CancellationToken cancellationToken)
+        {
+            ICollection<T> result = null;
+#else
+        protected virtual async Task<ICollection<T>?> ReadToCollectionAsync<T>(DbDataReader reader, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CancellationToken cancellationToken)
+        {
+            ICollection<T>? result = null;
+#endif //NETSTANDARD2_0
+
+            if (await reader.ReadAsync(cancellationToken))
+            {
+                result = GetOrBuildCollectionInstance<T>();
+
+                await FillToCollectionAsync<T>(reader, result, ignoreFieldNames, customAssignMethod, cancellationToken);
             }
             return result;
         }

@@ -46,12 +46,12 @@ namespace Sweety.Common.Converter
             PropertyInfo[] properties = modelType.GetProperties();
 
             DefaultConstructor = Expression.Lambda<Func<T>>(Expression.New(modelType), null).Compile();
-            Properties = new Dictionary<string, Action<T, Object>>(properties.Length, StringComparer.OrdinalIgnoreCase);
+            Properties = new Dictionary<string, RefT1Action<T, Object>>(properties.Length, StringComparer.OrdinalIgnoreCase);
 
             Type attribType = typeof(FieldNameAttribute);
             Type dateTimeKindAttribType = typeof(SpecifierStoredDateTimeKindAttribute);
 
-            ParameterExpression pe_instance = Expression.Parameter(modelType, "instance");
+            ParameterExpression pe_instance = Expression.Parameter(modelType.MakeByRefType(), "instance");
             ParameterExpression pe_value = Expression.Parameter(typeof(Object), "value");
 
             MethodInfo hackType = typeof(InternalConvertUtility).GetMethod("HackType", BindingFlags.Static | BindingFlags.NonPublic);
@@ -79,7 +79,7 @@ namespace Sweety.Common.Converter
                     expr_assign = Expression.Assign(expr_property, Expression.Convert(expr_method, p.PropertyType));
                 }
 
-                var expr_lambda = Expression.Lambda<Action<T, Object>>(expr_assign, pe_instance, pe_value);
+                var expr_lambda = Expression.Lambda<RefT1Action<T, Object>>(expr_assign, pe_instance, pe_value);
 
                 Properties.Add(key, expr_lambda.Compile());
             }
@@ -92,6 +92,6 @@ namespace Sweety.Common.Converter
         /// <summary>
         /// 为对象每个公开属性赋值的委托集合（key：属性名称，区分大小写；value：为该属性赋值的委托）
         /// </summary>
-        internal Dictionary<string, Action<T, Object>> Properties { get; private set; }
+        internal Dictionary<string, RefT1Action<T, Object>> Properties { get; private set; }
     }
 }
