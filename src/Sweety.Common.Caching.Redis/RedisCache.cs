@@ -171,7 +171,7 @@ namespace Sweety.Common.Caching
 
             var redisValue = BeforeStorageValueHandler(value);
 
-            return _cache.StringSet(redisKey, redisValue, absoluteExpiration.Subtract(DateTimeOffset.UtcNow), When.NotExists);
+            return _cache.StringSet(redisKey, redisValue, absoluteExpiration.Subtract(DateTimeOffset.UtcNow), when: When.NotExists);
         }
 
         public bool Add(string key, object value, TimeSpan slidingExpiration)

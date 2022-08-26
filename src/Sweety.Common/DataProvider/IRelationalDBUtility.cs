@@ -453,6 +453,18 @@ namespace Sweety.Common.DataProvider
         IDbDataParameter BuildParameter(string parameterName, object? value, ParameterDirection direction, int parameterType, int size = default);
 #endif //NETSTANDARD2_0
 
+        /// <summary>
+        /// 将参数对象的参数名、参数值和方向重置为指定的值，类型和大小随着<paramref name="value"/>的类型默认重置。
+        /// </summary>
+        /// <param name="parameter">参数对象。</param>
+        /// <param name="parameterName">参数名称。</param>
+        /// <param name="value">参数值。</param>
+        /// <param name="direction">参数方向。</param>
+#if NETSTANDARD2_0
+        void ResetParameter(IDbDataParameter parameter, string parameterName, object value, ParameterDirection direction = ParameterDirection.Input);
+#else
+        void ResetParameter(IDbDataParameter parameter, string parameterName, object? value, ParameterDirection direction = ParameterDirection.Input);
+#endif //NETSTANDARD2_0
 
         /// <summary>
         /// 将参数对象的参数名、参数值、类型、大小和方向重置为指定的值。
@@ -470,7 +482,21 @@ namespace Sweety.Common.DataProvider
 #endif //NETSTANDARD2_0
 
         /// <summary>
-        /// 如果<paramref name="parameter"/>不会<c>null</c>则将参数对象的参数名、参数值、类型、大小和方向重置为指定的值，否则用这些参数创建一个新的参数对象。
+        /// 如果<paramref name="parameter"/>不为<c>null</c>则将参数对象的参数名、参数值和方向重置为指定的值（类型和大小随着<paramref name="value"/>的类型默认重置），否则用这些参数创建一个新的参数对象。
+        /// </summary>
+        /// <param name="parameter">参数对象。</param>
+        /// <param name="parameterName">参数名称。</param>
+        /// <param name="value">参数值。</param>
+        /// <param name="direction">参数方向。</param>
+        /// <returns>返回一个用于<see cref="IDbCommand"/>的参数对象实例。</returns>
+#if NETSTANDARD2_0
+        IDbDataParameter ResetOrBuildParameter(IDbDataParameter parameter, string parameterName, object value, ParameterDirection direction = ParameterDirection.Input);
+#else
+        IDbDataParameter ResetOrBuildParameter(IDbDataParameter? parameter, string parameterName, object? value, ParameterDirection direction = ParameterDirection.Input);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 如果<paramref name="parameter"/>不为<c>null</c>则将参数对象的参数名、参数值、类型、大小和方向重置为指定的值，否则用这些参数创建一个新的参数对象。
         /// </summary>
         /// <param name="parameter">参数对象。</param>
         /// <param name="parameterName">参数名称。</param>
@@ -807,15 +833,13 @@ namespace Sweety.Common.DataProvider
         /// <param name="parameters">参数集合</param>
         /// <returns>返回键值对集合，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where TValue : new();
+        IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
 #elif NETSTANDARD2_1
         IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
-            where TKey : notnull
-            where TValue : new();
+            where TKey : notnull;
 #else
         IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
-            where TKey : notnull
-            where TValue : new();
+            where TKey : notnull;
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 获取键值对集合
@@ -828,15 +852,13 @@ namespace Sweety.Common.DataProvider
         /// <param name="parameters">参数集合</param>
         /// <returns>返回键值对集合，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where TValue : new();
+        IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
 #elif NETSTANDARD2_1
         IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
-            where TKey : notnull
-            where TValue : new();
+            where TKey : notnull;
 #else
         IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
-            where TKey : notnull
-            where TValue : new();
+            where TKey : notnull;
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 获取键值对集合
@@ -849,15 +871,13 @@ namespace Sweety.Common.DataProvider
         /// <param name="parameters">参数集合</param>
         /// <returns>返回键值对集合，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where TValue : new();
+        IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
 #elif NETSTANDARD2_1
         IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
-            where TKey : notnull
-            where TValue : new();
+            where TKey : notnull;
 #else
         IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
-            where TKey : notnull
-            where TValue : new();
+            where TKey : notnull;
 #endif //NETSTANDARD2_0
 
         /// <summary>
@@ -871,15 +891,13 @@ namespace Sweety.Common.DataProvider
         /// <param name="parameters">参数集合</param>
         /// <returns>返回键值对集合，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where TValue : new();
+        Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
 #elif NETSTANDARD2_1
         Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
-            where TKey : notnull
-            where TValue : new();
+            where TKey : notnull;
 #else
         Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
-            where TKey : notnull
-            where TValue : new();
+            where TKey : notnull;
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 异步获取键值对集合
@@ -893,15 +911,13 @@ namespace Sweety.Common.DataProvider
         /// <param name="parameters">参数集合</param>
         /// <returns>返回键值对集合，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where TValue : new();
+        Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
 #elif NETSTANDARD2_1
         Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
-            where TKey : notnull
-            where TValue : new();
+            where TKey : notnull;
 #else
         Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
-            where TKey : notnull
-            where TValue : new();
+            where TKey : notnull;
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 异步获取键值对集合
@@ -915,15 +931,13 @@ namespace Sweety.Common.DataProvider
         /// <param name="parameters">参数集合</param>
         /// <returns>返回键值对集合，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where TValue : new();
+        Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
 #elif NETSTANDARD2_1
         Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
-            where TKey : notnull
-            where TValue : new();
+            where TKey : notnull;
 #else
         Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
-            where TKey : notnull
-            where TValue : new();
+            where TKey : notnull;
 #endif //NETSTANDARD2_0
 
 

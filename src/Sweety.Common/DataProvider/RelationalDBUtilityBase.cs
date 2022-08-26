@@ -839,6 +839,21 @@ namespace Sweety.Common.DataProvider
         public abstract IDbDataParameter BuildParameter(string parameterName, object? value, ParameterDirection direction, int parameterType, int size = default);
 #endif //NETSTANDARD2_0
 
+
+
+        /// <summary>
+        /// 将参数对象的参数名、参数值和方向重置为指定的值，类型和大小随着<paramref name="value"/>的类型默认重置。
+        /// </summary>
+        /// <param name="parameter">参数对象。</param>
+        /// <param name="parameterName">参数名称。</param>
+        /// <param name="value">参数值。</param>
+        /// <param name="direction">参数方向。</param>
+#if NETSTANDARD2_0
+        public abstract void ResetParameter(IDbDataParameter parameter, string parameterName, object value, ParameterDirection direction = ParameterDirection.Input);
+#else
+        public abstract void ResetParameter(IDbDataParameter parameter, string parameterName, object? value, ParameterDirection direction = ParameterDirection.Input);
+#endif //NETSTANDARD2_0
+
         /// <summary>
         /// 将参数对象的参数名、参数值、类型、大小和方向重置为指定的值。
         /// </summary>
@@ -856,7 +871,35 @@ namespace Sweety.Common.DataProvider
 #endif //NETSTANDARD2_0
 
         /// <summary>
-        /// 如果<paramref name="parameter"/>不会<c>null</c>则将参数对象的参数名、参数值、类型、大小和方向重置为指定的值，否则用这些参数创建一个新的参数对象。
+        /// 如果<paramref name="parameter"/>不为<c>null</c>则将参数对象的参数名、参数值和方向重置为指定的值（类型和大小随着<paramref name="value"/>的类型默认重置），否则用这些参数创建一个新的参数对象。
+        /// </summary>
+        /// <param name="parameter">参数对象。</param>
+        /// <param name="parameterName">参数名称。</param>
+        /// <param name="value">参数值。</param>
+        /// <param name="direction">参数方向。</param>
+        /// <returns>返回一个用于<see cref="IDbCommand"/>的参数对象实例。</returns>
+#if NETSTANDARD2_0
+        public virtual IDbDataParameter ResetOrBuildParameter(IDbDataParameter parameter, string parameterName, object value, ParameterDirection direction = ParameterDirection.Input)
+#else
+        public virtual IDbDataParameter ResetOrBuildParameter(IDbDataParameter? parameter, string parameterName, object? value, ParameterDirection direction = ParameterDirection.Input)
+#endif //NETSTANDARD2_0
+        {
+            if (parameter is null)
+            {
+                parameter = BuildParameter(parameterName, value);
+
+                if (parameter.Direction != direction) parameter.Direction = direction;
+            }
+            else
+            {
+                ResetParameter(parameter, parameterName, value, direction);
+            }
+
+            return parameter;
+        }
+
+        /// <summary>
+        /// 如果<paramref name="parameter"/>不为<c>null</c>则将参数对象的参数名、参数值、类型、大小和方向重置为指定的值，否则用这些参数创建一个新的参数对象。
         /// </summary>
         /// <param name="parameter">参数对象。</param>
         /// <param name="parameterName">参数名称。</param>
@@ -1025,15 +1068,13 @@ namespace Sweety.Common.DataProvider
 
 
 #if NETSTANDARD2_0
-        public virtual IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where TValue : new()
+        public virtual IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
 #elif NETSTANDARD2_1
         public virtual IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
             where TKey : notnull
-            where TValue : new()
 #else
         public virtual IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
             where TKey : notnull
-            where TValue : new()
 #endif //NETSTANDARD2_0
         {
             IDbCommand cmd = BuildCommand();
@@ -1054,15 +1095,13 @@ namespace Sweety.Common.DataProvider
         }
 
 #if NETSTANDARD2_0
-        public virtual IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where TValue : new()
+        public virtual IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
 #elif NETSTANDARD2_1
         public virtual IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
             where TKey : notnull
-            where TValue : new()
 #else
         public virtual IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
             where TKey : notnull
-            where TValue : new()
 #endif //NETSTANDARD2_0
         {
 #if NETSTANDARD2_0
@@ -1083,16 +1122,24 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
+        /// <param name="conn"></param>
+        /// <param name="cmdText"></param>
+        /// <param name="cmdType"></param>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where TValue : new()
+        public virtual IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
 #elif NETSTANDARD2_1
         public virtual IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
             where TKey : notnull
-            where TValue : new()
 #else
         public virtual IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
             where TKey : notnull
-            where TValue : new()
 #endif //NETSTANDARD2_0
         {
 #if NETSTANDARD2_0
@@ -1114,15 +1161,13 @@ namespace Sweety.Common.DataProvider
         }
 
 #if NETSTANDARD2_0
-        public virtual async Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where TValue : new()
+        public virtual async Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
 #elif NETSTANDARD2_1
         public virtual async Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
             where TKey : notnull
-            where TValue : new()
 #else
         public virtual async Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
             where TKey : notnull
-            where TValue : new()
 #endif //NETSTANDARD2_0
         {
             IDbCommand cmd = BuildCommand();
@@ -1143,15 +1188,13 @@ namespace Sweety.Common.DataProvider
         }
 
 #if NETSTANDARD2_0
-        public virtual async Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where TValue : new()
+        public virtual async Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
 #elif NETSTANDARD2_1
         public virtual async Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
             where TKey : notnull
-            where TValue : new()
 #else
         public virtual async Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
             where TKey : notnull
-            where TValue : new()
 #endif //NETSTANDARD2_0
         {
 #if NETSTANDARD2_0
@@ -1176,16 +1219,25 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
+        /// <param name="conn"></param>
+        /// <param name="cmdText"></param>
+        /// <param name="cmdType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="parameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual async Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where TValue : new()
+        public virtual async Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
 #elif NETSTANDARD2_1
         public virtual async Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
             where TKey : notnull
-            where TValue : new()
 #else
         public virtual async Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
             where TKey : notnull
-            where TValue : new()
 #endif //NETSTANDARD2_0
         {
 #if NETSTANDARD2_0
@@ -1976,7 +2028,7 @@ namespace Sweety.Common.DataProvider
             {
                 using (var reader = ExecuteReader(cmd, parameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection))
                 {
-                    return ReadToList<T>(reader);
+                    return ReadToList<T>(reader, ignoreFieldName, customAssignMethod);
                 }
             }
             finally
@@ -1999,7 +2051,7 @@ namespace Sweety.Common.DataProvider
             {
                 using (var reader = ExecuteReader(tran, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
                 {
-                    return ReadToList<T>(reader);
+                    return ReadToList<T>(reader, ignoreFieldName, customAssignMethod);
                 }
             }
             finally
@@ -2022,7 +2074,7 @@ namespace Sweety.Common.DataProvider
             {
                 using (var reader = ExecuteReader(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
                 {
-                    return ReadToList<T>(reader);
+                    return ReadToList<T>(reader, ignoreFieldName, customAssignMethod);
                 }
             }
             finally
@@ -2046,7 +2098,7 @@ namespace Sweety.Common.DataProvider
             {
                 using (var reader = ExecuteReader(cmd, parameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection))
                 {
-                    return ReadToList<T>(reader);
+                    return ReadToList<T>(reader, ignoreFieldNames, customAssignMethod);
                 }
             }
             finally
@@ -2069,7 +2121,7 @@ namespace Sweety.Common.DataProvider
             {
                 using (var reader = ExecuteReader(tran, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
                 {
-                    return ReadToList<T>(reader);
+                    return ReadToList<T>(reader, ignoreFieldNames, customAssignMethod);
                 }
             }
             finally
@@ -2092,7 +2144,7 @@ namespace Sweety.Common.DataProvider
             {
                 using (var reader = ExecuteReader(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
                 {
-                    return ReadToList<T>(reader);
+                    return ReadToList<T>(reader, ignoreFieldNames, customAssignMethod);
                 }
             }
             finally
@@ -3423,7 +3475,210 @@ namespace Sweety.Common.DataProvider
         /// <param name="reader">数据读取器</param>
         /// <returns>如果读取器里有数据则返回这些数据的键值对集合。如果没有数据则返回<c>null</c>。</returns>
 #if NETSTANDARD2_0
-        protected virtual IDictionary<TKey, TValue> ReadToDictionary<TKey, TValue>(IDataReader reader) where TValue : new()
+        protected virtual IDictionary<TKey, TValue> ReadToDictionary<TKey, TValue>(IDataReader reader)
+        {
+            IDictionary<TKey, TValue> result = null;
+
+            if (reader.Read())
+            {
+                if (_dictionaryInstance != null)
+                {
+                    result = (IDictionary<TKey, TValue>)_dictionaryInstance;
+                    _dictionaryInstance = null;
+                }
+                else if (_funBuildDictionaryInstance != null)
+                {
+                    result = ((Func<IDictionary<TKey, TValue>>)_funBuildDictionaryInstance)();
+                    _funBuildDictionaryInstance = null;
+                }
+                else
+                {
+                    result = new Dictionary<TKey, TValue>();
+                }
+
+                do
+                {
+                    result.Add((TKey)reader[0], reader.IsDBNull(1) ? default : (TValue)InternalConvertUtility.HackType(reader[1], typeof(TValue)));
+                }
+                while (reader.Read());
+            }
+            return result;
+        }
+#elif NETSTANDARD2_1
+        protected virtual IDictionary<TKey, TValue>? ReadToDictionary<TKey, TValue>(IDataReader reader)
+            where TKey : notnull
+        {
+            IDictionary<TKey, TValue>? result = null;
+
+            if (reader.Read())
+            {
+                if (_dictionaryInstance != null)
+                {
+                    result = (IDictionary<TKey, TValue>)_dictionaryInstance;
+                    _dictionaryInstance = null;
+                }
+                else if (_funBuildDictionaryInstance != null)
+                {
+                    result = ((Func<IDictionary<TKey, TValue>>)_funBuildDictionaryInstance)();
+                    _funBuildDictionaryInstance = null;
+                }
+                else
+                {
+                    result = new Dictionary<TKey, TValue>();
+                }
+
+                do
+                {
+                    result.Add((TKey)reader[0], reader.IsDBNull(1) ? default : (TValue)InternalConvertUtility.HackType(reader[1], typeof(TValue)));
+                }
+                while (reader.Read());
+            }
+            return result;
+        }
+#else
+        protected virtual IDictionary<TKey, TValue?>? ReadToDictionary<TKey, TValue>(IDataReader reader)
+            where TKey : notnull
+        {
+            IDictionary<TKey, TValue?>? result = null;
+            
+            if (reader.Read())
+            {
+                if (_dictionaryInstance != null)
+                {
+                    result = (IDictionary<TKey, TValue?>)_dictionaryInstance;
+                    _dictionaryInstance = null;
+                }
+                else if (_funBuildDictionaryInstance != null)
+                {
+                    result = ((Func<IDictionary<TKey, TValue?>>)_funBuildDictionaryInstance)();
+                    _funBuildDictionaryInstance = null;
+                }
+                else
+                {
+                    result = new Dictionary<TKey, TValue?>();
+                }
+
+                do
+                {
+                    result.Add((TKey)reader[0], reader.IsDBNull(1) ? default : (TValue)InternalConvertUtility.HackType(reader[1], typeof(TValue)));
+                }
+                while (reader.Read());
+            }
+            return result;
+        }
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 异步将<paramref name="reader"/>[0]作为键、将<paramref name="reader"/>[1]作为值，读取到键值对集合实例里。
+        /// </summary>
+        /// <typeparam name="TKey">键的类型</typeparam>
+        /// <typeparam name="TValue">值的类型</typeparam>
+        /// <param name="reader">数据读取器</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <returns>如果读取器里有数据则返回这些数据的键值对集合。如果没有数据则返回<c>null</c>。</returns>
+#if NETSTANDARD2_0
+        protected virtual async Task<IDictionary<TKey, TValue>> ReadToDictionaryAsync<TKey, TValue>(DbDataReader reader, CancellationToken cancellationToken = default)
+        {
+            IDictionary<TKey, TValue> result = null;
+
+            if (await reader.ReadAsync(cancellationToken))
+            {
+                if (_dictionaryInstance != null)
+                {
+                    result = (IDictionary<TKey, TValue>)_dictionaryInstance;
+                    _dictionaryInstance = null;
+                }
+                else if (_funBuildDictionaryInstance != null)
+                {
+                    result = ((Func<IDictionary<TKey, TValue>>)_funBuildDictionaryInstance)();
+                    _funBuildDictionaryInstance = null;
+                }
+                else
+                {
+                    result = new Dictionary<TKey, TValue>();
+                }
+
+                do
+                {
+                    result.Add((TKey)reader[0], await reader.IsDBNullAsync(1, cancellationToken) ? default : (TValue)InternalConvertUtility.HackType(reader[1], typeof(TValue)));
+                }
+                while (await reader.ReadAsync(cancellationToken));
+            }
+            return result;
+        }
+#elif NETSTANDARD2_1
+        protected virtual async Task<IDictionary<TKey, TValue>?> ReadToDictionaryAsync<TKey, TValue>(DbDataReader reader, CancellationToken cancellationToken = default)
+            where TKey : notnull
+        {
+            IDictionary<TKey, TValue>? result = null;
+
+            if (await reader.ReadAsync(cancellationToken))
+            {
+                if (_dictionaryInstance != null)
+                {
+                    result = (IDictionary<TKey, TValue>)_dictionaryInstance;
+                    _dictionaryInstance = null;
+                }
+                else if (_funBuildDictionaryInstance != null)
+                {
+                    result = ((Func<IDictionary<TKey, TValue>>)_funBuildDictionaryInstance)();
+                    _funBuildDictionaryInstance = null;
+                }
+                else
+                {
+                    result = new Dictionary<TKey, TValue>();
+                }
+
+                do
+                {    
+                    result.Add((TKey)reader[0], await reader.IsDBNullAsync(1, cancellationToken) ? default : (TValue)InternalConvertUtility.HackType(reader[1], typeof(TValue)));
+                }
+                while (await reader.ReadAsync(cancellationToken));
+            }
+            return result;
+        }
+#else
+        protected virtual async Task<IDictionary<TKey, TValue?>?> ReadToDictionaryAsync<TKey, TValue>(DbDataReader reader, CancellationToken cancellationToken = default)
+            where TKey : notnull
+        {
+            IDictionary<TKey, TValue?>? result = null;
+
+            if (await reader.ReadAsync(cancellationToken))
+            {
+                if (_dictionaryInstance != null)
+                {
+                    result = (IDictionary<TKey, TValue?>)_dictionaryInstance;
+                    _dictionaryInstance = null;
+                }
+                else if (_funBuildDictionaryInstance != null)
+                {
+                    result = ((Func<IDictionary<TKey, TValue?>>)_funBuildDictionaryInstance)();
+                    _funBuildDictionaryInstance = null;
+                }
+                else
+                {
+                    result = new Dictionary<TKey, TValue?>();
+                }
+
+                do
+                {
+                    result.Add((TKey)reader[0], await reader.IsDBNullAsync(1, cancellationToken) ? default : (TValue)InternalConvertUtility.HackType(reader[1], typeof(TValue)));
+                }
+                while (await reader.ReadAsync(cancellationToken));
+            }
+            return result;
+        }
+#endif //NETSTANDARD2_0
+        /*
+        /// <summary>
+        /// 将<paramref name="reader"/>[0]作为键、将<paramref name="reader"/>[1]作为值，读取到键值对集合实例里。
+        /// </summary>
+        /// <typeparam name="TKey">键的类型</typeparam>
+        /// <typeparam name="TValue">值的类型</typeparam>
+        /// <param name="reader">数据读取器</param>
+        /// <returns>如果读取器里有数据则返回这些数据的键值对集合。如果没有数据则返回<c>null</c>。</returns>
+#if NETSTANDARD2_0
+        protected virtual IDictionary<TKey, TValue> ReadToDictionary<TKey, TValue>(IDataReader reader)
+            where TValue : new()
         {
             IDictionary<TKey, TValue> result = null;
 
@@ -3644,6 +3899,7 @@ namespace Sweety.Common.DataProvider
             return result;
         }
 #endif //NETSTANDARD2_0
+
         /// <summary>
         /// 异步将<paramref name="reader"/>[0]作为键、将<paramref name="reader"/>[1]作为值，读取到键值对集合实例里。
         /// </summary>
@@ -3804,7 +4060,7 @@ namespace Sweety.Common.DataProvider
             where TValue : new()
         {
             IDictionary<TKey, TValue?>? result = null;
-
+            
             if (await reader.ReadAsync(cancellationToken))
             {
                 if (_dictionaryInstance != null)
@@ -3874,7 +4130,7 @@ namespace Sweety.Common.DataProvider
             return result;
         }
 #endif //NETSTANDARD2_0
-
+        */
 
         /// <summary>
         /// 将<paramref name="reader"/>里的数据按照列明与属性名对应，读取到类型<typeparamref name="T"/>的对象实例的各个属性。

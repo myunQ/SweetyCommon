@@ -351,12 +351,14 @@ namespace Sweety.Common.DataProvider.PostgreSQL
         /// 将通配符转换为普通符号。
         /// </summary>
         /// <param name="value">放在<c>LIKE</c>中的值。</param>
-        /// <returns>% 返回 [%]，_ 返回 [_]。</returns>
+        /// <returns>% 返回 \%，_ 返回 \_，\ 返回 \\。</returns>
         public override string WildcardEscape(string value)
         {
             if (String.IsNullOrEmpty(value)) return value;
 
-            throw new NotImplementedException();
+            return value.Replace("\\", "\\\\")
+                .Replace("%", "\\%")
+                .Replace("_", "\\_");
         }
 
 
@@ -550,6 +552,38 @@ namespace Sweety.Common.DataProvider.PostgreSQL
         }
 
         /// <summary>
+        /// 将参数对象的参数名、参数值和方向重置为指定的值，类型和大小随着<paramref name="value"/>的类型默认重置。
+        /// </summary>
+        /// <param name="parameter">参数对象。</param>
+        /// <param name="parameterName">参数名称。</param>
+        /// <param name="value">参数值。</param>
+        /// <param name="direction">参数方向。</param>
+        /// <exception cref="NotImplementedException"></exception>
+#if NETSTANDARD2_0
+        public override void ResetParameter(IDbDataParameter parameter, string parameterName, object value, ParameterDirection direction = ParameterDirection.Input)
+#else
+        public override void ResetParameter(IDbDataParameter parameter, string parameterName, object? value, ParameterDirection direction = ParameterDirection.Input)
+#endif //NETSTANDARD2_0
+        {
+            if (parameter is NpgsqlParameter p)
+            {
+                p.ResetDbType();
+
+                if (p.Direction != direction) p.Direction = direction;
+                if (p.Size > 0) p.Size = 0;
+                p.ParameterName = parameterName;
+                p.Value = value ?? DBNull.Value;
+            }
+            else
+            {
+                throw new ArgumentException($"只接受“{typeof(NpgsqlParameter).FullName}”类型的参数对象。", nameof(parameter));
+            }
+
+            //还没有验证以上实现对象重置后是否达到重置效果，在验证之前始终抛出异常，以免调用后达不到重置效果引起不必要的麻烦。
+            throw new NotImplementedException("还没有验证参数对象重置后是否达到重置效果。在验证之前始终抛出异常，以免调用后达不到重置效果引起不必要的麻烦。");
+        }
+
+        /// <summary>
         /// 将参数对象的参数名、参数值、类型、大小和方向重置为指定的值。
         /// </summary>
         /// <param name="parameter">参数对象。</param>
@@ -583,7 +617,7 @@ namespace Sweety.Common.DataProvider.PostgreSQL
         }
 
         /// <summary>
-        /// 如果<paramref name="parameter"/>不会<c>null</c>则将参数对象的参数名、参数值、类型、大小和方向重置为指定的值，否则用这些参数创建一个新的参数对象。
+        /// 如果<paramref name="parameter"/>不为<c>null</c>则将参数对象的参数名、参数值、类型、大小和方向重置为指定的值，否则用这些参数创建一个新的参数对象。
         /// </summary>
         /// <param name="parameter">参数对象。</param>
         /// <param name="parameterName">参数名称。</param>
@@ -598,23 +632,14 @@ namespace Sweety.Common.DataProvider.PostgreSQL
         public override IDbDataParameter ResetOrBuildParameter(IDbDataParameter? parameter, string parameterName, object? value, int parameterType, int size = default, ParameterDirection direction = ParameterDirection.Input)
 #endif //NETSTANDARD2_0
         {
-            if (parameter is null) return BuildSqlParameter(parameterName, (NpgsqlDbType)parameterType, size, direction, value);
-
-            if (parameter is NpgsqlParameter p)
+            if (parameter is null)
             {
-                var type = (NpgsqlDbType)parameterType;
-
-                if (p.NpgsqlDbType != type) p.NpgsqlDbType = type;
-                if (p.Size != size) p.Size = size;
-                if (p.Direction != direction) p.Direction = direction;
-
-                p.ParameterName = parameterName;
-                p.Value = value ?? DBNull.Value;
-                return p;
+                return BuildSqlParameter(parameterName, (NpgsqlDbType)parameterType, size, direction, value);
             }
             else
             {
-                throw new ArgumentException($"只接受“{typeof(NpgsqlParameter).FullName}”类型的参数对象。", nameof(parameter));
+                ResetParameter(parameter, parameterName, value, parameterType, size, direction);
+                return parameter;
             }
         }
 

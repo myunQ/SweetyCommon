@@ -547,6 +547,34 @@ namespace Sweety.Common.DataProvider.SqlServer
         }
 
         /// <summary>
+        /// 将参数对象的参数名、参数值和方向重置为指定的值，类型和大小随着<paramref name="value"/>的类型默认重置。
+        /// </summary>
+        /// <param name="parameter">参数对象。</param>
+        /// <param name="parameterName">参数名称。</param>
+        /// <param name="value">参数值。</param>
+        /// <param name="direction">参数方向。</param>
+#if NETSTANDARD2_0
+        public override void ResetParameter(IDbDataParameter parameter, string parameterName, object value, ParameterDirection direction = ParameterDirection.Input)
+#else
+        public override void ResetParameter(IDbDataParameter parameter, string parameterName, object? value, ParameterDirection direction = ParameterDirection.Input)
+#endif //NETSTANDARD2_0
+        {
+            if (parameter is SqlParameter p)
+            {
+                p.ResetSqlDbType();
+                
+                if (p.Direction != direction) p.Direction = direction;
+                if (p.Size > 0) p.Size = 0;
+                p.ParameterName = parameterName;
+                p.Value = value ?? DBNull.Value;
+            }
+            else
+            {
+                throw new ArgumentException($"只接受“{typeof(SqlParameter).FullName}”类型的参数对象。", nameof(parameter));
+            }
+        }
+
+        /// <summary>
         /// 将参数对象的参数名、参数值、类型、大小和方向重置为指定的值。
         /// </summary>
         /// <param name="parameter">参数对象。</param>
@@ -579,7 +607,7 @@ namespace Sweety.Common.DataProvider.SqlServer
         }
 
         /// <summary>
-        /// 如果<paramref name="parameter"/>不会<c>null</c>则将参数对象的参数名、参数值、类型、大小和方向重置为指定的值，否则用这些参数创建一个新的参数对象。
+        /// 如果<paramref name="parameter"/>不为<c>null</c>则将参数对象的参数名、参数值、类型、大小和方向重置为指定的值，否则用这些参数创建一个新的参数对象。
         /// </summary>
         /// <param name="parameter">参数对象。</param>
         /// <param name="parameterName">参数名称。</param>
@@ -594,23 +622,14 @@ namespace Sweety.Common.DataProvider.SqlServer
         public override IDbDataParameter ResetOrBuildParameter(IDbDataParameter? parameter, string parameterName, object? value, int parameterType, int size = default, ParameterDirection direction = ParameterDirection.Input)
 #endif //NETSTANDARD2_0
         {
-            if (parameter is null) return BuildSqlParameter(parameterName, (SqlDbType)parameterType, size, direction, value);
-
-            if (parameter is SqlParameter p)
+            if (parameter is null)
             {
-                var type = (SqlDbType)parameterType;
-
-                if (p.SqlDbType != type) p.SqlDbType = type;
-                if (p.Size != size) p.Size = size;
-                if (p.Direction != direction) p.Direction = direction;
-
-                p.ParameterName = parameterName;
-                p.Value = value ?? DBNull.Value;
-                return p;
+                return BuildSqlParameter(parameterName, (SqlDbType)parameterType, size, direction, value);
             }
             else
             {
-                throw new ArgumentException($"只接受“{typeof(SqlParameter).FullName}”类型的参数对象。", nameof(parameter));
+                ResetParameter(parameter, parameterName, value, parameterType, size, direction);
+                return parameter;
             }
         }
 

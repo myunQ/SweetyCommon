@@ -534,6 +534,38 @@ namespace Sweety.Common.DataProvider.SQLite
         }
 
         /// <summary>
+        /// 将参数对象的参数名、参数值和方向重置为指定的值，类型和大小随着<paramref name="value"/>的类型默认重置。
+        /// </summary>
+        /// <param name="parameter">参数对象。</param>
+        /// <param name="parameterName">参数名称。</param>
+        /// <param name="value">参数值。</param>
+        /// <param name="direction">参数方向。</param>
+        /// <exception cref="NotImplementedException"></exception>
+#if NETSTANDARD2_0
+        public override void ResetParameter(IDbDataParameter parameter, string parameterName, object value, ParameterDirection direction = ParameterDirection.Input)
+#else
+        public override void ResetParameter(IDbDataParameter parameter, string parameterName, object? value, ParameterDirection direction = ParameterDirection.Input)
+#endif //NETSTANDARD2_0
+        {
+            if (parameter is SQLiteParameter p)
+            {
+                p.ResetDbType();
+                
+                if (p.Direction != direction) p.Direction = direction;
+                if (p.Size > 0) p.Size = 0;
+                p.ParameterName = parameterName;
+                p.Value = value ?? DBNull.Value;
+            }
+            else
+            {
+                throw new ArgumentException($"只接受“{typeof(SQLiteParameter).FullName}”类型的参数对象。", nameof(parameter));
+            }
+
+            //还没有验证以上实现对象重置后是否达到重置效果，在验证之前始终抛出异常，以免调用后达不到重置效果引起不必要的麻烦。
+            throw new NotImplementedException("还没有验证参数对象重置后是否达到重置效果。在验证之前始终抛出异常，以免调用后达不到重置效果引起不必要的麻烦。");
+        }
+
+        /// <summary>
         /// 将参数对象的参数名、参数值、类型、大小和方向重置为指定的值。
         /// </summary>
         /// <param name="parameter">参数对象。</param>
@@ -566,7 +598,7 @@ namespace Sweety.Common.DataProvider.SQLite
         }
 
         /// <summary>
-        /// 如果<paramref name="parameter"/>不会<c>null</c>则将参数对象的参数名、参数值、类型、大小和方向重置为指定的值，否则用这些参数创建一个新的参数对象。
+        /// 如果<paramref name="parameter"/>不为<c>null</c>则将参数对象的参数名、参数值、类型、大小和方向重置为指定的值，否则用这些参数创建一个新的参数对象。
         /// </summary>
         /// <param name="parameter">参数对象。</param>
         /// <param name="parameterName">参数名称。</param>
@@ -581,23 +613,14 @@ namespace Sweety.Common.DataProvider.SQLite
         public override IDbDataParameter ResetOrBuildParameter(IDbDataParameter? parameter, string parameterName, object? value, int parameterType, int size = default, ParameterDirection direction = ParameterDirection.Input)
 #endif //NETSTANDARD2_0
         {
-            if (parameter is null) return BuildSqlParameter(parameterName, (DbType)parameterType, size, direction, value);
-
-            if (parameter is SQLiteParameter p)
+            if (parameter is null)
             {
-                var type = (DbType)parameterType;
-
-                if (p.DbType != type) p.DbType = type;
-                if (p.Size != size) p.Size = size;
-                if (p.Direction != direction) p.Direction = direction;
-
-                p.ParameterName = parameterName;
-                p.Value = value ?? DBNull.Value;
-                return p;
+                return BuildSqlParameter(parameterName, (DbType)parameterType, size, direction, value);
             }
             else
             {
-                throw new ArgumentException($"只接受“{typeof(SQLiteParameter).FullName}”类型的参数对象。", nameof(parameter));
+                ResetParameter(parameter, parameterName, value, parameterType, size, direction);
+                return parameter;
             }
         }
 
@@ -1191,7 +1214,7 @@ namespace Sweety.Common.DataProvider.SQLite
                 throw;
             }
         }
-        #endregion Override base class RelationalDBUtilityBase
+#endregion Override base class RelationalDBUtilityBase
 
 
 
@@ -1232,7 +1255,7 @@ namespace Sweety.Common.DataProvider.SQLite
 
 
 
-        #region SqlHelper
+#region SqlHelper
         /// <summary>
         /// 将<see cref="SQLiteParameter"/>参数数组分配给<see cref="SQLiteCommand"/>对象实例。
         /// 这个方法将值为<c>null</c>的<see cref="ParameterDirection.Input"/>或<see cref="ParameterDirection.InputOutput"/>参数赋值为<see cref="DBNull.Value"/>。 
@@ -1398,6 +1421,6 @@ namespace Sweety.Common.DataProvider.SQLite
                 command.Transaction = transaction;
             }
         }
-        #endregion SqlHelper
+#endregion SqlHelper
     }
 }
