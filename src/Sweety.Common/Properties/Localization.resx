@@ -231,4 +231,13 @@
   <data name="is not a valid object of type XXX" xml:space="preserve">
     <value>"{0}" is not a valid object of type "{1}".</value>
   </data>
+  <data name="the parameter name cannot be empty" xml:space="preserve">
+    <value>The parameter name cannot be empty.</value>
+  </data>
+  <data name="a value greater than 0 is required" xml:space="preserve">
+    <value>A value greater than 0 is required.</value>
+  </data>
+  <data name="value cannot be null" xml:space="preserve">
+    <value>Value cannot be null.</value>
+  </data>
 </root>

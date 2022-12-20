@@ -28,7 +28,7 @@ namespace Sweety.Common.Caching
     public class InProcessCache : ICache
     {
         static readonly object __lock = new object();
-        static InProcessCache __defaultInstance;
+        static InProcessCache __defaultInstance = null;
 
         IMemoryCache _cache;
 

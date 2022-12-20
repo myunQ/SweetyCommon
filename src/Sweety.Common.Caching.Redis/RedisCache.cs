@@ -733,7 +733,7 @@ namespace Sweety.Common.Caching
             if (slidingExpiration.HasValue)
             {
                 long totalMilliseconds = (long)slidingExpiration.Value.TotalMilliseconds;
-                if (totalMilliseconds < 10L || totalMilliseconds > uint.MaxValue) throw new ArgumentOutOfRangeException(nameof(slidingExpiration), String.Format(Properties.LocalizationResources.the_value_ranges_from_XXX_to_XXX_milliseconds, 10, uint.MaxValue));
+                if (totalMilliseconds < 10L || totalMilliseconds > uint.MaxValue) throw new ArgumentOutOfRangeException(nameof(slidingExpiration), String.Format(Common.Properties.Localization.the_value_ranges_from_XXX_to_XXX_milliseconds, 10, uint.MaxValue));
 
                 data[0] = (byte)(ExpirationTypeMask | dataType);
 #if NETSTANDARD2_0

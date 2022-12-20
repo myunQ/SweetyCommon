@@ -231,4 +231,13 @@
   <data name="is not a valid object of type XXX" xml:space="preserve">
     <value>“{0}”不是有效的“{1}”類型的對象。</value>
   </data>
+  <data name="the parameter name cannot be empty" xml:space="preserve">
+    <value>參數名不能為空。</value>
+  </data>
+  <data name="a value greater than 0 is required" xml:space="preserve">
+    <value>需要大於 0 的值。</value>
+  </data>
+  <data name="value cannot be null" xml:space="preserve">
+    <value>值不能為null。</value>
+  </data>
 </root>

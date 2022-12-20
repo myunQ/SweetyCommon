@@ -31,11 +31,42 @@ namespace Sweety.Common.Extensions
         /// </summary>
         internal static readonly char[] URI_SAFE_CHARS = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '-', '_', '$', '!' };
 
+
+
+        /// <summary>
+        /// 获取 Unix 时间戳 所表示的本地时间。
+        /// </summary>
+        /// <param name="timestamp">精确到1毫秒的时间戳。</param>
+        /// <param name="kind">指示返回的日期时间是本地时间还是UTC时间。</param>
+        /// <returns>本地时间。</returns>
+        public static DateTime FromUnixTimestampAccuracy1Millisecond(this long timestamp, DateTimeKind kind = DateTimeKind.Local)
+        {
+            if (kind == DateTimeKind.Local)
+            {
+                return FromUnixTimestampAccuracy1Millisecond(timestamp, TimeZoneInfo.Local);
+            }
+            else
+            {
+                return DateTimeExtensions.UNIX_MIN_TIME.AddMilliseconds(timestamp);
+            }
+        }
+
+        /// <summary>
+        /// 获取 <c>Unix</c> 时间戳 所表示的指定时区时间。
+        /// </summary>
+        /// <param name="timestamp">精确到1毫秒的时间戳。</param>
+        /// <param name="destinationTimeZone">目标时区。</param>
+        /// <returns>目标时区。</returns>
+        public static DateTime FromUnixTimestampAccuracy1Millisecond(this long timestamp, TimeZoneInfo destinationTimeZone)
+        {
+            return TimeZoneInfo.ConvertTimeFromUtc(DateTimeExtensions.UNIX_MIN_TIME.AddMilliseconds(timestamp), destinationTimeZone);
+        }
+
         /// <summary>
         /// 将 <c>Unix</c> 时间戳 转换成 <see cref="DateTime"/> 类型。
         /// </summary>
         /// <param name="timestamp">时间戳。</param>
-        /// <param name="kind"><see cref="DateTime.Kind"/></param>
+        /// <param name="kind">指示返回的日期时间是本地时间还是UTC时间。</param>
         /// <returns>时间戳所表示的 <see cref="DateTime"/> 值。</returns>
         public static DateTime FromUnixTimestamp(this long timestamp, DateTimeKind kind = DateTimeKind.Local)
         {

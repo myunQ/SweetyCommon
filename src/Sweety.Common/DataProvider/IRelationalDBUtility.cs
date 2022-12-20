@@ -349,47 +349,19 @@ namespace Sweety.Common.DataProvider
 
 
         /// <summary>
-        /// 使用默认的数据库链接创建一个实现了<see cref="System.Data.IDbCommand"/>接口的对象实例。
+        /// 使用默认的数据库链接创建一个实现了<see cref="IDbCommand"/>接口的对象实例。
         /// </summary>
-        /// <returns>返回一个实现了<see cref="System.Data.IDbCommand"/>接口的对象实例。</returns>
+        /// <returns>返回一个实现了<see cref="IDbCommand"/>接口的对象实例。</returns>
         IDbCommand BuildCommand();
         /// <summary>
-        /// 使用指定的数据库链接创建一个实现了<see cref="System.Data.IDbCommand"/>接口的对象实例。
+        /// 使用指定的数据库链接创建一个实现了<see cref="IDbCommand"/>接口的对象实例。
         /// </summary>
-        /// <param name="conn">实现了<see cref="IDbConnection"/>接口的数据库链接对象实例。</param>
-        /// <returns>返回一个实现了<see cref="System.Data.IDbCommand"/>接口的对象实例。</returns>
-        IDbCommand BuildCommand(IDbConnection conn);
+        /// <param name="connection">实现了<see cref="IDbConnection"/>接口的数据库链接对象实例。</param>
+        /// <returns>返回一个实现了<see cref="IDbCommand"/>接口的对象实例。</returns>
+        IDbCommand BuildCommand(IDbConnection connection);
 
 
-        /// <summary>
-        /// 使用默认数据库链接对象创建数据库事务对象实例。
-        /// </summary>
-        /// <returns>数据库事务对象实例。</returns>
-        [Obsolete("这个方法即将在新的版本中被移除。因为使用词方法极为容易导致数据库链接未关闭的情况。除非您主动从事务对象中获取链接对象并确保在不使用时关闭。")]
-        IDbTransaction BuildTransaction();
-        /// <summary>
-        /// 使用默认数据库链接对象和指定的事务隔离级别创建数据库事务对象实例。
-        /// </summary>
-        /// <param name="level">事务隔离级别。</param>
-        /// <returns>数据库事务对象实例。</returns>
-        [Obsolete("这个方法即将在新的版本中被移除。因为使用词方法极为容易导致数据库链接未关闭的情况。除非您主动从事务对象中获取链接对象并确保在不使用时关闭。")]
-        IDbTransaction BuildTransaction(IsolationLevel level);
-
-        /// <summary>
-        /// 使用默认数据库链接对象创建数据库事务对象实例。
-        /// </summary>
-        /// <param name="cancellationToken">表示异步任务是否取消的令牌。</param>
-        /// <returns>数据库事务对象实例。</returns>
-        [Obsolete("这个方法即将在新的版本中被移除。因为使用词方法极为容易导致数据库链接未关闭的情况。除非您主动从事务对象中获取链接对象并确保在不使用时关闭。")]
-        Task<IDbTransaction> BuildTransactionAsync(CancellationToken cancellationToken = default);
-        /// <summary>
-        /// 使用默认数据库链接对象和指定的事务隔离级别创建数据库事务对象实例。
-        /// </summary>
-        /// <param name="level">事务隔离级别。</param>
-        /// <param name="cancellationToken">表示异步任务是否取消的令牌。</param>
-        /// <returns>数据库事务对象实例。</returns>
-        [Obsolete("这个方法即将在新的版本中被移除。因为使用词方法极为容易导致数据库链接未关闭的情况。除非您主动从事务对象中获取链接对象并确保在不使用时关闭。")]
-        Task<IDbTransaction> BuildTransactionAsync(IsolationLevel level, CancellationToken cancellationToken = default);
+        
 
 
         /// <summary>
@@ -513,249 +485,654 @@ namespace Sweety.Common.DataProvider
 
 
         /// <summary>
-        /// 执行T-SQL命令
+        /// 执行T-SQL命令。
         /// </summary>
-        /// <param name="cmdText">T-SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
-        /// <param name="parameters">SQL参数对象数组</param>
-        /// <returns>返回受影响的记录数</returns>
-        int ExecuteNonQuery(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
-        /// <summary>
-        /// 执行T-SQL命令
-        /// </summary>
-        /// <param name="tran">数据库事务对象实例。</param>
-        /// <param name="cmdText">T-SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
-        /// <param name="parameters">SQL参数对象数组</param>
-        /// <returns>返回受影响的记录数</returns>
-        int ExecuteNonQuery(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
-        /// <summary>
-        /// 执行T-SQL命令
-        /// </summary>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">T-SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
-        /// <param name="parameters">SQL参数对象数组</param>
-        /// <returns>返回受影响的记录数</returns>
-        int ExecuteNonQuery(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
-
-        /// <summary>
-        /// 异步执行T-SQL命令
-        /// </summary>
-        /// <param name="cmdText">T-SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
-        /// <param name="cancellationToken">通知任务取消的令牌。</param>
-        /// <param name="parameters">SQL参数对象数组</param>
-        /// <returns>返回受影响的记录数</returns>
+        /// <param name="commandText">T-SQL命令。</param>
+        /// <param name="commandType">命令类型。</param>
+        /// <param name="parameters">SQL参数对象数组。</param>
+        /// <returns>返回受影响的记录数。</returns>
 #if NETSTANDARD2_0
-        Task<int> ExecuteNonQueryAsync(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        int ExecuteNonQuery(string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
 #else
-        ValueTask<int> ExecuteNonQueryAsync(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        int ExecuteNonQuery(string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters);
+#endif
+//        /// <summary>
+//        /// 执行T-SQL命令。
+//        /// </summary>
+//        /// <param name="commandText">T-SQL命令。</param>
+//        /// <param name="commandType">命令类型。</param>
+//        /// <param name="parameters">SQL参数对象列表。</param>
+//        /// <returns>返回受影响的记录数。</returns>
+//#if NETSTANDARD2_0
+//        int ExecuteNonQuery(string commandText, CommandType commandType = CommandType.Text, IParameterList<IDataParameter> parameters = null);
+//#else
+//        int ExecuteNonQuery(string commandText, CommandType commandType = CommandType.Text, IParameterList<IDataParameter>? parameters = null);
+//#endif
+        /// <summary>
+        /// 执行T-SQL命令。
+        /// </summary>
+        /// <param name="commandText">T-SQL命令。</param>
+        /// <param name="commandType">命令类型。</param>
+        /// <param name="parameters">可迭代的SQL参数对象集合。</param>
+        /// <returns>返回受影响的记录数。</returns>
+#if NETSTANDARD2_0
+        int ExecuteNonQuery(string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
+#else
+        int ExecuteNonQuery(string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null);
 #endif
         /// <summary>
-        /// 异步执行T-SQL命令
+        /// 执行T-SQL命令。
         /// </summary>
-        /// <param name="tran">数据库事务对象实例。</param>
-        /// <param name="cmdText">T-SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
-        /// <param name="cancellationToken">通知任务取消的令牌。</param>
-        /// <param name="parameters">SQL参数对象数组</param>
-        /// <returns>返回受影响的记录数</returns>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">T-SQL命令。</param>
+        /// <param name="commandType">命令类型。</param>
+        /// <param name="parameters">SQL参数对象数组。</param>
+        /// <returns>返回受影响的记录数。</returns>
 #if NETSTANDARD2_0
-        Task<int> ExecuteNonQueryAsync(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        int ExecuteNonQuery(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
 #else
-        ValueTask<int> ExecuteNonQueryAsync(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        int ExecuteNonQuery(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters);
+#endif
+//        /// <summary>
+//        /// 执行T-SQL命令。
+//        /// </summary>
+//        /// <param name="transaction">数据库事务对象实例。</param>
+//        /// <param name="commandText">T-SQL命令。</param>
+//        /// <param name="commandType">命令类型。</param>
+//        /// <param name="parameters">SQL参数对象列表。</param>
+//        /// <returns>返回受影响的记录数。</returns>
+//#if NETSTANDARD2_0
+//        int ExecuteNonQuery(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IParameterList<IDataParameter> parameters = null);
+//#else
+//        int ExecuteNonQuery(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IParameterList<IDataParameter>? parameters = null);
+//#endif
+        /// <summary>
+        /// 执行T-SQL命令。
+        /// </summary>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">T-SQL命令。</param>
+        /// <param name="commandType">命令类型。</param>
+        /// <param name="parameters">可迭代的SQL参数对象集合。</param>
+        /// <returns>返回受影响的记录数。</returns>
+#if NETSTANDARD2_0
+        int ExecuteNonQuery(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
+#else
+        int ExecuteNonQuery(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null);
 #endif
         /// <summary>
-        /// 异步执行T-SQL命令
+        /// 执行T-SQL命令。
         /// </summary>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">T-SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
-        /// <param name="cancellationToken">通知任务取消的令牌。</param>
-        /// <param name="parameters">SQL参数对象数组</param>
-        /// <returns>返回受影响的记录数</returns>
+        /// <param name="connection">数据库链接对象。</param>
+        /// <param name="commandText">T-SQL命令。</param>
+        /// <param name="commandType">命令类型。</param>
+        /// <param name="parameters">SQL参数对象数组。</param>
+        /// <returns>返回受影响的记录数。</returns>
 #if NETSTANDARD2_0
-        Task<int> ExecuteNonQueryAsync(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        int ExecuteNonQuery(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
 #else
-        ValueTask<int> ExecuteNonQueryAsync(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        int ExecuteNonQuery(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters);
+#endif
+//        /// <summary>
+//        /// 执行T-SQL命令。
+//        /// </summary>
+//        /// <param name="connection">数据库链接对象。</param>
+//        /// <param name="commandText">T-SQL命令。</param>
+//        /// <param name="commandType">命令类型。</param>
+//        /// <param name="parameters">SQL参数对象列表。</param>
+//        /// <returns>返回受影响的记录数。</returns>
+//#if NETSTANDARD2_0
+//        int ExecuteNonQuery(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IParameterList<IDataParameter> parameters = null);
+//#else
+//        int ExecuteNonQuery(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IParameterList<IDataParameter>? parameters = null);
+//#endif
+        /// <summary>
+        /// 执行T-SQL命令。
+        /// </summary>
+        /// <param name="connection">数据库链接对象。</param>
+        /// <param name="commandText">T-SQL命令。</param>
+        /// <param name="commandType">命令类型。</param>
+        /// <param name="parameters">可迭代的SQL参数对象集合。</param>
+        /// <returns>返回受影响的记录数。</returns>
+#if NETSTANDARD2_0
+        int ExecuteNonQuery(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
+#else
+        int ExecuteNonQuery(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null);
 #endif
 
 
         /// <summary>
-        /// 执行T-SQL命令，并生成<see cref="System.Data.IDataReader"/>。
+        /// 异步执行T-SQL命令。
+        /// </summary>
+        /// <param name="commandText">T-SQL命令。</param>
+        /// <param name="commandType">命令类型。</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">SQL参数对象数组。</param>
+        /// <returns>返回受影响的记录数。</returns>
+#if NETSTANDARD2_0
+        Task<int> ExecuteNonQueryAsync(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#else
+        Task<int> ExecuteNonQueryAsync(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters);
+#endif
+
+//        /// <summary>
+//        /// 异步执行T-SQL命令。
+//        /// </summary>
+//        /// <param name="commandText">T-SQL命令。</param>
+//        /// <param name="commandType">命令类型。</param>
+//        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+//        /// <param name="parameters">SQL参数对象列表。</param>
+//        /// <returns>返回受影响的记录数。</returns>
+//#if NETSTANDARD2_0
+//        Task<int> ExecuteNonQueryAsync(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IParameterList<IDataParameter> parameters = null);
+//#else
+//        Task<int> ExecuteNonQueryAsync(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IParameterList<IDataParameter>? parameters = null);
+//#endif
+
+        /// <summary>
+        /// 异步执行T-SQL命令。
+        /// </summary>
+        /// <param name="commandText">T-SQL命令。</param>
+        /// <param name="commandType">命令类型。</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">可迭代的SQL参数对象集合。</param>
+        /// <returns>返回受影响的记录数。</returns>
+#if NETSTANDARD2_0
+        Task<int> ExecuteNonQueryAsync(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
+#else
+        Task<int> ExecuteNonQueryAsync(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
+#endif
+        /// <summary>
+        /// 异步执行T-SQL命令。
+        /// </summary>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">T-SQL命令。</param>
+        /// <param name="commandType">命令类型。</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">SQL参数对象数组。</param>
+        /// <returns>返回受影响的记录数。</returns>
+#if NETSTANDARD2_0
+        Task<int> ExecuteNonQueryAsync(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#else
+        Task<int> ExecuteNonQueryAsync(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters);
+#endif
+
+//        /// <summary>
+//        /// 异步执行T-SQL命令。
+//        /// </summary>
+//        /// <param name="transaction">数据库事务对象实例。</param>
+//        /// <param name="commandText">T-SQL命令。</param>
+//        /// <param name="commandType">命令类型。</param>
+//        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+//        /// <param name="parameters">SQL参数对象列表。</param>
+//        /// <returns>返回受影响的记录数。</returns>
+//#if NETSTANDARD2_0
+//        Task<int> ExecuteNonQueryAsync(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IParameterList<IDataParameter> parameters = null);
+//#else
+//        Task<int> ExecuteNonQueryAsync(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IParameterList<IDataParameter>? parameters = null);
+//#endif
+
+        /// <summary>
+        /// 异步执行T-SQL命令。
+        /// </summary>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">T-SQL命令。</param>
+        /// <param name="commandType">命令类型。</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">可迭代的SQL参数对象集合。</param>
+        /// <returns>返回受影响的记录数。</returns>
+#if NETSTANDARD2_0
+        Task<int> ExecuteNonQueryAsync(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
+#else
+        Task<int> ExecuteNonQueryAsync(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
+#endif
+        /// <summary>
+        /// 异步执行T-SQL命令。
+        /// </summary>
+        /// <param name="connection">数据库链接对象。</param>
+        /// <param name="commandText">T-SQL命令。</param>
+        /// <param name="commandType">命令类型。</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">SQL参数对象数组。</param>
+        /// <returns>返回受影响的记录数。</returns>
+#if NETSTANDARD2_0
+        Task<int> ExecuteNonQueryAsync(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#else
+        Task<int> ExecuteNonQueryAsync(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters);
+#endif
+
+//        /// <summary>
+//        /// 异步执行T-SQL命令。
+//        /// </summary>
+//        /// <param name="connection">数据库链接对象。</param>
+//        /// <param name="commandText">T-SQL命令。</param>
+//        /// <param name="commandType">命令类型。</param>
+//        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+//        /// <param name="parameters">SQL参数对象列表。</param>
+//        /// <returns>返回受影响的记录数。</returns>
+//#if NETSTANDARD2_0
+//        Task<int> ExecuteNonQueryAsync(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IParameterList<IDataParameter> parameters = null);
+//#else
+//        Task<int> ExecuteNonQueryAsync(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IParameterList<IDataParameter>? parameters = null);
+//#endif
+
+        /// <summary>
+        /// 异步执行T-SQL命令。
+        /// </summary>
+        /// <param name="connection">数据库链接对象。</param>
+        /// <param name="commandText">T-SQL命令。</param>
+        /// <param name="commandType">命令类型。</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">可迭代的SQL参数对象集合。</param>
+        /// <returns>返回受影响的记录数。</returns>
+#if NETSTANDARD2_0
+        Task<int> ExecuteNonQueryAsync(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
+#else
+        Task<int> ExecuteNonQueryAsync(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
+#endif
+
+
+        /// <summary>
+        /// 执行T-SQL命令，并生成<see cref="IDataReader"/>。
+        /// </summary>
+        /// <param name="command">一个有效的用于执行数据库命令的对象。</param> 
+        /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
+        /// <param name="parameters">SQL参数对象数组</param>
+        /// <returns>返回<see cref="IDataReader"/>对象实例</returns>
+        IDataReader GetReader(IDbCommand command, CommandBehavior commandBehavior = CommandBehavior.Default, params IDataParameter[] parameters);
+        /// <summary>
+        /// 执行T-SQL命令，并生成<see cref="IDataReader"/>。
+        /// </summary>
+        /// <param name="command">一个有效的用于执行数据库命令的对象。</param> 
+        /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
+        /// <param name="parameters">SQL参数对象数组</param>
+        /// <returns>返回<see cref="IDataReader"/>对象实例</returns>
+#if NETSTANDARD2_0
+        IDataReader GetReader(IDbCommand command, CommandBehavior commandBehavior = CommandBehavior.Default, IEnumerable<IDataParameter> parameters = null);
+#else
+        IDataReader GetReader(IDbCommand command, CommandBehavior commandBehavior = CommandBehavior.Default, IEnumerable<IDataParameter?>? parameters = null);
+#endif
+        /// <summary>
+        /// 执行T-SQL命令，并生成<see cref="IDataReader"/>。
         /// </summary>
         /// <remarks>
         /// 如果在方法返回的<see cref="IDataReader"/>关闭之后才会对<see cref="IDbCommand.Parameters"/>关联的输出参数赋值的话，那么此方法不会对存储过程的输出参数赋值。
         /// 因为在方法返回的<see cref="IDataReader"/>关闭之前就已将<see cref="IDbCommand.Parameters"/>集合清空。
         /// 如果要使用输出参数请使用 <see cref="GetReader(IDbCommand, CommandBehavior, IDataParameter[])"/> 或 <see cref="GetReader(string, CommandType, CommandBehavior, out IDbCommand, IDataParameter[])"/> 方法。
         /// </remarks>
-        /// <param name="cmdText">T-SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">T-SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
         /// <param name="parameters">SQL参数对象数组</param>
-        /// <returns>返回<see cref="System.Data.IDataReader"/>对象实例</returns>
-        IDataReader GetReader(string cmdText, CommandType cmdType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, params IDataParameter[] parameters);
+        /// <returns>返回<see cref="IDataReader"/>对象实例</returns>
+        IDataReader GetReader(string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, params IDataParameter[] parameters);
         /// <summary>
-        /// 执行T-SQL命令，并生成<see cref="System.Data.IDataReader"/>。
+        /// 执行T-SQL命令，并生成<see cref="IDataReader"/>。
         /// </summary>
-        /// <param name="cmdText">T-SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <remarks>
+        /// 如果在方法返回的<see cref="IDataReader"/>关闭之后才会对<see cref="IDbCommand.Parameters"/>关联的输出参数赋值的话，那么此方法不会对存储过程的输出参数赋值。
+        /// 因为在方法返回的<see cref="IDataReader"/>关闭之前就已将<see cref="IDbCommand.Parameters"/>集合清空。
+        /// 如果要使用输出参数请使用 <see cref="GetReader(IDbCommand, CommandBehavior, IEnumerable{IDataParameter?}?)"/> 或 <see cref="GetReader(string, CommandType, CommandBehavior, out IDbCommand, IEnumerable{IDataParameter?}?)"/> 方法。
+        /// </remarks>
+        /// <param name="commandText">T-SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
+        /// <param name="parameters">SQL参数对象数组</param>
+        /// <returns>返回<see cref="IDataReader"/>对象实例</returns>
+#if NETSTANDARD2_0
+        IDataReader GetReader(string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, IEnumerable<IDataParameter> parameters = null);
+#else
+        IDataReader GetReader(string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, IEnumerable<IDataParameter?>? parameters = null);
+#endif
+        /// <summary>
+        /// 执行T-SQL命令，并生成<see cref="IDataReader"/>。
+        /// </summary>
+        /// <param name="commandText">T-SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
         /// <param name="command">返回执行命令的对象。用于在存储过程使用输出变量时，关闭 <see cref="IDataReader"/> 对象，输出参数被赋值后清除参数，达到参数对象重复使用的目的。</param>
         /// <param name="parameters">SQL参数对象数组</param>
-        /// <returns>返回<see cref="System.Data.IDataReader"/>对象实例</returns>
-        IDataReader GetReader(string cmdText, CommandType cmdType, CommandBehavior commandBehavior, out IDbCommand command, params IDataParameter[] parameters);
+        /// <returns>返回<see cref="IDataReader"/>对象实例</returns>
+        IDataReader GetReader(string commandText, CommandType commandType, CommandBehavior commandBehavior, out IDbCommand command, params IDataParameter[] parameters);
         /// <summary>
-        /// 执行T-SQL命令，并生成<see cref="System.Data.IDataReader"/>。
+        /// 执行T-SQL命令，并生成<see cref="IDataReader"/>。
         /// </summary>
-        /// <param name="command">一个有效的用于执行数据库命令的对象。</param> 
+        /// <param name="commandText">T-SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
+        /// <param name="command">返回执行命令的对象。用于在存储过程使用输出变量时，关闭 <see cref="IDataReader"/> 对象，输出参数被赋值后清除参数，达到参数对象重复使用的目的。</param>
         /// <param name="parameters">SQL参数对象数组</param>
-        /// <returns>返回<see cref="System.Data.IDataReader"/>对象实例</returns>
-        IDataReader GetReader(IDbCommand command, CommandBehavior commandBehavior = CommandBehavior.Default, params IDataParameter[] parameters);
+        /// <returns>返回<see cref="IDataReader"/>对象实例</returns>
+#if NETSTANDARD2_0
+        IDataReader GetReader(string commandText, CommandType commandType, CommandBehavior commandBehavior, out IDbCommand command, IEnumerable<IDataParameter> parameters = null);
+#else
+        IDataReader GetReader(string commandText, CommandType commandType, CommandBehavior commandBehavior, out IDbCommand command, IEnumerable<IDataParameter?>? parameters = null);
+#endif
         /// <summary>
-        /// 执行T-SQL命令，并生成<see cref="System.Data.IDataReader"/>。
+        /// 执行T-SQL命令，并生成<see cref="IDataReader"/>。
         /// </summary>
         /// <remarks>
         /// 如果在方法返回的<see cref="IDataReader"/>关闭之后才会对<see cref="IDbCommand.Parameters"/>关联的输出参数赋值的话，那么此方法不会对存储过程的输出参数赋值。
         /// 因为在方法返回的<see cref="IDataReader"/>关闭之前就已将<see cref="IDbCommand.Parameters"/>集合清空。
         /// 如果要使用输出参数请使用 <see cref="GetReader(IDbCommand, CommandBehavior, IDataParameter[])"/> 或 <see cref="GetReader(IDbConnection, string, CommandType, CommandBehavior, out IDbCommand, IDataParameter[])"/> 方法。
         /// </remarks>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">T-SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">T-SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
         /// <param name="parameters">SQL参数对象数组</param>
-        /// <returns>返回<see cref="System.Data.IDataReader"/>对象实例</returns>
-        IDataReader GetReader(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, params IDataParameter[] parameters);
+        /// <returns>返回<see cref="IDataReader"/>对象实例</returns>
+        IDataReader GetReader(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, params IDataParameter[] parameters);
         /// <summary>
-        /// 执行T-SQL命令，并生成<see cref="System.Data.IDataReader"/>。
+        /// 执行T-SQL命令，并生成<see cref="IDataReader"/>。
+        /// </summary>
+        /// <remarks>
+        /// 如果在方法返回的<see cref="IDataReader"/>关闭之后才会对<see cref="IDbCommand.Parameters"/>关联的输出参数赋值的话，那么此方法不会对存储过程的输出参数赋值。
+        /// 因为在方法返回的<see cref="IDataReader"/>关闭之前就已将<see cref="IDbCommand.Parameters"/>集合清空。
+        /// 如果要使用输出参数请使用 <see cref="GetReader(IDbCommand, CommandBehavior, IEnumerable{IDataParameter?}?)"/> 或 <see cref="GetReader(IDbConnection, string, CommandType, CommandBehavior, out IDbCommand, IEnumerable{IDataParameter?}?)"/> 方法。
+        /// </remarks>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">T-SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
+        /// <param name="parameters">SQL参数对象数组</param>
+        /// <returns>返回<see cref="IDataReader"/>对象实例</returns>
+#if NETSTANDARD2_0
+        IDataReader GetReader(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, IEnumerable<IDataParameter> parameters = null);
+#else
+        IDataReader GetReader(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, IEnumerable<IDataParameter?>? parameters = null);
+#endif
+        /// <summary>
+        /// 执行T-SQL命令，并生成<see cref="IDataReader"/>。
         /// </summary>
         /// <remarks>
         /// 如果在方法返回的<see cref="IDataReader"/>关闭之后才会对<see cref="IDbCommand.Parameters"/>关联的输出参数赋值的话，那么此方法不会对存储过程的输出参数赋值。
         /// 因为在方法返回的<see cref="IDataReader"/>关闭之前就已将<see cref="IDbCommand.Parameters"/>集合清空。
         /// 如果要使用输出参数请使用 <see cref="GetReader(IDbCommand, CommandBehavior, IDataParameter[])"/> 或 <see cref="GetReader(IDbTransaction, string, CommandType, CommandBehavior, out IDbCommand, IDataParameter[])"/> 方法。
         /// </remarks>
-        /// <param name="tran">数据库事务对象实例。</param>
-        /// <param name="cmdText">T-SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">T-SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
         /// <param name="parameters">SQL参数对象数组</param>
-        /// <returns>返回<see cref="System.Data.IDataReader"/>对象实例</returns>
-        IDataReader GetReader(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, params IDataParameter[] parameters);
+        /// <returns>返回<see cref="IDataReader"/>对象实例</returns>
+        IDataReader GetReader(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, params IDataParameter[] parameters);
         /// <summary>
-        /// 执行T-SQL命令，并生成<see cref="System.Data.IDataReader"/>。
+        /// 执行T-SQL命令，并生成<see cref="IDataReader"/>。
         /// </summary>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">T-SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <remarks>
+        /// 如果在方法返回的<see cref="IDataReader"/>关闭之后才会对<see cref="IDbCommand.Parameters"/>关联的输出参数赋值的话，那么此方法不会对存储过程的输出参数赋值。
+        /// 因为在方法返回的<see cref="IDataReader"/>关闭之前就已将<see cref="IDbCommand.Parameters"/>集合清空。
+        /// 如果要使用输出参数请使用 <see cref="GetReader(IDbCommand, CommandBehavior, IEnumerable{IDataParameter?}?)"/> 或 <see cref="GetReader(IDbTransaction, string, CommandType, CommandBehavior, out IDbCommand, IEnumerable{IDataParameter?}?)"/> 方法。
+        /// </remarks>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">T-SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
+        /// <param name="parameters">SQL参数对象数组</param>
+        /// <returns>返回<see cref="IDataReader"/>对象实例</returns>
+#if NETSTANDARD2_0
+        IDataReader GetReader(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, IEnumerable<IDataParameter> parameters = null);
+#else
+        IDataReader GetReader(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, IEnumerable<IDataParameter?>? parameters = null);
+#endif
+        /// <summary>
+        /// 执行T-SQL命令，并生成<see cref="IDataReader"/>。
+        /// </summary>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">T-SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
         /// <param name="command">返回执行命令的对象。用于在存储过程使用输出变量时，关闭 <see cref="IDataReader"/> 对象，输出参数被赋值后清除参数，达到参数对象重复使用的目的。</param>
         /// <param name="parameters">SQL参数对象数组</param>
-        /// <returns>返回<see cref="System.Data.IDataReader"/>对象实例</returns>
-        IDataReader GetReader(IDbConnection conn, string cmdText, CommandType cmdType, CommandBehavior commandBehavior, out IDbCommand command, params IDataParameter[] parameters);
+        /// <returns>返回<see cref="IDataReader"/>对象实例</returns>
+        IDataReader GetReader(IDbConnection connection, string commandText, CommandType commandType, CommandBehavior commandBehavior, out IDbCommand command, params IDataParameter[] parameters);
         /// <summary>
-        /// 执行T-SQL命令，并生成<see cref="System.Data.IDataReader"/>。
+        /// 执行T-SQL命令，并生成<see cref="IDataReader"/>。
         /// </summary>
-        /// <param name="tran">数据库事务对象实例。</param>
-        /// <param name="cmdText">T-SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">T-SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
         /// <param name="command">返回执行命令的对象。用于在存储过程使用输出变量时，关闭 <see cref="IDataReader"/> 对象，输出参数被赋值后清除参数，达到参数对象重复使用的目的。</param>
         /// <param name="parameters">SQL参数对象数组</param>
-        /// <returns>返回<see cref="System.Data.IDataReader"/>对象实例</returns>
-        IDataReader GetReader(IDbTransaction tran, string cmdText, CommandType cmdType, CommandBehavior commandBehavior, out IDbCommand command, params IDataParameter[] parameters);
+        /// <returns>返回<see cref="IDataReader"/>对象实例</returns>
+#if NETSTANDARD2_0
+        IDataReader GetReader(IDbConnection connection, string commandText, CommandType commandType, CommandBehavior commandBehavior, out IDbCommand command, IEnumerable<IDataParameter> parameters = null);
+#else
+        IDataReader GetReader(IDbConnection connection, string commandText, CommandType commandType, CommandBehavior commandBehavior, out IDbCommand command, IEnumerable<IDataParameter?>? parameters = null);
+#endif
+        /// <summary>
+        /// 执行T-SQL命令，并生成<see cref="IDataReader"/>。
+        /// </summary>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">T-SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
+        /// <param name="command">返回执行命令的对象。用于在存储过程使用输出变量时，关闭 <see cref="IDataReader"/> 对象，输出参数被赋值后清除参数，达到参数对象重复使用的目的。</param>
+        /// <param name="parameters">SQL参数对象数组</param>
+        /// <returns>返回<see cref="IDataReader"/>对象实例</returns>
+        IDataReader GetReader(IDbTransaction transaction, string commandText, CommandType commandType, CommandBehavior commandBehavior, out IDbCommand command, params IDataParameter[] parameters);
+        /// <summary>
+        /// 执行T-SQL命令，并生成<see cref="IDataReader"/>。
+        /// </summary>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">T-SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
+        /// <param name="command">返回执行命令的对象。用于在存储过程使用输出变量时，关闭 <see cref="IDataReader"/> 对象，输出参数被赋值后清除参数，达到参数对象重复使用的目的。</param>
+        /// <param name="parameters">SQL参数对象数组</param>
+        /// <returns>返回<see cref="IDataReader"/>对象实例</returns>
+#if NETSTANDARD2_0
+        IDataReader GetReader(IDbTransaction transaction, string commandText, CommandType commandType, CommandBehavior commandBehavior, out IDbCommand command, IEnumerable<IDataParameter> parameters = null);
+#else
+        IDataReader GetReader(IDbTransaction transaction, string commandText, CommandType commandType, CommandBehavior commandBehavior, out IDbCommand command, IEnumerable<IDataParameter?>? parameters = null);
+#endif
 
 
         /// <summary>
-        /// 异步执行T-SQL命令，并生成<see cref="System.Data.IDataReader"/>。
+        /// 异步执行T-SQL命令，并生成<see cref="IDataReader"/>。
+        /// </summary>
+        /// <param name="command">一个有效的用于执行数据库命令的对象。</param> 
+        /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">SQL参数对象数组</param>
+        /// <returns>返回<see cref="IDataReader"/>对象实例</returns>
+        Task<IDataReader> GetReaderAsync(IDbCommand command, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        /// <summary>
+        /// 异步执行T-SQL命令，并生成<see cref="IDataReader"/>。
+        /// </summary>
+        /// <param name="command">一个有效的用于执行数据库命令的对象。</param> 
+        /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">SQL参数对象数组</param>
+        /// <returns>返回<see cref="IDataReader"/>对象实例</returns>
+#if NETSTANDARD2_0
+        Task<IDataReader> GetReaderAsync(IDbCommand command, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
+#else
+        Task<IDataReader> GetReaderAsync(IDbCommand command, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
+#endif
+        /// <summary>
+        /// 异步执行T-SQL命令，并生成<see cref="IDataReader"/>。
         /// </summary>
         /// <remarks>
         /// 如果在方法返回的<see cref="IDataReader"/>关闭之后才会对<see cref="IDbCommand.Parameters"/>关联的输出参数赋值的话，那么此方法不会对存储过程的输出参数赋值。
         /// 因为在方法返回的<see cref="IDataReader"/>关闭之前就已将<see cref="IDbCommand.Parameters"/>集合清空。
         /// 如果要使用输出参数请使用 <see cref="GetReaderAsync(IDbCommand, CommandBehavior, CancellationToken, IDataParameter[])"/> 或 <see cref="GetReaderAndOutParametersAsync(string, CommandType, CommandBehavior, CancellationToken, IDataParameter[])"/> 方法。
         /// </remarks>
-        /// <param name="cmdText">T-SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">T-SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">SQL参数对象数组</param>
-        /// <returns>返回<see cref="System.Data.IDataReader"/>对象实例</returns>
-        Task<IDataReader> GetReaderAsync(string cmdText, CommandType cmdType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        /// <returns>返回<see cref="IDataReader"/>对象实例</returns>
+        Task<IDataReader> GetReaderAsync(string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
         /// <summary>
-        /// 异步执行T-SQL命令，并生成<see cref="System.Data.IDataReader"/>。
+        /// 异步执行T-SQL命令，并生成<see cref="IDataReader"/>。
         /// </summary>
-        /// <param name="command">一个有效的用于执行数据库命令的对象。</param> 
+        /// <remarks>
+        /// 如果在方法返回的<see cref="IDataReader"/>关闭之后才会对<see cref="IDbCommand.Parameters"/>关联的输出参数赋值的话，那么此方法不会对存储过程的输出参数赋值。
+        /// 因为在方法返回的<see cref="IDataReader"/>关闭之前就已将<see cref="IDbCommand.Parameters"/>集合清空。
+        /// 如果要使用输出参数请使用 <see cref="GetReaderAsync(IDbCommand, CommandBehavior, CancellationToken, IEnumerable{IDataParameter?}?)"/> 或 <see cref="GetReaderAndOutParametersAsync(string, CommandType, CommandBehavior, CancellationToken, IEnumerable{IDataParameter?}?)"/> 方法。
+        /// </remarks>
+        /// <param name="commandText">T-SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">SQL参数对象数组</param>
-        /// <returns>返回<see cref="System.Data.IDataReader"/>对象实例</returns>
-        Task<IDataReader> GetReaderAsync(IDbCommand command, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        /// <returns>返回<see cref="IDataReader"/>对象实例</returns>
+#if NETSTANDARD2_0
+        Task<IDataReader> GetReaderAsync(string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
+#else
+        Task<IDataReader> GetReaderAsync(string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
+#endif
         /// <summary>
-        /// 异步执行T-SQL命令，并生成<see cref="System.Data.IDataReader"/>。
+        /// 异步执行T-SQL命令，并生成<see cref="IDataReader"/>。
         /// </summary>
         /// <remarks>
         /// 如果在方法返回的<see cref="IDataReader"/>关闭之后才会对<see cref="IDbCommand.Parameters"/>关联的输出参数赋值的话，那么此方法不会对存储过程的输出参数赋值。
         /// 因为在方法返回的<see cref="IDataReader"/>关闭之前就已将<see cref="IDbCommand.Parameters"/>集合清空。
         /// 如果要使用输出参数请使用 <see cref="GetReaderAsync(IDbCommand, CommandBehavior, CancellationToken, IDataParameter[])"/> 或 <see cref="GetReaderAndOutParametersAsync(IDbConnection, string, CommandType, CommandBehavior, CancellationToken, IDataParameter[])"/> 方法。
         /// </remarks>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">T-SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">T-SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">SQL参数对象数组</param>
-        /// <returns>返回<see cref="System.Data.IDataReader"/>对象实例</returns>
-        Task<IDataReader> GetReaderAsync(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        /// <returns>返回<see cref="IDataReader"/>对象实例</returns>
+        Task<IDataReader> GetReaderAsync(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
         /// <summary>
-        /// 异步执行T-SQL命令，并生成<see cref="System.Data.IDataReader"/>。
+        /// 异步执行T-SQL命令，并生成<see cref="IDataReader"/>。
+        /// </summary>
+        /// <remarks>
+        /// 如果在方法返回的<see cref="IDataReader"/>关闭之后才会对<see cref="IDbCommand.Parameters"/>关联的输出参数赋值的话，那么此方法不会对存储过程的输出参数赋值。
+        /// 因为在方法返回的<see cref="IDataReader"/>关闭之前就已将<see cref="IDbCommand.Parameters"/>集合清空。
+        /// 如果要使用输出参数请使用 <see cref="GetReaderAsync(IDbCommand, CommandBehavior, CancellationToken, IEnumerable{IDataParameter?}?)"/> 或 <see cref="GetReaderAndOutParametersAsync(IDbConnection, string, CommandType, CommandBehavior, CancellationToken, IEnumerable{IDataParameter?}?)"/> 方法。
+        /// </remarks>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">T-SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">SQL参数对象数组</param>
+        /// <returns>返回<see cref="IDataReader"/>对象实例</returns>
+#if NETSTANDARD2_0
+        Task<IDataReader> GetReaderAsync(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
+#else
+        Task<IDataReader> GetReaderAsync(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
+#endif
+        /// <summary>
+        /// 异步执行T-SQL命令，并生成<see cref="IDataReader"/>。
         /// </summary>
         /// <remarks>
         /// 如果在方法返回的<see cref="IDataReader"/>关闭之后才会对<see cref="IDbCommand.Parameters"/>关联的输出参数赋值的话，那么此方法不会对存储过程的输出参数赋值。
         /// 因为在方法返回的<see cref="IDataReader"/>关闭之前就已将<see cref="IDbCommand.Parameters"/>集合清空。
         /// 如果要使用输出参数请使用 <see cref="GetReaderAsync(IDbCommand, CommandBehavior, CancellationToken, IDataParameter[])"/> 或 <see cref="GetReaderAndOutParametersAsync(IDbTransaction, string, CommandType, CommandBehavior, CancellationToken, IDataParameter[])"/> 方法。
         /// </remarks>
-        /// <param name="tran">数据库事务对象实例。</param>
-        /// <param name="cmdText">T-SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">T-SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">SQL参数对象数组</param>
-        /// <returns>返回<see cref="System.Data.IDataReader"/>对象实例</returns>
-        Task<IDataReader> GetReaderAsync(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        /// <returns>返回<see cref="IDataReader"/>对象实例</returns>
+        Task<IDataReader> GetReaderAsync(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
         /// <summary>
-        /// 异步执行T-SQL命令，并生成<see cref="System.Data.IDataReader"/>。
+        /// 异步执行T-SQL命令，并生成<see cref="IDataReader"/>。
         /// </summary>
-        /// <param name="cmdText">T-SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <remarks>
+        /// 如果在方法返回的<see cref="IDataReader"/>关闭之后才会对<see cref="IDbCommand.Parameters"/>关联的输出参数赋值的话，那么此方法不会对存储过程的输出参数赋值。
+        /// 因为在方法返回的<see cref="IDataReader"/>关闭之前就已将<see cref="IDbCommand.Parameters"/>集合清空。
+        /// 如果要使用输出参数请使用 <see cref="GetReaderAsync(IDbCommand, CommandBehavior, CancellationToken, IEnumerable{IDataParameter?}?)"/> 或 <see cref="GetReaderAndOutParametersAsync(IDbTransaction, string, CommandType, CommandBehavior, CancellationToken, IEnumerable{IDataParameter?}?)"/> 方法。
+        /// </remarks>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">T-SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">SQL参数对象数组</param>
-        /// <returns>返回<see cref="System.Data.IDataReader"/>对象实例和<see cref="IDbCommand"/>对象实例，用于在存储过程使用输出变量时，关闭 <see cref="IDataReader"/> 对象，输出参数被赋值后清除参数，达到参数对象重复使用的目的。</returns>
-        Task<(IDataReader, IDbCommand)> GetReaderAndOutParametersAsync(string cmdText, CommandType cmdType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        /// <returns>返回<see cref="IDataReader"/>对象实例</returns>
+#if NETSTANDARD2_0
+        Task<IDataReader> GetReaderAsync(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
+#else
+        Task<IDataReader> GetReaderAsync(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
+#endif
         /// <summary>
-        /// 异步执行T-SQL命令，并生成<see cref="System.Data.IDataReader"/>。
+        /// 异步执行T-SQL命令，并生成<see cref="IDataReader"/>。
         /// </summary>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">T-SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">T-SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">SQL参数对象数组</param>
-        /// <returns>返回<see cref="System.Data.IDataReader"/>对象实例和<see cref="IDbCommand"/>对象实例，用于在存储过程使用输出变量时，关闭 <see cref="IDataReader"/> 对象，输出参数被赋值后清除参数，达到参数对象重复使用的目的。</returns>
-        Task<(IDataReader, IDbCommand)> GetReaderAndOutParametersAsync(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        /// <returns>返回<see cref="IDataReader"/>对象实例和<see cref="IDbCommand"/>对象实例，用于在存储过程使用输出变量时，关闭 <see cref="IDataReader"/> 对象，输出参数被赋值后清除参数，达到参数对象重复使用的目的。</returns>
+        Task<(IDataReader, IDbCommand)> GetReaderAndOutParametersAsync(string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
         /// <summary>
-        /// 异步执行T-SQL命令，并生成<see cref="System.Data.IDataReader"/>。
+        /// 异步执行T-SQL命令，并生成<see cref="IDataReader"/>。
         /// </summary>
-        /// <param name="tran">数据库事务对象实例。</param>
-        /// <param name="cmdText">T-SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">T-SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">SQL参数对象数组</param>
-        /// <returns>返回<see cref="System.Data.IDataReader"/>对象实例和<see cref="IDbCommand"/>对象实例，用于在存储过程使用输出变量时，关闭 <see cref="IDataReader"/> 对象，输出参数被赋值后清除参数，达到参数对象重复使用的目的。</returns>
-        Task<(IDataReader, IDbCommand)> GetReaderAndOutParametersAsync(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        /// <returns>返回<see cref="IDataReader"/>对象实例和<see cref="IDbCommand"/>对象实例，用于在存储过程使用输出变量时，关闭 <see cref="IDataReader"/> 对象，输出参数被赋值后清除参数，达到参数对象重复使用的目的。</returns>
+#if NETSTANDARD2_0
+        Task<(IDataReader, IDbCommand)> GetReaderAndOutParametersAsync(string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
+#else
+        Task<(IDataReader, IDbCommand)> GetReaderAndOutParametersAsync(string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
+#endif
+        /// <summary>
+        /// 异步执行T-SQL命令，并生成<see cref="IDataReader"/>。
+        /// </summary>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">T-SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">SQL参数对象数组</param>
+        /// <returns>返回<see cref="IDataReader"/>对象实例和<see cref="IDbCommand"/>对象实例，用于在存储过程使用输出变量时，关闭 <see cref="IDataReader"/> 对象，输出参数被赋值后清除参数，达到参数对象重复使用的目的。</returns>
+        Task<(IDataReader, IDbCommand)> GetReaderAndOutParametersAsync(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        /// <summary>
+        /// 异步执行T-SQL命令，并生成<see cref="IDataReader"/>。
+        /// </summary>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">T-SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">SQL参数对象数组</param>
+        /// <returns>返回<see cref="IDataReader"/>对象实例和<see cref="IDbCommand"/>对象实例，用于在存储过程使用输出变量时，关闭 <see cref="IDataReader"/> 对象，输出参数被赋值后清除参数，达到参数对象重复使用的目的。</returns>
+#if NETSTANDARD2_0
+        Task<(IDataReader, IDbCommand)> GetReaderAndOutParametersAsync(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
+#else
+        Task<(IDataReader, IDbCommand)> GetReaderAndOutParametersAsync(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
+#endif
+        /// <summary>
+        /// 异步执行T-SQL命令，并生成<see cref="IDataReader"/>。
+        /// </summary>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">T-SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">SQL参数对象数组</param>
+        /// <returns>返回<see cref="IDataReader"/>对象实例和<see cref="IDbCommand"/>对象实例，用于在存储过程使用输出变量时，关闭 <see cref="IDataReader"/> 对象，输出参数被赋值后清除参数，达到参数对象重复使用的目的。</returns>
+        Task<(IDataReader, IDbCommand)> GetReaderAndOutParametersAsync(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        /// <summary>
+        /// 异步执行T-SQL命令，并生成<see cref="IDataReader"/>。
+        /// </summary>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">T-SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">SQL参数对象数组</param>
+        /// <returns>返回<see cref="IDataReader"/>对象实例和<see cref="IDbCommand"/>对象实例，用于在存储过程使用输出变量时，关闭 <see cref="IDataReader"/> 对象，输出参数被赋值后清除参数，达到参数对象重复使用的目的。</returns>
+#if NETSTANDARD2_0
+        Task<(IDataReader, IDbCommand)> GetReaderAndOutParametersAsync(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
+#else
+        Task<(IDataReader, IDbCommand)> GetReaderAndOutParametersAsync(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
+#endif
 
 
 
@@ -763,64 +1140,173 @@ namespace Sweety.Common.DataProvider
         /// 执行查询，并返回查询所返回的结果集中第一行的第一列。忽略其他列或行。
         /// </summary>
         /// <typeparam name="T">预返回类型</typeparam>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>结果集中第一行的第一列；如果结果集为空，则为预返回类型的默认值。</returns>
-        T GetScalar<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+#if NET5_0_OR_GREATER
+        T? GetScalar<T>(string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters);
+#else
+        T GetScalar<T>(string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
+#endif
         /// <summary>
         /// 执行查询，并返回查询所返回的结果集中第一行的第一列。忽略其他列或行。
         /// </summary>
         /// <typeparam name="T">预返回类型</typeparam>
-        /// <param name="tran">SQL事务</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>结果集中第一行的第一列；如果结果集为空，则为预返回类型的默认值。</returns>
-        T GetScalar<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+#if NET5_0_OR_GREATER
+        T? GetScalar<T>(string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null);
+#else
+        T GetScalar<T>(string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
+#endif
         /// <summary>
         /// 执行查询，并返回查询所返回的结果集中第一行的第一列。忽略其他列或行。
         /// </summary>
         /// <typeparam name="T">预返回类型</typeparam>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="transaction">SQL事务</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>结果集中第一行的第一列；如果结果集为空，则为预返回类型的默认值。</returns>
-        T GetScalar<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+#if NET5_0_OR_GREATER
+        T? GetScalar<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters);
+#else
+        T GetScalar<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
+#endif
+        /// <summary>
+        /// 执行查询，并返回查询所返回的结果集中第一行的第一列。忽略其他列或行。
+        /// </summary>
+        /// <typeparam name="T">预返回类型</typeparam>
+        /// <param name="transaction">SQL事务</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>结果集中第一行的第一列；如果结果集为空，则为预返回类型的默认值。</returns>
+#if NET5_0_OR_GREATER
+        T? GetScalar<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null);
+#else
+        T GetScalar<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
+#endif
+        /// <summary>
+        /// 执行查询，并返回查询所返回的结果集中第一行的第一列。忽略其他列或行。
+        /// </summary>
+        /// <typeparam name="T">预返回类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>结果集中第一行的第一列；如果结果集为空，则为预返回类型的默认值。</returns>
+#if NET5_0_OR_GREATER
+        T? GetScalar<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters);
+#else
+        T GetScalar<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
+#endif
+        /// <summary>
+        /// 执行查询，并返回查询所返回的结果集中第一行的第一列。忽略其他列或行。
+        /// </summary>
+        /// <typeparam name="T">预返回类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>结果集中第一行的第一列；如果结果集为空，则为预返回类型的默认值。</returns>
+#if NET5_0_OR_GREATER
+        T? GetScalar<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null);
+#else
+        T GetScalar<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
+#endif
 
         /// <summary>
         /// 异步执行查询，并返回查询所返回的结果集中第一行的第一列。忽略其他列或行。
         /// </summary>
         /// <typeparam name="T">预返回类型</typeparam>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>结果集中第一行的第一列；如果结果集为空，则为预返回类型的默认值。</returns>
-        Task<T> GetScalarAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#if NET5_0_OR_GREATER
+        Task<T?> GetScalarAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters);
+#else
+        Task<T> GetScalarAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#endif
         /// <summary>
         /// 异步执行查询，并返回查询所返回的结果集中第一行的第一列。忽略其他列或行。
         /// </summary>
         /// <typeparam name="T">预返回类型</typeparam>
-        /// <param name="tran">SQL事务</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>结果集中第一行的第一列；如果结果集为空，则为预返回类型的默认值。</returns>
-        Task<T> GetScalarAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#if NET5_0_OR_GREATER
+        Task<T?> GetScalarAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
+#else
+        Task<T> GetScalarAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
+#endif
         /// <summary>
         /// 异步执行查询，并返回查询所返回的结果集中第一行的第一列。忽略其他列或行。
         /// </summary>
         /// <typeparam name="T">预返回类型</typeparam>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="transaction">SQL事务</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>结果集中第一行的第一列；如果结果集为空，则为预返回类型的默认值。</returns>
-        Task<T> GetScalarAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#if NET5_0_OR_GREATER
+        Task<T?> GetScalarAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters);
+#else
+        Task<T> GetScalarAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#endif
+        /// <summary>
+        /// 异步执行查询，并返回查询所返回的结果集中第一行的第一列。忽略其他列或行。
+        /// </summary>
+        /// <typeparam name="T">预返回类型</typeparam>
+        /// <param name="transaction">SQL事务</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>结果集中第一行的第一列；如果结果集为空，则为预返回类型的默认值。</returns>
+#if NET5_0_OR_GREATER
+        Task<T?> GetScalarAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
+#else
+        Task<T> GetScalarAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
+#endif
+        /// <summary>
+        /// 异步执行查询，并返回查询所返回的结果集中第一行的第一列。忽略其他列或行。
+        /// </summary>
+        /// <typeparam name="T">预返回类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>结果集中第一行的第一列；如果结果集为空，则为预返回类型的默认值。</returns>
+#if NET5_0_OR_GREATER
+        Task<T?> GetScalarAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters);
+#else
+        Task<T> GetScalarAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#endif
+        /// <summary>
+        /// 异步执行查询，并返回查询所返回的结果集中第一行的第一列。忽略其他列或行。
+        /// </summary>
+        /// <typeparam name="T">预返回类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>结果集中第一行的第一列；如果结果集为空，则为预返回类型的默认值。</returns>
+#if NET5_0_OR_GREATER
+        Task<T?> GetScalarAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
+#else
+        Task<T> GetScalarAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
+#endif
 
 
         /// <summary>
@@ -828,17 +1314,17 @@ namespace Sweety.Common.DataProvider
         /// </summary>
         /// <typeparam name="TKey">键的数据类型</typeparam>
         /// <typeparam name="TValue">值的数据类型</typeparam>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回键值对集合，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
 #elif NETSTANDARD2_1
-        IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters)
             where TKey : notnull;
 #else
-        IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters)
             where TKey : notnull;
 #endif //NETSTANDARD2_0
         /// <summary>
@@ -846,18 +1332,17 @@ namespace Sweety.Common.DataProvider
         /// </summary>
         /// <typeparam name="TKey">键的数据类型</typeparam>
         /// <typeparam name="TValue">值的数据类型</typeparam>
-        /// <param name="tran">SQL事务</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回键值对集合，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
 #elif NETSTANDARD2_1
-        IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null)
             where TKey : notnull;
 #else
-        IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null)
             where TKey : notnull;
 #endif //NETSTANDARD2_0
         /// <summary>
@@ -865,18 +1350,75 @@ namespace Sweety.Common.DataProvider
         /// </summary>
         /// <typeparam name="TKey">键的数据类型</typeparam>
         /// <typeparam name="TValue">值的数据类型</typeparam>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="transaction">SQL事务</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回键值对集合，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
 #elif NETSTANDARD2_1
-        IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters)
             where TKey : notnull;
 #else
-        IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters)
+            where TKey : notnull;
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 获取键值对集合
+        /// </summary>
+        /// <typeparam name="TKey">键的数据类型</typeparam>
+        /// <typeparam name="TValue">值的数据类型</typeparam>
+        /// <param name="transaction">SQL事务</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回键值对集合，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
+#elif NETSTANDARD2_1
+        IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null)
+            where TKey : notnull;
+#else
+        IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null)
+            where TKey : notnull;
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 获取键值对集合
+        /// </summary>
+        /// <typeparam name="TKey">键的数据类型</typeparam>
+        /// <typeparam name="TValue">值的数据类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回键值对集合，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
+#elif NETSTANDARD2_1
+        IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters)
+            where TKey : notnull;
+#else
+        IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters)
+            where TKey : notnull;
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 获取键值对集合
+        /// </summary>
+        /// <typeparam name="TKey">键的数据类型</typeparam>
+        /// <typeparam name="TValue">值的数据类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回键值对集合，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
+#elif NETSTANDARD2_1
+        IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null)
+            where TKey : notnull;
+#else
+        IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null)
             where TKey : notnull;
 #endif //NETSTANDARD2_0
 
@@ -885,18 +1427,18 @@ namespace Sweety.Common.DataProvider
         /// </summary>
         /// <typeparam name="TKey">键的数据类型</typeparam>
         /// <typeparam name="TValue">值的数据类型</typeparam>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回键值对集合，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
 #elif NETSTANDARD2_1
-        Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters)
             where TKey : notnull;
 #else
-        Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters)
             where TKey : notnull;
 #endif //NETSTANDARD2_0
         /// <summary>
@@ -904,19 +1446,18 @@ namespace Sweety.Common.DataProvider
         /// </summary>
         /// <typeparam name="TKey">键的数据类型</typeparam>
         /// <typeparam name="TValue">值的数据类型</typeparam>
-        /// <param name="tran">SQL事务</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回键值对集合，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
 #elif NETSTANDARD2_1
-        Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null)
             where TKey : notnull;
 #else
-        Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null)
             where TKey : notnull;
 #endif //NETSTANDARD2_0
         /// <summary>
@@ -924,19 +1465,79 @@ namespace Sweety.Common.DataProvider
         /// </summary>
         /// <typeparam name="TKey">键的数据类型</typeparam>
         /// <typeparam name="TValue">值的数据类型</typeparam>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="transaction">SQL事务</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回键值对集合，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
 #elif NETSTANDARD2_1
-        Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters)
             where TKey : notnull;
 #else
-        Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters)
+            where TKey : notnull;
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 异步获取键值对集合
+        /// </summary>
+        /// <typeparam name="TKey">键的数据类型</typeparam>
+        /// <typeparam name="TValue">值的数据类型</typeparam>
+        /// <param name="transaction">SQL事务</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回键值对集合，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
+#elif NETSTANDARD2_1
+        Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null)
+            where TKey : notnull;
+#else
+        Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null)
+            where TKey : notnull;
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 异步获取键值对集合
+        /// </summary>
+        /// <typeparam name="TKey">键的数据类型</typeparam>
+        /// <typeparam name="TValue">值的数据类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回键值对集合，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#elif NETSTANDARD2_1
+        Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters)
+            where TKey : notnull;
+#else
+        Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters)
+            where TKey : notnull;
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 异步获取键值对集合
+        /// </summary>
+        /// <typeparam name="TKey">键的数据类型</typeparam>
+        /// <typeparam name="TValue">值的数据类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回键值对集合，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
+#elif NETSTANDARD2_1
+        Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null)
+            where TKey : notnull;
+#else
+        Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null)
             where TKey : notnull;
 #endif //NETSTANDARD2_0
 
@@ -945,42 +1546,88 @@ namespace Sweety.Common.DataProvider
         /// 获取单个实体
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回单个实体，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        T GetSingle<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class;
+        T GetSingle<T>(string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] parameters) where T : class;
 #else
-        T? GetSingle<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class;
+        T? GetSingle<T>(string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters) where T : class;
 #endif //NETSTANDARD2_0
+
         /// <summary>
         /// 获取单个实体
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="tran">数据库事务对象实例。</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回单个实体，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        T GetSingle<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class;
+        T GetSingle<T>(string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null) where T : class;
 #else
-        T? GetSingle<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class;
+        T? GetSingle<T>(string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null) where T : class;
 #endif //NETSTANDARD2_0
+
         /// <summary>
         /// 获取单个实体
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回单个实体，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        T GetSingle<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class;
+        T GetSingle<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] parameters) where T : class;
 #else
-        T? GetSingle<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class;
+        T? GetSingle<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters) where T : class;
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 获取单个实体
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回单个实体，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        T GetSingle<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null) where T : class;
+#else
+        T? GetSingle<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null) where T : class;
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 获取单个实体
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回单个实体，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        T GetSingle<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] parameters) where T : class;
+#else
+        T? GetSingle<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters) where T : class;
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 获取单个实体
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回单个实体，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        T GetSingle<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null) where T : class;
+#else
+        T? GetSingle<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null) where T : class;
 #endif //NETSTANDARD2_0
 
 
@@ -988,194 +1635,295 @@ namespace Sweety.Common.DataProvider
         /// 获取单个实体
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="cmdText">SQL命令</param>
+        /// <param name="commandText">SQL命令</param>
         /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
         /// <param name="customAssignMethod">特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回单个实体，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        T GetSingle<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class;
+        T GetSingle<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] parameters) where T : class;
 #else
-        T? GetSingle<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class;
+        T? GetSingle<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters) where T : class;
 #endif //NETSTANDARD2_0
-        /// <summary>
-        /// 获取单个实体
-        /// </summary>
-        /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="tran">数据库事务对象实例。</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
-        /// <param name="parameters">参数集合</param>
-        /// <returns>返回单个实体，没有数据返回null</returns>
-#if NETSTANDARD2_0
-        T GetSingle<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class;
-#else
-        T? GetSingle<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class;
-#endif //NETSTANDARD2_0
-        /// <summary>
-        /// 获取单个实体
-        /// </summary>
-        /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
-        /// <param name="parameters">参数集合</param>
-        /// <returns>返回单个实体，没有数据返回null</returns>
-#if NETSTANDARD2_0
-        T GetSingle<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class;
-#else
-        T? GetSingle<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class;
-#endif //NETSTANDARD2_0
-
 
         /// <summary>
         /// 获取单个实体
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回单个实体，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        T GetSingle<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class;
+        T GetSingle<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null) where T : class;
 #else
-        T? GetSingle<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class;
+        T? GetSingle<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null) where T : class;
 #endif //NETSTANDARD2_0
+
         /// <summary>
         /// 获取单个实体
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="tran">数据库事务对象实例。</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回单个实体，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        T GetSingle<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class;
+        T GetSingle<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] parameters) where T : class;
 #else
-        T? GetSingle<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class;
+        T? GetSingle<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters) where T : class;
 #endif //NETSTANDARD2_0
+
         /// <summary>
         /// 获取单个实体
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
-        /// <param name="parameters">参数集合</param>
-        /// <returns>返回单个实体，没有数据返回null</returns>
-#if NETSTANDARD2_0
-        T GetSingle<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class;
-#else
-        T? GetSingle<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class;
-#endif //NETSTANDARD2_0
-
-        /// <summary>
-        /// 异步获取单个实体
-        /// </summary>
-        /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
-        /// <param name="cancellationToken">通知任务取消的令牌。</param>
-        /// <param name="parameters">参数集合</param>
-        /// <returns>返回单个实体，没有数据返回null</returns>
-#if NETSTANDARD2_0
-        Task<T> GetSingleAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class;
-#else
-        Task<T?> GetSingleAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class;
-#endif //NETSTANDARD2_0
-        /// <summary>
-        /// 异步获取单个实体
-        /// </summary>
-        /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="tran">数据库事务对象实例。</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
-        /// <param name="cancellationToken">通知任务取消的令牌。</param>
-        /// <param name="parameters">参数集合</param>
-        /// <returns>返回单个实体，没有数据返回null</returns>
-#if NETSTANDARD2_0
-        Task<T> GetSingleAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class;
-#else
-        Task<T?> GetSingleAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class;
-#endif //NETSTANDARD2_0
-        /// <summary>
-        /// 异步获取单个实体
-        /// </summary>
-        /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
-        /// <param name="cancellationToken">通知任务取消的令牌。</param>
-        /// <param name="parameters">参数集合</param>
-        /// <returns>返回单个实体，没有数据返回null</returns>
-#if NETSTANDARD2_0
-        Task<T> GetSingleAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class;
-#else
-        Task<T?> GetSingleAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class;
-#endif //NETSTANDARD2_0
-
-
-        /// <summary>
-        /// 异步获取单个实体
-        /// </summary>
-        /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="cmdText">SQL命令</param>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
         /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
         /// <param name="customAssignMethod">特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
-        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回单个实体，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        Task<T> GetSingleAsync<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class;
+        T GetSingle<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null) where T : class;
 #else
-        Task<T?> GetSingleAsync<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class;
+        T? GetSingle<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null) where T : class;
 #endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 获取单个实体
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回单个实体，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        T GetSingle<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] parameters) where T : class;
+#else
+        T? GetSingle<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters) where T : class;
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 获取单个实体
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回单个实体，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        T GetSingle<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null) where T : class;
+#else
+        T? GetSingle<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null) where T : class;
+#endif //NETSTANDARD2_0
+
+
+        /// <summary>
+        /// 获取单个实体
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回单个实体，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        T GetSingle<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] parameters) where T : class;
+#else
+        T? GetSingle<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters) where T : class;
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 获取单个实体
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回单个实体，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        T GetSingle<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null) where T : class;
+#else
+        T? GetSingle<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null) where T : class;
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 获取单个实体
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回单个实体，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        T GetSingle<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] parameters) where T : class;
+#else
+        T? GetSingle<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters) where T : class;
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 获取单个实体
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回单个实体，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        T GetSingle<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null) where T : class;
+#else
+        T? GetSingle<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null) where T : class;
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 获取单个实体
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回单个实体，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        T GetSingle<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] parameters) where T : class;
+#else
+        T? GetSingle<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters) where T : class;
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 获取单个实体
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回单个实体，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        T GetSingle<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null) where T : class;
+#else
+        T? GetSingle<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null) where T : class;
+#endif //NETSTANDARD2_0
+
         /// <summary>
         /// 异步获取单个实体
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="tran">数据库事务对象实例。</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回单个实体，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        Task<T> GetSingleAsync<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class;
+        Task<T> GetSingleAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class;
 #else
-        Task<T?> GetSingleAsync<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class;
+        Task<T?> GetSingleAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters) where T : class;
 #endif //NETSTANDARD2_0
+
         /// <summary>
         /// 异步获取单个实体
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回单个实体，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        Task<T> GetSingleAsync<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class;
+        Task<T> GetSingleAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null) where T : class;
 #else
-        Task<T?> GetSingleAsync<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class;
+        Task<T?> GetSingleAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null) where T : class;
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 异步获取单个实体
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回单个实体，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<T> GetSingleAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class;
+#else
+        Task<T?> GetSingleAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters) where T : class;
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 异步获取单个实体
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回单个实体，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<T> GetSingleAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null) where T : class;
+#else
+        Task<T?> GetSingleAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null) where T : class;
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 异步获取单个实体
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回单个实体，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<T> GetSingleAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class;
+#else
+        Task<T?> GetSingleAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters) where T : class;
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 异步获取单个实体
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回单个实体，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<T> GetSingleAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null) where T : class;
+#else
+        Task<T?> GetSingleAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null) where T : class;
 #endif //NETSTANDARD2_0
 
 
@@ -1183,51 +1931,213 @@ namespace Sweety.Common.DataProvider
         /// 异步获取单个实体
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回单个实体，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        Task<T> GetSingleAsync<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class;
+        Task<T> GetSingleAsync<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class;
 #else
-        Task<T?> GetSingleAsync<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class;
+        Task<T?> GetSingleAsync<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters) where T : class;
 #endif //NETSTANDARD2_0
+
         /// <summary>
         /// 异步获取单个实体
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="tran">数据库事务对象实例。</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回单个实体，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        Task<T> GetSingleAsync<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class;
+        Task<T> GetSingleAsync<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null) where T : class;
 #else
-        Task<T?> GetSingleAsync<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class;
+        Task<T?> GetSingleAsync<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null) where T : class;
 #endif //NETSTANDARD2_0
+
         /// <summary>
         /// 异步获取单个实体
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回单个实体，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        Task<T> GetSingleAsync<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class;
+        Task<T> GetSingleAsync<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class;
 #else
-        Task<T?> GetSingleAsync<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class;
+        Task<T?> GetSingleAsync<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters) where T : class;
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 异步获取单个实体
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回单个实体，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<T> GetSingleAsync<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null) where T : class;
+#else
+        Task<T?> GetSingleAsync<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null) where T : class;
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 异步获取单个实体
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回单个实体，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<T> GetSingleAsync<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class;
+#else
+        Task<T?> GetSingleAsync<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters) where T : class;
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 异步获取单个实体
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回单个实体，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<T> GetSingleAsync<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null) where T : class;
+#else
+        Task<T?> GetSingleAsync<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null) where T : class;
+#endif //NETSTANDARD2_0
+
+
+        /// <summary>
+        /// 异步获取单个实体
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回单个实体，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<T> GetSingleAsync<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class;
+#else
+        Task<T?> GetSingleAsync<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters) where T : class;
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 异步获取单个实体
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回单个实体，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<T> GetSingleAsync<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null) where T : class;
+#else
+        Task<T?> GetSingleAsync<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null) where T : class;
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 异步获取单个实体
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回单个实体，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<T> GetSingleAsync<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class;
+#else
+        Task<T?> GetSingleAsync<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters) where T : class;
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 异步获取单个实体
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回单个实体，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<T> GetSingleAsync<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null) where T : class;
+#else
+        Task<T?> GetSingleAsync<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null) where T : class;
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 异步获取单个实体
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回单个实体，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<T> GetSingleAsync<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class;
+#else
+        Task<T?> GetSingleAsync<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters) where T : class;
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 异步获取单个实体
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回单个实体，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<T> GetSingleAsync<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null) where T : class;
+#else
+        Task<T?> GetSingleAsync<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null) where T : class;
 #endif //NETSTANDARD2_0
 
 
@@ -1236,33 +2146,94 @@ namespace Sweety.Common.DataProvider
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
         /// <param name="structure">接收数据的结构体</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>读取到数据返回<c>true</c>，否则返回<c>false</c>。</returns>
-        bool TryGetSingle<T>(ref T structure, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct;
+#if NETSTANDARD2_0
+        bool TryGetSingle<T>(ref T structure, string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] parameters) where T : struct;
+#else
+        bool TryGetSingle<T>(ref T structure, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters) where T : struct;
+#endif
+
         /// <summary>
         /// 获取单个实体
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
         /// <param name="structure">接收数据的结构体</param>
-        /// <param name="tran">数据库事务对象实例。</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>读取到数据返回<c>true</c>，否则返回<c>false</c>。</returns>
-        bool TryGetSingle<T>(ref T structure, IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct;
+#if NETSTANDARD2_0
+        bool TryGetSingle<T>(ref T structure, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null) where T : struct;
+#else
+        bool TryGetSingle<T>(ref T structure, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null) where T : struct;
+#endif
+
         /// <summary>
         /// 获取单个实体
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
         /// <param name="structure">接收数据的结构体</param>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>读取到数据返回<c>true</c>，否则返回<c>false</c>。</returns>
-        bool TryGetSingle<T>(ref T structure, IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct;
+#if NETSTANDARD2_0
+        bool TryGetSingle<T>(ref T structure, IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] parameters) where T : struct;
+#else
+        bool TryGetSingle<T>(ref T structure, IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters) where T : struct;
+#endif
+
+        /// <summary>
+        /// 获取单个实体
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="structure">接收数据的结构体</param>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>读取到数据返回<c>true</c>，否则返回<c>false</c>。</returns>
+#if NETSTANDARD2_0
+        bool TryGetSingle<T>(ref T structure, IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null) where T : struct;
+#else
+        bool TryGetSingle<T>(ref T structure, IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null) where T : struct;
+#endif
+
+        /// <summary>
+        /// 获取单个实体
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="structure">接收数据的结构体</param>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>读取到数据返回<c>true</c>，否则返回<c>false</c>。</returns>
+#if NETSTANDARD2_0
+        bool TryGetSingle<T>(ref T structure, IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] parameters) where T : struct;
+#else
+        bool TryGetSingle<T>(ref T structure, IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters) where T : struct;
+#endif
+
+        /// <summary>
+        /// 获取单个实体
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="structure">接收数据的结构体</param>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>读取到数据返回<c>true</c>，否则返回<c>false</c>。</returns>
+#if NETSTANDARD2_0
+        bool TryGetSingle<T>(ref T structure, IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null) where T : struct;
+#else
+        bool TryGetSingle<T>(ref T structure, IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null) where T : struct;
+#endif
 
 
         /// <summary>
@@ -1270,39 +2241,106 @@ namespace Sweety.Common.DataProvider
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
         /// <param name="structure">接收数据的结构体</param>
-        /// <param name="cmdText">SQL命令</param>
+        /// <param name="commandText">SQL命令</param>
         /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
         /// <param name="customAssignMethod">特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>读取到数据返回<c>true</c>，否则返回<c>false</c>。</returns>
-        bool TryGetSingle<T>(ref T structure, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct;
+#if NETSTANDARD2_0
+        bool TryGetSingle<T>(ref T structure, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] parameters) where T : struct;
+#else
+        bool TryGetSingle<T>(ref T structure, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters) where T : struct;
+#endif
+
         /// <summary>
         /// 获取单个实体
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
         /// <param name="structure">接收数据的结构体</param>
-        /// <param name="tran">数据库事务对象实例。</param>
-        /// <param name="cmdText">SQL命令</param>
+        /// <param name="commandText">SQL命令</param>
         /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
         /// <param name="customAssignMethod">特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>读取到数据返回<c>true</c>，否则返回<c>false</c>。</returns>
-        bool TryGetSingle<T>(ref T structure, IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct;
+#if NETSTANDARD2_0
+        bool TryGetSingle<T>(ref T structure, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null) where T : struct;
+#else
+        bool TryGetSingle<T>(ref T structure, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null) where T : struct;
+#endif
+
         /// <summary>
         /// 获取单个实体
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
         /// <param name="structure">接收数据的结构体</param>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">SQL命令</param>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
         /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
         /// <param name="customAssignMethod">特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>读取到数据返回<c>true</c>，否则返回<c>false</c>。</returns>
-        bool TryGetSingle<T>(ref T structure, IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct;
+#if NETSTANDARD2_0
+        bool TryGetSingle<T>(ref T structure, IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] parameters) where T : struct;
+#else
+        bool TryGetSingle<T>(ref T structure, IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters) where T : struct;
+#endif
+
+        /// <summary>
+        /// 获取单个实体
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="structure">接收数据的结构体</param>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>读取到数据返回<c>true</c>，否则返回<c>false</c>。</returns>
+#if NETSTANDARD2_0
+        bool TryGetSingle<T>(ref T structure, IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null) where T : struct;
+#else
+        bool TryGetSingle<T>(ref T structure, IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null) where T : struct;
+#endif
+
+        /// <summary>
+        /// 获取单个实体
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="structure">接收数据的结构体</param>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>读取到数据返回<c>true</c>，否则返回<c>false</c>。</returns>
+#if NETSTANDARD2_0
+        bool TryGetSingle<T>(ref T structure, IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] parameters) where T : struct;
+#else
+        bool TryGetSingle<T>(ref T structure, IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters) where T : struct;
+#endif
+
+        /// <summary>
+        /// 获取单个实体
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="structure">接收数据的结构体</param>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>读取到数据返回<c>true</c>，否则返回<c>false</c>。</returns>
+#if NETSTANDARD2_0
+        bool TryGetSingle<T>(ref T structure, IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null) where T : struct;
+#else
+        bool TryGetSingle<T>(ref T structure, IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null) where T : struct;
+#endif
 
 
         /// <summary>
@@ -1310,39 +2348,106 @@ namespace Sweety.Common.DataProvider
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
         /// <param name="structure">接收数据的结构体</param>
-        /// <param name="cmdText">SQL命令</param>
+        /// <param name="commandText">SQL命令</param>
         /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
         /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>读取到数据返回<c>true</c>，否则返回<c>false</c>。</returns>
-        bool TryGetSingle<T>(ref T structure, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct;
+#if NETSTANDARD2_0
+        bool TryGetSingle<T>(ref T structure, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] parameters) where T : struct;
+#else
+        bool TryGetSingle<T>(ref T structure, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters) where T : struct;
+#endif
+
         /// <summary>
         /// 获取单个实体
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
         /// <param name="structure">接收数据的结构体</param>
-        /// <param name="tran">数据库事务对象实例。</param>
-        /// <param name="cmdText">SQL命令</param>
+        /// <param name="commandText">SQL命令</param>
         /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
         /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>读取到数据返回<c>true</c>，否则返回<c>false</c>。</returns>
-        bool TryGetSingle<T>(ref T structure, IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct;
+#if NETSTANDARD2_0
+        bool TryGetSingle<T>(ref T structure, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null) where T : struct;
+#else
+        bool TryGetSingle<T>(ref T structure, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null) where T : struct;
+#endif
+
         /// <summary>
         /// 获取单个实体
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
         /// <param name="structure">接收数据的结构体</param>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">SQL命令</param>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
         /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
         /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>读取到数据返回<c>true</c>，否则返回<c>false</c>。</returns>
-        bool TryGetSingle<T>(ref T structure, IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct;
+#if NETSTANDARD2_0
+        bool TryGetSingle<T>(ref T structure, IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] parameters) where T : struct;
+#else
+        bool TryGetSingle<T>(ref T structure, IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters) where T : struct;
+#endif
+
+        /// <summary>
+        /// 获取单个实体
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="structure">接收数据的结构体</param>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>读取到数据返回<c>true</c>，否则返回<c>false</c>。</returns>
+#if NETSTANDARD2_0
+        bool TryGetSingle<T>(ref T structure, IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null) where T : struct;
+#else
+        bool TryGetSingle<T>(ref T structure, IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null) where T : struct;
+#endif
+
+        /// <summary>
+        /// 获取单个实体
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="structure">接收数据的结构体</param>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>读取到数据返回<c>true</c>，否则返回<c>false</c>。</returns>
+#if NETSTANDARD2_0
+        bool TryGetSingle<T>(ref T structure, IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] parameters) where T : struct;
+#else
+        bool TryGetSingle<T>(ref T structure, IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters) where T : struct;
+#endif
+
+        /// <summary>
+        /// 获取单个实体
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="structure">接收数据的结构体</param>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>读取到数据返回<c>true</c>，否则返回<c>false</c>。</returns>
+#if NETSTANDARD2_0
+        bool TryGetSingle<T>(ref T structure, IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null) where T : struct;
+#else
+        bool TryGetSingle<T>(ref T structure, IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null) where T : struct;
+#endif
 
 
 
@@ -1351,286 +2456,595 @@ namespace Sweety.Common.DataProvider
         /// 获取实体列表
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回据列表，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        IList<T> GetList<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        IList<T> GetList<T>(string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
 #else
-        IList<T>? GetList<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        IList<T>? GetList<T>(string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters);
 #endif //NETSTANDARD2_0
+
         /// <summary>
         /// 获取实体列表
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="tran">数据库事务对象实例。</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回据列表，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        IList<T> GetList<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        IList<T> GetList<T>(string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
 #else
-        IList<T>? GetList<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        IList<T>? GetList<T>(string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null);
 #endif //NETSTANDARD2_0
+
         /// <summary>
         /// 获取实体列表
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回据列表，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        IList<T> GetList<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
+#else
+        IList<T>? GetList<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 获取实体列表
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回据列表，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        IList<T> GetList<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
+#else
+        IList<T>? GetList<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 获取实体列表
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据列表，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        IList<T> GetList<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        IList<T> GetList<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
 #else
-        IList<T>? GetList<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        IList<T>? GetList<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters);
 #endif //NETSTANDARD2_0
 
-
         /// <summary>
         /// 获取实体列表
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
-        /// <param name="parameters">参数集合</param>
-        /// <returns>返回据列表，没有数据返回null</returns>
-#if NETSTANDARD2_0
-        IList<T> GetList<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
-#else
-        IList<T>? GetList<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
-#endif //NETSTANDARD2_0
-        /// <summary>
-        /// 获取实体列表
-        /// </summary>
-        /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="tran">数据库事务对象实例。</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
-        /// <param name="parameters">参数集合</param>
-        /// <returns>返回据列表，没有数据返回null</returns>
-#if NETSTANDARD2_0
-        IList<T> GetList<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
-#else
-        IList<T>? GetList<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
-#endif //NETSTANDARD2_0
-        /// <summary>
-        /// 获取实体列表
-        /// </summary>
-        /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据列表，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        IList<T> GetList<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        IList<T> GetList<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
 #else
-        IList<T>? GetList<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        IList<T>? GetList<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null);
+#endif //NETSTANDARD2_0
+
+
+        /// <summary>
+        /// 获取实体列表
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回据列表，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        IList<T> GetList<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
+#else
+        IList<T>? GetList<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters);
 #endif //NETSTANDARD2_0
 
         /// <summary>
         /// 获取实体列表
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回据列表，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        IList<T> GetList<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        IList<T> GetList<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
 #else
-        IList<T>? GetList<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        IList<T>? GetList<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null);
 #endif //NETSTANDARD2_0
+
         /// <summary>
         /// 获取实体列表
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="tran">数据库事务对象实例。</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回据列表，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        IList<T> GetList<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        IList<T> GetList<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
 #else
-        IList<T>? GetList<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        IList<T>? GetList<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters);
 #endif //NETSTANDARD2_0
+
         /// <summary>
         /// 获取实体列表
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回据列表，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        IList<T> GetList<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
+#else
+        IList<T>? GetList<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 获取实体列表
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据列表，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        IList<T> GetList<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        IList<T> GetList<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
 #else
-        IList<T>? GetList<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        IList<T>? GetList<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 获取实体列表
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据列表，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        IList<T> GetList<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
+#else
+        IList<T>? GetList<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 获取实体列表
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回据列表，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        IList<T> GetList<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
+#else
+        IList<T>? GetList<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 获取实体列表
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回据列表，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        IList<T> GetList<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
+#else
+        IList<T>? GetList<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 获取实体列表
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回据列表，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        IList<T> GetList<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
+#else
+        IList<T>? GetList<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 获取实体列表
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回据列表，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        IList<T> GetList<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
+#else
+        IList<T>? GetList<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 获取实体列表
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据列表，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        IList<T> GetList<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
+#else
+        IList<T>? GetList<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 获取实体列表
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据列表，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        IList<T> GetList<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
+#else
+        IList<T>? GetList<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null);
 #endif //NETSTANDARD2_0
 
         /// <summary>
         /// 异步获取实体列表
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回据列表，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        Task<IList<T>> GetListAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<IList<T>> GetListAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
 #else
-        Task<IList<T>?> GetListAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
-#endif //NETSTANDARD2_0
-        /// <summary>
-        /// 异步获取实体列表
-        /// </summary>
-        /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="tran">数据库事务对象实例。</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
-        /// <param name="cancellationToken">通知任务取消的令牌。</param>
-        /// <param name="parameters">参数集合</param>
-        /// <returns>返回据列表，没有数据返回null</returns>
-#if NETSTANDARD2_0
-        Task<IList<T>> GetListAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
-#else
-        Task<IList<T>?> GetListAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
-#endif //NETSTANDARD2_0
-        /// <summary>
-        /// 异步获取实体列表
-        /// </summary>
-        /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
-        /// <param name="cancellationToken">通知任务取消的令牌。</param>
-        /// <param name="parameters">参数集合</param>
-        /// <returns>返回据列表，没有数据返回null</returns>
-#if NETSTANDARD2_0
-        Task<IList<T>> GetListAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
-#else
-        Task<IList<T>?> GetListAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<IList<T>?> GetListAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters);
 #endif //NETSTANDARD2_0
 
         /// <summary>
         /// 异步获取实体列表
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回据列表，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        Task<IList<T>> GetListAsync<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<IList<T>> GetListAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
 #else
-        Task<IList<T>?> GetListAsync<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
-#endif //NETSTANDARD2_0
-        /// <summary>
-        /// 异步获取实体列表
-        /// </summary>
-        /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="tran">数据库事务对象实例。</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
-        /// <param name="cancellationToken">通知任务取消的令牌。</param>
-        /// <param name="parameters">参数集合</param>
-        /// <returns>返回据列表，没有数据返回null</returns>
-#if NETSTANDARD2_0
-        Task<IList<T>> GetListAsync<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
-#else
-        Task<IList<T>?> GetListAsync<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
-#endif //NETSTANDARD2_0
-        /// <summary>
-        /// 异步获取实体列表
-        /// </summary>
-        /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
-        /// <param name="cancellationToken">通知任务取消的令牌。</param>
-        /// <param name="parameters">参数集合</param>
-        /// <returns>返回据列表，没有数据返回null</returns>
-#if NETSTANDARD2_0
-        Task<IList<T>> GetListAsync<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
-#else
-        Task<IList<T>?> GetListAsync<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<IList<T>?> GetListAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
 #endif //NETSTANDARD2_0
 
         /// <summary>
         /// 异步获取实体列表
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回据列表，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        Task<IList<T>> GetListAsync<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<IList<T>> GetListAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
 #else
-        Task<IList<T>?> GetListAsync<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<IList<T>?> GetListAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters);
 #endif //NETSTANDARD2_0
+
         /// <summary>
         /// 异步获取实体列表
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="tran">数据库事务对象实例。</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回据列表，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        Task<IList<T>> GetListAsync<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<IList<T>> GetListAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
 #else
-        Task<IList<T>?> GetListAsync<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<IList<T>?> GetListAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
 #endif //NETSTANDARD2_0
+
         /// <summary>
         /// 异步获取实体列表
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回据列表，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        Task<IList<T>> GetListAsync<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<IList<T>> GetListAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
 #else
-        Task<IList<T>?> GetListAsync<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<IList<T>?> GetListAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 异步获取实体列表
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回据列表，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<IList<T>> GetListAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
+#else
+        Task<IList<T>?> GetListAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 异步获取实体列表
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回据列表，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<IList<T>> GetListAsync<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#else
+        Task<IList<T>?> GetListAsync<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 异步获取实体列表
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回据列表，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<IList<T>> GetListAsync<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
+#else
+        Task<IList<T>?> GetListAsync<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 异步获取实体列表
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回据列表，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<IList<T>> GetListAsync<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#else
+        Task<IList<T>?> GetListAsync<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 异步获取实体列表
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回据列表，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<IList<T>> GetListAsync<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
+#else
+        Task<IList<T>?> GetListAsync<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 异步获取实体列表
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回据列表，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<IList<T>> GetListAsync<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#else
+        Task<IList<T>?> GetListAsync<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 异步获取实体列表
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回据列表，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<IList<T>> GetListAsync<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
+#else
+        Task<IList<T>?> GetListAsync<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 异步获取实体列表
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回据列表，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<IList<T>> GetListAsync<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#else
+        Task<IList<T>?> GetListAsync<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 异步获取实体列表
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回据列表，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<IList<T>> GetListAsync<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
+#else
+        Task<IList<T>?> GetListAsync<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 异步获取实体列表
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回据列表，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<IList<T>> GetListAsync<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#else
+        Task<IList<T>?> GetListAsync<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 异步获取实体列表
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回据列表，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<IList<T>> GetListAsync<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
+#else
+        Task<IList<T>?> GetListAsync<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 异步获取实体列表
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回据列表，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<IList<T>> GetListAsync<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#else
+        Task<IList<T>?> GetListAsync<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 异步获取实体列表
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回据列表，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<IList<T>> GetListAsync<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
+#else
+        Task<IList<T>?> GetListAsync<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
 #endif //NETSTANDARD2_0
 
 
@@ -1638,281 +3052,560 @@ namespace Sweety.Common.DataProvider
         /// 获取实体集
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        ISet<T> GetSet<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ISet<T> GetSet<T>(string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
 #else
-        ISet<T>? GetSet<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ISet<T>? GetSet<T>(string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters);
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 获取实体集
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="tran">数据库事务对象实例。</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        ISet<T> GetSet<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ISet<T> GetSet<T>(string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
 #else
-        ISet<T>? GetSet<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ISet<T>? GetSet<T>(string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null);
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 获取实体集
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        ISet<T> GetSet<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ISet<T> GetSet<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
 #else
-        ISet<T>? GetSet<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ISet<T>? GetSet<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters);
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 获取实体集
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="cmdText">SQL命令</param>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        ISet<T> GetSet<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
+#else
+        ISet<T>? GetSet<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 获取实体集
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        ISet<T> GetSet<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
+#else
+        ISet<T>? GetSet<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 获取实体集
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        ISet<T> GetSet<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
+#else
+        ISet<T>? GetSet<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 获取实体集
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="commandText">SQL命令</param>
         /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
         /// <param name="customAssignMethod">特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        ISet<T> GetSet<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ISet<T> GetSet<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
 #else
-        ISet<T>? GetSet<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ISet<T>? GetSet<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters);
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 获取实体集
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="tran">数据库事务对象实例。</param>
-        /// <param name="cmdText">SQL命令</param>
+        /// <param name="commandText">SQL命令</param>
         /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
         /// <param name="customAssignMethod">特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        ISet<T> GetSet<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ISet<T> GetSet<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
 #else
-        ISet<T>? GetSet<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ISet<T>? GetSet<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null);
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 获取实体集
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">SQL命令</param>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
         /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
         /// <param name="customAssignMethod">特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        ISet<T> GetSet<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ISet<T> GetSet<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
 #else
-        ISet<T>? GetSet<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ISet<T>? GetSet<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters);
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 获取实体集
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        ISet<T> GetSet<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ISet<T> GetSet<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
 #else
-        ISet<T>? GetSet<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ISet<T>? GetSet<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null);
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 获取实体集
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="tran">数据库事务对象实例。</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        ISet<T> GetSet<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ISet<T> GetSet<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
 #else
-        ISet<T>? GetSet<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ISet<T>? GetSet<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters);
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 获取实体集
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        ISet<T> GetSet<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ISet<T> GetSet<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
 #else
-        ISet<T>? GetSet<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ISet<T>? GetSet<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 获取实体集
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        ISet<T> GetSet<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
+#else
+        ISet<T>? GetSet<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 获取实体集
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        ISet<T> GetSet<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
+#else
+        ISet<T>? GetSet<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 获取实体集
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        ISet<T> GetSet<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
+#else
+        ISet<T>? GetSet<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 获取实体集
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        ISet<T> GetSet<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
+#else
+        ISet<T>? GetSet<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 获取实体集
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        ISet<T> GetSet<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
+#else
+        ISet<T>? GetSet<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 获取实体集
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        ISet<T> GetSet<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
+#else
+        ISet<T>? GetSet<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null);
 #endif //NETSTANDARD2_0
 
         /// <summary>
         /// 异步获取实体集
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        Task<ISet<T>> GetSetAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<ISet<T>> GetSetAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
 #else
-        Task<ISet<T>?> GetSetAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<ISet<T>?> GetSetAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters);
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 异步获取实体集
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="tran">数据库事务对象实例。</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        Task<ISet<T>> GetSetAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<ISet<T>> GetSetAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
 #else
-        Task<ISet<T>?> GetSetAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<ISet<T>?> GetSetAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 异步获取实体集
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        Task<ISet<T>> GetSetAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<ISet<T>> GetSetAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
 #else
-        Task<ISet<T>?> GetSetAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<ISet<T>?> GetSetAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters);
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 异步获取实体集
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="cmdText">SQL命令</param>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<ISet<T>> GetSetAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
+#else
+        Task<ISet<T>?> GetSetAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 异步获取实体集
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<ISet<T>> GetSetAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#else
+        Task<ISet<T>?> GetSetAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 异步获取实体集
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<ISet<T>> GetSetAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
+#else
+        Task<ISet<T>?> GetSetAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 异步获取实体集
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="commandText">SQL命令</param>
         /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
         /// <param name="customAssignMethod">特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        Task<ISet<T>> GetSetAsync<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<ISet<T>> GetSetAsync<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
 #else
-        Task<ISet<T>?> GetSetAsync<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<ISet<T>?> GetSetAsync<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters);
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 异步获取实体集
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="tran">数据库事务对象实例。</param>
-        /// <param name="cmdText">SQL命令</param>
+        /// <param name="commandText">SQL命令</param>
         /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
         /// <param name="customAssignMethod">特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        Task<ISet<T>> GetSetAsync<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<ISet<T>> GetSetAsync<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
 #else
-        Task<ISet<T>?> GetSetAsync<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<ISet<T>?> GetSetAsync<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 异步获取实体集
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">SQL命令</param>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
         /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
         /// <param name="customAssignMethod">特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        Task<ISet<T>> GetSetAsync<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<ISet<T>> GetSetAsync<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
 #else
-        Task<ISet<T>?> GetSetAsync<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<ISet<T>?> GetSetAsync<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters);
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 异步获取实体集
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        Task<ISet<T>> GetSetAsync<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<ISet<T>> GetSetAsync<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
 #else
-        Task<ISet<T>?> GetSetAsync<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<ISet<T>?> GetSetAsync<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 异步获取实体集
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="tran">数据库事务对象实例。</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        Task<ISet<T>> GetSetAsync<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<ISet<T>> GetSetAsync<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
 #else
-        Task<ISet<T>?> GetSetAsync<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<ISet<T>?> GetSetAsync<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters);
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 异步获取实体集
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        Task<ISet<T>> GetSetAsync<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<ISet<T>> GetSetAsync<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
 #else
-        Task<ISet<T>?> GetSetAsync<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<ISet<T>?> GetSetAsync<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 异步获取实体集
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<ISet<T>> GetSetAsync<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#else
+        Task<ISet<T>?> GetSetAsync<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 异步获取实体集
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<ISet<T>> GetSetAsync<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
+#else
+        Task<ISet<T>?> GetSetAsync<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 异步获取实体集
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<ISet<T>> GetSetAsync<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#else
+        Task<ISet<T>?> GetSetAsync<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 异步获取实体集
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<ISet<T>> GetSetAsync<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
+#else
+        Task<ISet<T>?> GetSetAsync<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 异步获取实体集
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<ISet<T>> GetSetAsync<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#else
+        Task<ISet<T>?> GetSetAsync<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 异步获取实体集
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<ISet<T>> GetSetAsync<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
+#else
+        Task<ISet<T>?> GetSetAsync<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
 #endif //NETSTANDARD2_0
 
 
@@ -1922,283 +3615,562 @@ namespace Sweety.Common.DataProvider
         /// 获取实体集合
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集合，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        ICollection<T> GetCollection<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ICollection<T> GetCollection<T>(string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
 #else
-        ICollection<T>? GetCollection<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ICollection<T>? GetCollection<T>(string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters);
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 获取实体集合
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="tran">数据库事务对象实例。</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集合，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        ICollection<T> GetCollection<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ICollection<T> GetCollection<T>(string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
 #else
-        ICollection<T>? GetCollection<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ICollection<T>? GetCollection<T>(string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null);
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 获取实体集合
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集合，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        ICollection<T> GetCollection<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ICollection<T> GetCollection<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
 #else
-        ICollection<T>? GetCollection<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ICollection<T>? GetCollection<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters);
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 获取实体集合
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="cmdText">SQL命令</param>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集合，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        ICollection<T> GetCollection<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
+#else
+        ICollection<T>? GetCollection<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 获取实体集合
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集合，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        ICollection<T> GetCollection<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
+#else
+        ICollection<T>? GetCollection<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 获取实体集合
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集合，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        ICollection<T> GetCollection<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
+#else
+        ICollection<T>? GetCollection<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 获取实体集合
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="commandText">SQL命令</param>
         /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
         /// <param name="customAssignMethod">特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集合，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        ICollection<T> GetCollection<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ICollection<T> GetCollection<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
 #else
-        ICollection<T>? GetCollection<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ICollection<T>? GetCollection<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters);
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 获取实体集合
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="tran">数据库事务对象实例。</param>
-        /// <param name="cmdText">SQL命令</param>
+        /// <param name="commandText">SQL命令</param>
         /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
         /// <param name="customAssignMethod">特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集合，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        ICollection<T> GetCollection<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ICollection<T> GetCollection<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
 #else
-        ICollection<T>? GetCollection<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ICollection<T>? GetCollection<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null);
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 获取实体集合
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">SQL命令</param>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
         /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
         /// <param name="customAssignMethod">特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集合，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        ICollection<T> GetCollection<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ICollection<T> GetCollection<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
 #else
-        ICollection<T>? GetCollection<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ICollection<T>? GetCollection<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters);
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 获取实体集合
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集合，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        ICollection<T> GetCollection<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ICollection<T> GetCollection<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
 #else
-        ICollection<T>? GetCollection<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ICollection<T>? GetCollection<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null);
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 获取实体集合
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="tran">数据库事务对象实例。</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集合，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        ICollection<T> GetCollection<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ICollection<T> GetCollection<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
 #else
-        ICollection<T>? GetCollection<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ICollection<T>? GetCollection<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters);
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 获取实体集合
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集合，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        ICollection<T> GetCollection<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ICollection<T> GetCollection<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
 #else
-        ICollection<T>? GetCollection<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters);
+        ICollection<T>? GetCollection<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 获取实体集合
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集合，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        ICollection<T> GetCollection<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
+#else
+        ICollection<T>? GetCollection<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 获取实体集合
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集合，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        ICollection<T> GetCollection<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
+#else
+        ICollection<T>? GetCollection<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 获取实体集合
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集合，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        ICollection<T> GetCollection<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
+#else
+        ICollection<T>? GetCollection<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 获取实体集合
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集合，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        ICollection<T> GetCollection<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
+#else
+        ICollection<T>? GetCollection<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 获取实体集合
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集合，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        ICollection<T> GetCollection<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] parameters);
+#else
+        ICollection<T>? GetCollection<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? parameters);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 获取实体集合
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集合，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        ICollection<T> GetCollection<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> parameters = null);
+#else
+        ICollection<T>? GetCollection<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? parameters = null);
 #endif //NETSTANDARD2_0
 
         /// <summary>
         /// 异步获取实体集合
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集合，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        Task<ICollection<T>> GetCollectionAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<ICollection<T>> GetCollectionAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
 #else
-        Task<ICollection<T>?> GetCollectionAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<ICollection<T>?> GetCollectionAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters);
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 异步获取实体集合
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="tran">数据库事务对象实例。</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集合，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        Task<ICollection<T>> GetCollectionAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<ICollection<T>> GetCollectionAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
 #else
-        Task<ICollection<T>?> GetCollectionAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<ICollection<T>?> GetCollectionAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 异步获取实体集合
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集合，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        Task<ICollection<T>> GetCollectionAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<ICollection<T>> GetCollectionAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
 #else
-        Task<ICollection<T>?> GetCollectionAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
-#endif //NETSTANDARD2_0
-
-        /// <summary>
-        /// 异步获取实体集合
-        /// </summary>
-        /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
-        /// <param name="cancellationToken">通知任务取消的令牌。</param>
-        /// <param name="parameters">参数集合</param>
-        /// <returns>返回数据集合，没有数据返回null</returns>
-#if NETSTANDARD2_0
-        Task<ICollection<T>> GetCollectionAsync<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
-#else
-        Task<ICollection<T>?> GetCollectionAsync<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<ICollection<T>?> GetCollectionAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters);
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 异步获取实体集合
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="tran">数据库事务对象实例。</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集合，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        Task<ICollection<T>> GetCollectionAsync<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<ICollection<T>> GetCollectionAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
 #else
-        Task<ICollection<T>?> GetCollectionAsync<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<ICollection<T>?> GetCollectionAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 异步获取实体集合
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集合，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        Task<ICollection<T>> GetCollectionAsync<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<ICollection<T>> GetCollectionAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
 #else
-        Task<ICollection<T>?> GetCollectionAsync<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<ICollection<T>?> GetCollectionAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 异步获取实体集合
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集合，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<ICollection<T>> GetCollectionAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
+#else
+        Task<ICollection<T>?> GetCollectionAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
 #endif //NETSTANDARD2_0
 
         /// <summary>
         /// 异步获取实体集合
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集合，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        Task<ICollection<T>> GetCollectionAsync<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<ICollection<T>> GetCollectionAsync<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
 #else
-        Task<ICollection<T>?> GetCollectionAsync<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<ICollection<T>?> GetCollectionAsync<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters);
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 异步获取实体集合
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="tran">数据库事务对象实例。</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集合，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        Task<ICollection<T>> GetCollectionAsync<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<ICollection<T>> GetCollectionAsync<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
 #else
-        Task<ICollection<T>?> GetCollectionAsync<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<ICollection<T>?> GetCollectionAsync<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
 #endif //NETSTANDARD2_0
         /// <summary>
         /// 异步获取实体集合
         /// </summary>
         /// <typeparam name="T">实体类型</typeparam>
-        /// <param name="conn">数据库链接对象</param>
-        /// <param name="cmdText">SQL命令</param>
-        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
-        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
-        /// <param name="cmdType">命令类型</param>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <param name="parameters">参数集合</param>
         /// <returns>返回数据集合，没有数据返回null</returns>
 #if NETSTANDARD2_0
-        Task<ICollection<T>> GetCollectionAsync<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<ICollection<T>> GetCollectionAsync<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
 #else
-        Task<ICollection<T>?> GetCollectionAsync<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+        Task<ICollection<T>?> GetCollectionAsync<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 异步获取实体集合
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集合，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<ICollection<T>> GetCollectionAsync<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
+#else
+        Task<ICollection<T>?> GetCollectionAsync<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 异步获取实体集合
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集合，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<ICollection<T>> GetCollectionAsync<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#else
+        Task<ICollection<T>?> GetCollectionAsync<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 异步获取实体集合
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldName">要忽略赋值的列名，因为该列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集合，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<ICollection<T>> GetCollectionAsync<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
+#else
+        Task<ICollection<T>?> GetCollectionAsync<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 异步获取实体集合
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集合，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<ICollection<T>> GetCollectionAsync<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#else
+        Task<ICollection<T>?> GetCollectionAsync<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 异步获取实体集合
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集合，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<ICollection<T>> GetCollectionAsync<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
+#else
+        Task<ICollection<T>?> GetCollectionAsync<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 异步获取实体集合
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集合，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<ICollection<T>> GetCollectionAsync<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#else
+        Task<ICollection<T>?> GetCollectionAsync<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 异步获取实体集合
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="transaction">数据库事务对象实例。</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集合，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<ICollection<T>> GetCollectionAsync<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
+#else
+        Task<ICollection<T>?> GetCollectionAsync<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 异步获取实体集合
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集合，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<ICollection<T>> GetCollectionAsync<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters);
+#else
+        Task<ICollection<T>?> GetCollectionAsync<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? parameters);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 异步获取实体集合
+        /// </summary>
+        /// <typeparam name="T">实体类型</typeparam>
+        /// <param name="connection">数据库链接对象</param>
+        /// <param name="commandText">SQL命令</param>
+        /// <param name="ignoreFieldNames">要忽略赋值的列名，因为这些列不需要赋值或在<paramref name="customAssignMethod"/>里进行赋值。</param>
+        /// <param name="customAssignMethod">键为<typeparamref name="T"/>成员属性名，值为特殊的赋值方法。</param>
+        /// <param name="commandType">命令类型</param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <param name="parameters">参数集合</param>
+        /// <returns>返回数据集合，没有数据返回null</returns>
+#if NETSTANDARD2_0
+        Task<ICollection<T>> GetCollectionAsync<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> parameters = null);
+#else
+        Task<ICollection<T>?> GetCollectionAsync<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? parameters = null);
 #endif //NETSTANDARD2_0
     }
 }

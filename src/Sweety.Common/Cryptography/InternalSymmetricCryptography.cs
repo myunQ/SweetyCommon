@@ -13,8 +13,6 @@
  * * * * * * * * * * * * * * * * * * * * */
 
 
-[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Sweety.Common.Tests")]
-
 namespace Sweety.Common.Cryptography
 {
     using System;

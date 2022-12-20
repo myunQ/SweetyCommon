@@ -117,16 +117,46 @@ namespace Sweety.Common.DataProvider
         protected object _funBuildCollectionInstance = null; //Func<T>
         protected object _funBuildDictionaryInstance = null; //Func<T>
 #else
+        /// <summary>
+        /// 将数据填充到该实例。
+        /// </summary>
         protected object? _modelInstance = null;              //model object.
+        /// <summary>
+        /// 将填充了数据的实例添加到该列表实例。
+        /// </summary>
         protected object? _listInstance = null;               //IList<T>
+        /// <summary>
+        /// 将填充了数据的实例添加到该集实例。
+        /// </summary>
         protected object? _setInstance = null;                //ISet<T>
+        /// <summary>
+        /// 将填充了数据的实例添加到该集合实例。
+        /// </summary>
         protected object? _collectionInstance = null;         //ICollection<T>
+        /// <summary>
+        /// 将填充了数据的实例添加到该键值对实例。
+        /// </summary>
         protected object? _dictionaryInstance = null;         //IDictionary<TKey, TValue>
 
+        /// <summary>
+        /// 一个返回模型实例的委托，将数据填充到该委托返回的实例。
+        /// </summary>
         protected object? _funBuildModelInstance = null;      //Func<T>
+        /// <summary>
+        /// 一个返回模型列表实例的委托，将填充了数据的实例添加到该委托返回的模型列表实例。
+        /// </summary>
         protected object? _funBuildListInstance = null;       //Func<T>
+        /// <summary>
+        /// 一个返回模型集实例的委托，将填充了数据的实例添加到该委托返回的模型集实例。
+        /// </summary>
         protected object? _funBuildSetInstance = null;        //Func<T>
+        /// <summary>
+        /// 一个返回模型集合实例的委托，将填充了数据的实例添加到该委托返回的模型集合实例。
+        /// </summary>
         protected object? _funBuildCollectionInstance = null; //Func<T>
+        /// <summary>
+        /// 一个返回键值对模型集合实例的委托，将填充了数据的实例添加到该委托返回的键值对模型集合实例。
+        /// </summary>
         protected object? _funBuildDictionaryInstance = null; //Func<T>
 #endif //NETSTANDARD2_0
 
@@ -233,6 +263,9 @@ namespace Sweety.Common.DataProvider
         /// </summary>
         public bool BreakWhenParametersElementIsNull { get; set; } = true;
 
+        /// <summary>
+        /// 获取或设置目标数据库角色。
+        /// </summary>
         public virtual DatabaseServerRole TargetRole
         {
             get => _targetRole;
@@ -249,6 +282,9 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 获取当前操作的数据库服务器索引。
+        /// </summary>
         public int ServerIndex
         {
             get
@@ -542,14 +578,14 @@ namespace Sweety.Common.DataProvider
         }
 
 
-        public virtual string[] GetSqlInExpressions(IEnumerable<string> parameters)
+        public virtual string[] GetSqlInExpressions(IEnumerable<string> commandParameters)
         {
-            return GetSqlInExpressions(parameters, out _);
+            return GetSqlInExpressions(commandParameters, out _);
         }
 
-        public virtual string[] GetSqlInExpressions(IEnumerable<string> parameters, out int parameterCount)
+        public virtual string[] GetSqlInExpressions(IEnumerable<string> commandParameters, out int parameterCount)
         {
-            parameterCount = parameters.Count();
+            parameterCount = commandParameters.Count();
 
             int arrLength = parameterCount / SqlInParameterMaximumLength;
 
@@ -563,7 +599,7 @@ namespace Sweety.Common.DataProvider
             string[] result = new string[arrLength];
             StringBuilder strBuilder = new StringBuilder(1024);
 
-            foreach (var p in parameters)
+            foreach (var p in commandParameters)
             {
                 strBuilder.Append('\'');
                 strBuilder.Append(SafeHandler(p));
@@ -592,14 +628,14 @@ namespace Sweety.Common.DataProvider
         }
 
 
-        public virtual string[] GetSqlInExpressions<T>(IEnumerable<T> parameters) where T : struct
+        public virtual string[] GetSqlInExpressions<T>(IEnumerable<T> commandParameters) where T : struct
         {
-            return GetSqlInExpressions<T>(parameters, out _);
+            return GetSqlInExpressions<T>(commandParameters, out _);
         }
 
-        public virtual string[] GetSqlInExpressions<T>(IEnumerable<T> parameters, out int parameterCount) where T : struct
+        public virtual string[] GetSqlInExpressions<T>(IEnumerable<T> commandParameters, out int parameterCount) where T : struct
         {
-            parameterCount = parameters.Count();
+            parameterCount = commandParameters.Count();
 
             int arrLength = parameterCount / SqlInParameterMaximumLength;
 
@@ -615,7 +651,7 @@ namespace Sweety.Common.DataProvider
             Type tType = typeof(T);
             bool needQuotes = tType == typeof(Guid) || tType == typeof(DateTime);
 
-            foreach (var p in parameters)
+            foreach (var p in commandParameters)
             {
                 if (needQuotes)
                 {
@@ -743,40 +779,11 @@ namespace Sweety.Common.DataProvider
 
         public abstract IDbCommand BuildCommand();
 
-        public abstract IDbCommand BuildCommand(IDbConnection conn);
+        public abstract IDbCommand BuildCommand(IDbConnection connection);
 
 
 
-        /// <summary>
-        /// 使用默认数据库链接对象创建数据库事务对象实例。
-        /// </summary>
-        /// <returns>数据库事务对象实例。</returns>
-        [Obsolete("这个方法即将在新的版本中被移除。因为使用词方法极为容易导致数据库链接未关闭的情况。除非您主动从事务对象中获取链接对象并确保在不使用时关闭。")]
-        public abstract IDbTransaction BuildTransaction();
-        /// <summary>
-        /// 使用默认数据库链接对象和指定的事务隔离级别创建数据库事务对象实例。
-        /// </summary>
-        /// <param name="level">事务隔离级别。</param>
-        /// <returns>数据库事务对象实例。</returns>
-        [Obsolete("这个方法即将在新的版本中被移除。因为使用词方法极为容易导致数据库链接未关闭的情况。除非您主动从事务对象中获取链接对象并确保在不使用时关闭。")]
-        public abstract IDbTransaction BuildTransaction(IsolationLevel level);
-
-        /// <summary>
-        /// 使用默认数据库链接对象创建数据库事务对象实例。
-        /// </summary>
-        /// <param name="cancellationToken">表示异步任务是否取消的令牌。</param>
-        /// <returns>数据库事务对象实例。</returns>
-        [Obsolete("这个方法即将在新的版本中被移除。因为使用词方法极为容易导致数据库链接未关闭的情况。除非您主动从事务对象中获取链接对象并确保在不使用时关闭。")]
-        public abstract Task<IDbTransaction> BuildTransactionAsync(CancellationToken cancellationToken = default);
-        /// <summary>
-        /// 使用默认数据库链接对象和指定的事务隔离级别创建数据库事务对象实例。
-        /// </summary>
-        /// <param name="level">事务隔离级别。</param>
-        /// <param name="cancellationToken">表示异步任务是否取消的令牌。</param>
-        /// <returns>数据库事务对象实例。</returns>
-        [Obsolete("这个方法即将在新的版本中被移除。因为使用词方法极为容易导致数据库链接未关闭的情况。除非您主动从事务对象中获取链接对象并确保在不使用时关闭。")]
-        public abstract Task<IDbTransaction> BuildTransactionAsync(IsolationLevel level, CancellationToken cancellationToken = default);
-
+        
 
         /// <summary>
         /// 创建一个参数对象实例。
@@ -915,175 +922,454 @@ namespace Sweety.Common.DataProvider
 #endif //NETSTANDARD2_0
 
 
-
-        public virtual int ExecuteNonQuery(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
-        {
-            return ExecuteNonQuery(BuildConnection(), null, cmdType, cmdText, parameters);
-        }
-
-        public virtual int ExecuteNonQuery(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
-        {
-            return ExecuteNonQuery(tran.Connection, tran, cmdType, cmdText, parameters);
-        }
-
-        public virtual int ExecuteNonQuery(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
-        {
-            return ExecuteNonQuery(conn, null, cmdType, cmdText, parameters);
-        }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public Task<int> ExecuteNonQueryAsync(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual int ExecuteNonQuery(string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+            => ExecuteNonQuery(BuildConnection(), commandText, commandType, (IEnumerable<IDataParameter>)commandParameters);
 #else
-        public ValueTask<int> ExecuteNonQueryAsync(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual int ExecuteNonQuery(string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+            => ExecuteNonQuery(BuildConnection(), commandText, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
 #endif
-        {
-            return ExecuteNonQueryAsync(BuildConnection(), null, cmdType, cmdText, parameters, cancellationToken);
-        }
 
+//#if NETSTANDARD2_0
+//        public virtual int ExecuteNonQuery(string commandText, CommandType commandType = CommandType.Text, IParameterList<IDataParameter> commandParameters = null)
+//            => ExecuteNonQuery(BuildConnection(), commandText, commandType, (IEnumerable<IDataParameter>)commandParameters);
+//#else
+//        public virtual int ExecuteNonQuery(string commandText, CommandType commandType = CommandType.Text, IParameterList<IDataParameter>? commandParameters = null)
+//            => ExecuteNonQuery(BuildConnection(), commandText, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+//#endif
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public Task<int> ExecuteNonQueryAsync(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual int ExecuteNonQuery(string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null)
 #else
-        public ValueTask<int> ExecuteNonQueryAsync(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual int ExecuteNonQuery(string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
 #endif
-        {
-            return ExecuteNonQueryAsync(null, tran, cmdType, cmdText, parameters, cancellationToken);
-        }
-
+            => ExecuteNonQuery(BuildConnection(), commandText, commandType, commandParameters);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public Task<int> ExecuteNonQueryAsync(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual int ExecuteNonQuery(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+            => ExecuteNonQuery(transaction, commandText, commandType, (IEnumerable<IDataParameter>)commandParameters);
 #else
-        public ValueTask<int> ExecuteNonQueryAsync(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual int ExecuteNonQuery(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+            => ExecuteNonQuery(transaction, commandText, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
 #endif
-        {
-            return ExecuteNonQueryAsync(conn, null, cmdType, cmdText, parameters, cancellationToken);
-        }
+
+//#if NETSTANDARD2_0
+//        public virtual int ExecuteNonQuery(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IParameterList<IDataParameter> commandParameters = null)
+//            => ExecuteNonQuery(transaction, commandText, commandType, (IEnumerable<IDataParameter>)commandParameters);
+//#else
+//        public virtual int ExecuteNonQuery(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IParameterList<IDataParameter>? commandParameters = null)
+//            => ExecuteNonQuery(transaction, commandText, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+//#endif
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public abstract int ExecuteNonQuery(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null);
+#else
+        public abstract int ExecuteNonQuery(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null);
+#endif
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual int ExecuteNonQuery(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+            => ExecuteNonQuery(connection, commandText, commandType, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual int ExecuteNonQuery(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+            => ExecuteNonQuery(connection, commandText, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif
+
+//#if NETSTANDARD2_0
+//        public virtual int ExecuteNonQuery(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IParameterList<IDataParameter> commandParameters = null)
+//            => ExecuteNonQuery(connection, commandText, commandType, (IEnumerable<IDataParameter>)commandParameters);
+//#else
+//        public virtual int ExecuteNonQuery(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IParameterList<IDataParameter>? commandParameters = null)
+//            => ExecuteNonQuery(connection, commandText, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+//#endif
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public abstract int ExecuteNonQuery(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null);
+#else
+        public abstract int ExecuteNonQuery(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null);
+#endif
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public Task<int> ExecuteNonQueryAsync(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => ExecuteNonQueryAsync(BuildConnection(), commandText, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public Task<int> ExecuteNonQueryAsync(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            => ExecuteNonQueryAsync(BuildConnection(), commandText, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public Task<int> ExecuteNonQueryAsync(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
+#else
+        public Task<int> ExecuteNonQueryAsync(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
+#endif
+            => ExecuteNonQueryAsync(BuildConnection(), commandText, commandType, cancellationToken, commandParameters);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public Task<int> ExecuteNonQueryAsync(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => ExecuteNonQueryAsync(transaction, commandText, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public Task<int> ExecuteNonQueryAsync(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            => ExecuteNonQueryAsync(transaction, commandText, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public abstract Task<int> ExecuteNonQueryAsync(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null);
+#else
+        public abstract Task<int> ExecuteNonQueryAsync(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null);
+#endif
+
+#if NETSTANDARD2_0
+        public Task<int> ExecuteNonQueryAsync(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => ExecuteNonQueryAsync(connection, commandText, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public Task<int> ExecuteNonQueryAsync(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            => ExecuteNonQueryAsync(connection, commandText, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif
+
+#if NETSTANDARD2_0
+        public abstract Task<int> ExecuteNonQueryAsync(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null);
+#else
+        public abstract Task<int> ExecuteNonQueryAsync(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null);
+#endif
 
 
 
-        public virtual IDataReader GetReader(string cmdText, CommandType cmdType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, params IDataParameter[] parameters)
-        {
-            return ExecuteReader(BuildConnection(), commandBehavior | CommandBehavior.CloseConnection, cmdType, cmdText, parameters);
-        }
 
-        public virtual IDataReader GetReader(string cmdText, CommandType cmdType, CommandBehavior commandBehavior, out IDbCommand command, params IDataParameter[] parameters)
-        {
-            return ExecuteReader(BuildConnection(), commandBehavior | CommandBehavior.CloseConnection, cmdType, cmdText, parameters, out command);
-        }
+        public virtual IDataReader GetReader(IDbCommand command, CommandBehavior commandBehavior = CommandBehavior.Default, params IDataParameter[] commandParameters)
+            => ExecuteReader(command, commandParameters, commandBehavior);
 
-        public virtual IDataReader GetReader(IDbCommand command, CommandBehavior commandBehavior = CommandBehavior.Default, params IDataParameter[] parameters)
-        {
-            return ExecuteReader(command, parameters, commandBehavior);
-        }
+#if NETSTANDARD2_0
+        public virtual IDataReader GetReader(IDbCommand command, CommandBehavior commandBehavior = CommandBehavior.Default, IEnumerable<IDataParameter> commandParameters = null)
+#else
+        public virtual IDataReader GetReader(IDbCommand command, CommandBehavior commandBehavior = CommandBehavior.Default, IEnumerable<IDataParameter?>? commandParameters = null)
+#endif
+            => ExecuteReader(command, commandParameters, commandBehavior);
+        
 
+        public virtual IDataReader GetReader(string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, params IDataParameter[] commandParameters)
+            => ExecuteReader(BuildConnection(), commandBehavior | CommandBehavior.CloseConnection, commandType, commandText, commandParameters);
 
+#if NETSTANDARD2_0
+        public virtual IDataReader GetReader(string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, IEnumerable<IDataParameter> commandParameters = null)
+#else
+        public virtual IDataReader GetReader(string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, IEnumerable<IDataParameter?>? commandParameters = null)
+#endif
+            => ExecuteReader(BuildConnection(), commandBehavior | CommandBehavior.CloseConnection, commandType, commandText, commandParameters);
 
-        public virtual IDataReader GetReader(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, params IDataParameter[] parameters)
-        {
-            return ExecuteReader(conn, commandBehavior, cmdType, cmdText, parameters);
-        }
+        public virtual IDataReader GetReader(string commandText, CommandType commandType, CommandBehavior commandBehavior, out IDbCommand command, params IDataParameter[] commandParameters)
+            => ExecuteReader(BuildConnection(), commandBehavior | CommandBehavior.CloseConnection, commandType, commandText, commandParameters, out command);
 
-        public virtual IDataReader GetReader(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, params IDataParameter[] parameters)
-        {
-            return ExecuteReader(tran, commandBehavior, cmdType, cmdText, parameters);
-        }
+#if NETSTANDARD2_0
+        public virtual IDataReader GetReader(string commandText, CommandType commandType, CommandBehavior commandBehavior, out IDbCommand command, IEnumerable<IDataParameter> commandParameters = null)
+#else
+        public virtual IDataReader GetReader(string commandText, CommandType commandType, CommandBehavior commandBehavior, out IDbCommand command, IEnumerable<IDataParameter?>? commandParameters = null)
+#endif
+            => ExecuteReader(BuildConnection(), commandBehavior | CommandBehavior.CloseConnection, commandType, commandText, commandParameters, out command);
 
-        public virtual IDataReader GetReader(IDbConnection conn, string cmdText, CommandType cmdType, CommandBehavior commandBehavior, out IDbCommand command, params IDataParameter[] parameters)
-        {
-            return ExecuteReader(conn, commandBehavior, cmdType, cmdText, parameters, out command);
-        }
+        public virtual IDataReader GetReader(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, params IDataParameter[] commandParameters)
+            => ExecuteReader(connection, commandBehavior, commandType, commandText, commandParameters);
 
-        public virtual IDataReader GetReader(IDbTransaction tran, string cmdText, CommandType cmdType, CommandBehavior commandBehavior, out IDbCommand command, params IDataParameter[] parameters)
-        {
-            return ExecuteReader(tran, commandBehavior, cmdType, cmdText, parameters, out command);
-        }
+#if NETSTANDARD2_0
+        public virtual IDataReader GetReader(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, IEnumerable<IDataParameter> commandParameters = null)
+#else
+        public virtual IDataReader GetReader(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, IEnumerable<IDataParameter?>? commandParameters = null)
+#endif
+            => ExecuteReader(connection, commandBehavior, commandType, commandText, commandParameters);
 
-        public virtual Task<IDataReader> GetReaderAsync(string cmdText, CommandType cmdType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
-        {
-            return ExecuteReaderAsync(BuildConnection(), commandBehavior | CommandBehavior.CloseConnection, cmdType, cmdText, parameters, cancellationToken);
-        }
+        public virtual IDataReader GetReader(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, params IDataParameter[] commandParameters)
+            => ExecuteReader(transaction, commandBehavior, commandType, commandText, commandParameters);
 
-        public virtual Task<IDataReader> GetReaderAsync(IDbCommand command, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
-        {
-            return ExecuteReaderAsync(command, parameters, commandBehavior, cancellationToken);
-        }
+#if NETSTANDARD2_0
+        public virtual IDataReader GetReader(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, IEnumerable<IDataParameter> commandParameters = null)
+#else
+        public virtual IDataReader GetReader(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, IEnumerable<IDataParameter?>? commandParameters = null)
+#endif
+            => ExecuteReader(transaction, commandBehavior, commandType, commandText, commandParameters);
 
-        public virtual Task<IDataReader> GetReaderAsync(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
-        {
-            return ExecuteReaderAsync(conn, commandBehavior, cmdType, cmdText, parameters, cancellationToken);
-        }
+        public virtual IDataReader GetReader(IDbConnection connection, string commandText, CommandType commandType, CommandBehavior commandBehavior, out IDbCommand command, params IDataParameter[] commandParameters)
+            => ExecuteReader(connection, commandBehavior, commandType, commandText, commandParameters, out command);
 
-        public virtual Task<IDataReader> GetReaderAsync(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
-        {
-            return ExecuteReaderAsync(tran, commandBehavior, cmdType, cmdText, parameters, cancellationToken);
-        }
+#if NETSTANDARD2_0
+        public virtual IDataReader GetReader(IDbConnection connection, string commandText, CommandType commandType, CommandBehavior commandBehavior, out IDbCommand command, IEnumerable<IDataParameter> commandParameters = null)
+#else
+        public virtual IDataReader GetReader(IDbConnection connection, string commandText, CommandType commandType, CommandBehavior commandBehavior, out IDbCommand command, IEnumerable<IDataParameter?>? commandParameters = null)
+#endif
+            => ExecuteReader(connection, commandBehavior, commandType, commandText, commandParameters, out command);
 
-        public virtual Task<(IDataReader, IDbCommand)> GetReaderAndOutParametersAsync(string cmdText, CommandType cmdType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
-        {
-            return ExecuteReaderAndGetCommandAsync(BuildConnection(), commandBehavior | CommandBehavior.CloseConnection, cmdType, cmdText, parameters, cancellationToken);
-        }
+        public virtual IDataReader GetReader(IDbTransaction transaction, string commandText, CommandType commandType, CommandBehavior commandBehavior, out IDbCommand command, params IDataParameter[] commandParameters)
+            => ExecuteReader(transaction, commandBehavior, commandType, commandText, commandParameters, out command);
 
-        public virtual Task<(IDataReader, IDbCommand)> GetReaderAndOutParametersAsync(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
-        {
-            return ExecuteReaderAndGetCommandAsync(conn, commandBehavior, cmdType, cmdText, parameters, cancellationToken);
-        }
-
-        public virtual Task<(IDataReader, IDbCommand)> GetReaderAndOutParametersAsync(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
-        {
-            return ExecuteReaderAndGetCommandAsync(tran, commandBehavior, cmdType, cmdText, parameters, cancellationToken);
-        }
-
-
+#if NETSTANDARD2_0
+        public virtual IDataReader GetReader(IDbTransaction transaction, string commandText, CommandType commandType, CommandBehavior commandBehavior, out IDbCommand command, IEnumerable<IDataParameter> commandParameters = null)
+#else
+        public virtual IDataReader GetReader(IDbTransaction transaction, string commandText, CommandType commandType, CommandBehavior commandBehavior, out IDbCommand command, IEnumerable<IDataParameter?>? commandParameters = null)
+#endif
+            => ExecuteReader(transaction, commandBehavior, commandType, commandText, commandParameters, out command);
 
 
-        public virtual T GetScalar<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
-        {
-            return ObjectToScalar<T>(ExecuteScalar(BuildConnection(), null, cmdType, cmdText, parameters));
-        }
 
-        public virtual T GetScalar<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
-        {
-            return ObjectToScalar<T>(ExecuteScalar(tran.Connection, tran, cmdType, cmdText, parameters));
-        }
+        public virtual Task<IDataReader> GetReaderAsync(IDbCommand command, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => ExecuteReaderAsync(command, commandParameters, commandBehavior, cancellationToken);
 
-        public virtual T GetScalar<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
-        {
-            return ObjectToScalar<T>(ExecuteScalar(conn, null, cmdType, cmdText, parameters));
-        }
+#if NETSTANDARD2_0
+        public virtual Task<IDataReader> GetReaderAsync(IDbCommand command, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
+#else
+        public virtual Task<IDataReader> GetReaderAsync(IDbCommand command, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
+#endif
+            => ExecuteReaderAsync(command, commandParameters, commandBehavior, cancellationToken);
 
-        public virtual async Task<T> GetScalarAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
-        {
-            return ObjectToScalar<T>(await ExecuteScalarAsync(BuildConnection(), null, cmdType, cmdText, parameters, cancellationToken));
-        }
+        public virtual Task<IDataReader> GetReaderAsync(string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => ExecuteReaderAsync(BuildConnection(), commandBehavior | CommandBehavior.CloseConnection, commandType, commandText, commandParameters, cancellationToken);
 
-        public virtual async Task<T> GetScalarAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
-        {
-            return ObjectToScalar<T>(await ExecuteScalarAsync(tran.Connection, tran, cmdType, cmdText, parameters, cancellationToken));
-        }
+#if NETSTANDARD2_0
+        public virtual Task<IDataReader> GetReaderAsync(string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
+#else
+        public virtual Task<IDataReader> GetReaderAsync(string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
+#endif
+            => ExecuteReaderAsync(BuildConnection(), commandBehavior | CommandBehavior.CloseConnection, commandType, commandText, commandParameters, cancellationToken);
 
-        public virtual async Task<T> GetScalarAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
-        {
-            return ObjectToScalar<T>(await ExecuteScalarAsync(conn, null, cmdType, cmdText, parameters, cancellationToken));
-        }
+        public virtual Task<IDataReader> GetReaderAsync(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => ExecuteReaderAsync(connection, commandBehavior, commandType, commandText, commandParameters, cancellationToken);
 
+#if NETSTANDARD2_0
+        public virtual Task<IDataReader> GetReaderAsync(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
+#else
+        public virtual Task<IDataReader> GetReaderAsync(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
+#endif
+            => ExecuteReaderAsync(connection, commandBehavior, commandType, commandText, commandParameters, cancellationToken);
+
+        public virtual Task<IDataReader> GetReaderAsync(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => ExecuteReaderAsync(transaction, commandBehavior, commandType, commandText, commandParameters, cancellationToken);
+
+#if NETSTANDARD2_0
+        public virtual Task<IDataReader> GetReaderAsync(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
+#else
+        public virtual Task<IDataReader> GetReaderAsync(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
+#endif
+            => ExecuteReaderAsync(transaction, commandBehavior, commandType, commandText, commandParameters, cancellationToken);
+
+        public virtual Task<(IDataReader, IDbCommand)> GetReaderAndOutParametersAsync(string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => ExecuteReaderAndGetCommandAsync(BuildConnection(), commandBehavior | CommandBehavior.CloseConnection, commandType, commandText, commandParameters, cancellationToken);
+
+#if NETSTANDARD2_0
+        public virtual Task<(IDataReader, IDbCommand)> GetReaderAndOutParametersAsync(string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
+#else
+        public virtual Task<(IDataReader, IDbCommand)> GetReaderAndOutParametersAsync(string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
+#endif
+            => ExecuteReaderAndGetCommandAsync(BuildConnection(), commandBehavior | CommandBehavior.CloseConnection, commandType, commandText, commandParameters, cancellationToken);
+
+        public virtual Task<(IDataReader, IDbCommand)> GetReaderAndOutParametersAsync(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => ExecuteReaderAndGetCommandAsync(connection, commandBehavior, commandType, commandText, commandParameters, cancellationToken);
+
+#if NETSTANDARD2_0
+        public virtual Task<(IDataReader, IDbCommand)> GetReaderAndOutParametersAsync(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
+#else
+        public virtual Task<(IDataReader, IDbCommand)> GetReaderAndOutParametersAsync(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
+#endif
+            => ExecuteReaderAndGetCommandAsync(connection, commandBehavior, commandType, commandText, commandParameters, cancellationToken);
+
+        public virtual Task<(IDataReader, IDbCommand)> GetReaderAndOutParametersAsync(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => ExecuteReaderAndGetCommandAsync(transaction, commandBehavior, commandType, commandText, commandParameters, cancellationToken);
+
+#if NETSTANDARD2_0
+        public virtual Task<(IDataReader, IDbCommand)> GetReaderAndOutParametersAsync(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
+#else
+        public virtual Task<(IDataReader, IDbCommand)> GetReaderAndOutParametersAsync(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CommandBehavior commandBehavior = CommandBehavior.Default, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
+#endif
+            => ExecuteReaderAndGetCommandAsync(transaction, commandBehavior, commandType, commandText, commandParameters, cancellationToken);
+
+
+
+#if NET5_0_OR_GREATER
+        public virtual T? GetScalar<T>(string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+#else
+        public virtual T GetScalar<T>(string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+#endif
+            => ObjectToScalar<T>(ExecuteScalar(BuildConnection(), commandText, commandType, commandParameters));
+
+#if NET5_0_OR_GREATER
+        public virtual T? GetScalar<T>(string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
+#else
+        public virtual T GetScalar<T>(string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null)
+#endif
+            => ObjectToScalar<T>(ExecuteScalar(BuildConnection(), commandText, commandType, commandParameters));
+
+#if NET5_0_OR_GREATER
+        public virtual T? GetScalar<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+#else
+        public virtual T GetScalar<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+#endif
+            => ObjectToScalar<T>(ExecuteScalar(transaction, commandText, commandType, commandParameters));
+
+
+#if NET5_0_OR_GREATER
+        public virtual T? GetScalar<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
+#else
+        public virtual T GetScalar<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null)
+#endif
+            => ObjectToScalar<T>(ExecuteScalar(transaction, commandText, commandType, commandParameters));
+
+#if NET5_0_OR_GREATER
+        public virtual T? GetScalar<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+#else
+        public virtual T GetScalar<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+#endif
+            => ObjectToScalar<T>(ExecuteScalar(connection, commandText, commandType, commandParameters));
+
+#if NET5_0_OR_GREATER
+        public virtual T? GetScalar<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
+#else
+        public virtual T GetScalar<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null)
+#endif
+            => ObjectToScalar<T>(ExecuteScalar(connection, commandText, commandType, commandParameters));
+
+#if NET5_0_OR_GREATER
+        public virtual async Task<T?> GetScalarAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+#else
+        public virtual async Task<T> GetScalarAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+#endif
+            => ObjectToScalar<T>(await ExecuteScalarAsync(BuildConnection(), commandText, commandType, cancellationToken, commandParameters));
+
+#if NET5_0_OR_GREATER
+        public virtual async Task<T?> GetScalarAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
+#else
+        public virtual async Task<T> GetScalarAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
+#endif
+            => ObjectToScalar<T>(await ExecuteScalarAsync(BuildConnection(), commandText, commandType, cancellationToken, commandParameters));
+
+#if NET5_0_OR_GREATER
+        public virtual async Task<T?> GetScalarAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+#else
+        public virtual async Task<T> GetScalarAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+#endif
+            => ObjectToScalar<T>(await ExecuteScalarAsync(transaction, commandText, commandType, cancellationToken, commandParameters));
+
+
+#if NET5_0_OR_GREATER
+        public virtual async Task<T?> GetScalarAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
+#else
+        public virtual async Task<T> GetScalarAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
+#endif
+            => ObjectToScalar<T>(await ExecuteScalarAsync(transaction, commandText, commandType, cancellationToken, commandParameters));
+
+#if NET5_0_OR_GREATER
+        public virtual async Task<T?> GetScalarAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+#else
+        public virtual async Task<T> GetScalarAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+#endif
+            => ObjectToScalar<T>(await ExecuteScalarAsync(connection, commandText, commandType, cancellationToken, commandParameters));
+
+#if NET5_0_OR_GREATER
+        public virtual async Task<T?> GetScalarAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
+#else
+        public virtual async Task<T> GetScalarAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
+#endif
+            => ObjectToScalar<T>(await ExecuteScalarAsync(connection, commandText, commandType, cancellationToken, commandParameters));
 
 
 #if NETSTANDARD2_0
-        public virtual IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+            => GetDictionary<TKey, TValue>(commandText, commandType, (IEnumerable<IDataParameter>)commandParameters);
 #elif NETSTANDARD2_1
-        public virtual IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+            where TKey : notnull
+            => GetDictionary<TKey, TValue>(commandText, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#else
+        public virtual IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+            where TKey : notnull
+            => GetDictionary<TKey, TValue?>(commandText, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+
+#endif //NETSTANDARD2_0
+
+#if NETSTANDARD2_0
+        public virtual IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null)
+#elif NETSTANDARD2_1
+        public virtual IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
             where TKey : notnull
 #else
-        public virtual IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
             where TKey : notnull
 #endif //NETSTANDARD2_0
         {
             IDbCommand cmd = BuildCommand();
-            cmd.CommandText = cmdText;
-            cmd.CommandType = cmdType;
+            cmd.CommandText = commandText;
+            cmd.CommandType = commandType;
 
             try
             {
-                using (var reader = ExecuteReader(cmd, parameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection))
+                using (var reader = ExecuteReader(cmd, commandParameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection))
                 {
                     return ReadToDictionary<TKey, TValue>(reader);
                 }
@@ -1095,12 +1381,22 @@ namespace Sweety.Common.DataProvider
         }
 
 #if NETSTANDARD2_0
-        public virtual IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+            => GetDictionary<TKey, TValue>(transaction, commandText, commandType, (IEnumerable<IDataParameter>)commandParameters);
+
+        public virtual IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null)
 #elif NETSTANDARD2_1
-        public virtual IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+            where TKey : notnull
+            => GetDictionary<TKey, TValue>(transaction, commandText, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+
+        public virtual IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
             where TKey : notnull
 #else
-        public virtual IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+            where TKey : notnull
+            => GetDictionary<TKey, TValue>(transaction, commandText, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+        public virtual IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
             where TKey : notnull
 #endif //NETSTANDARD2_0
         {
@@ -1111,7 +1407,7 @@ namespace Sweety.Common.DataProvider
 #endif
             try
             {
-                using (var reader = ExecuteReader(tran, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
+                using (var reader = ExecuteReader(transaction, CommandBehavior.SingleResult, commandType, commandText, commandParameters, out cmd))
                 {
                     return ReadToDictionary<TKey, TValue>(reader);
                 }
@@ -1127,18 +1423,40 @@ namespace Sweety.Common.DataProvider
         /// </summary>
         /// <typeparam name="TKey"></typeparam>
         /// <typeparam name="TValue"></typeparam>
-        /// <param name="conn"></param>
-        /// <param name="cmdText"></param>
-        /// <param name="cmdType"></param>
-        /// <param name="parameters"></param>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
         /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+            => GetDictionary<TKey, TValue>(connection, commandText, commandType, (IEnumerable<IDataParameter>)commandParameters);
 #elif NETSTANDARD2_1
-        public virtual IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+            where TKey : notnull
+            => GetDictionary<TKey, TValue>(connection, commandText, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#else
+        public virtual IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+            where TKey : notnull
+            => GetDictionary<TKey, TValue?>(connection, commandText, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <typeparam name="TKey"></typeparam>
+            /// <typeparam name="TValue"></typeparam>
+            /// <param name="connection"></param>
+            /// <param name="commandText"></param>
+            /// <param name="commandType"></param>
+            /// <param name="commandParameters"></param>
+            /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual IDictionary<TKey, TValue> GetDictionary<TKey, TValue>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null)
+#elif NETSTANDARD2_1
+        public virtual IDictionary<TKey, TValue>? GetDictionary<TKey, TValue>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
             where TKey : notnull
 #else
-        public virtual IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual IDictionary<TKey, TValue?>? GetDictionary<TKey, TValue>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
             where TKey : notnull
 #endif //NETSTANDARD2_0
         {
@@ -1149,7 +1467,7 @@ namespace Sweety.Common.DataProvider
 #endif
             try
             {
-                using (var reader = ExecuteReader(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
+                using (var reader = ExecuteReader(connection, CommandBehavior.SingleResult, commandType, commandText, commandParameters, out cmd))
                 {
                     return ReadToDictionary<TKey, TValue>(reader);
                 }
@@ -1161,22 +1479,35 @@ namespace Sweety.Common.DataProvider
         }
 
 #if NETSTANDARD2_0
-        public virtual async Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => GetDictionaryAsync<TKey, TValue>(commandText, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
 #elif NETSTANDARD2_1
-        public virtual async Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            where TKey : notnull
+            => GetDictionaryAsync<TKey, TValue>(commandText, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#else
+        public virtual Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            where TKey : notnull
+            => GetDictionaryAsync<TKey, TValue?>(commandText, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+#if NETSTANDARD2_0
+        public virtual async Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
+#elif NETSTANDARD2_1
+        public virtual async Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
             where TKey : notnull
 #else
-        public virtual async Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual async Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
             where TKey : notnull
 #endif //NETSTANDARD2_0
         {
             IDbCommand cmd = BuildCommand();
-            cmd.CommandType = cmdType;
-            cmd.CommandText = cmdText;
+            cmd.CommandType = commandType;
+            cmd.CommandText = commandText;
 
             try
             {
-                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection, cancellationToken))
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, commandParameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection, cancellationToken))
                 {
                     return await ReadToDictionaryAsync<TKey, TValue>(reader, cancellationToken);
                 }
@@ -1188,12 +1519,25 @@ namespace Sweety.Common.DataProvider
         }
 
 #if NETSTANDARD2_0
-        public virtual async Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => GetDictionaryAsync<TKey, TValue>(transaction, commandText, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
 #elif NETSTANDARD2_1
-        public virtual async Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            where TKey : notnull
+            => GetDictionaryAsync<TKey, TValue>(transaction, commandText, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#else
+        public virtual Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            where TKey : notnull
+            => GetDictionaryAsync<TKey, TValue?>(transaction, commandText, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+#if NETSTANDARD2_0
+        public virtual async Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
+#elif NETSTANDARD2_1
+        public virtual async Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
             where TKey : notnull
 #else
-        public virtual async Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual async Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
             where TKey : notnull
 #endif //NETSTANDARD2_0
         {
@@ -1207,7 +1551,7 @@ namespace Sweety.Common.DataProvider
 
             try
             {
-                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(tran, CommandBehavior.SingleResult, cmdType, cmdText, parameters, cancellationToken);
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(transaction, CommandBehavior.SingleResult, commandType, commandText, commandParameters, cancellationToken);
                     
                 return await ReadToDictionaryAsync<TKey, TValue>((DbDataReader)reader, cancellationToken);
                 
@@ -1224,19 +1568,43 @@ namespace Sweety.Common.DataProvider
         /// </summary>
         /// <typeparam name="TKey"></typeparam>
         /// <typeparam name="TValue"></typeparam>
-        /// <param name="conn"></param>
-        /// <param name="cmdText"></param>
-        /// <param name="cmdType"></param>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
         /// <param name="cancellationToken"></param>
-        /// <param name="parameters"></param>
+        /// <param name="commandParameters"></param>
         /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual async Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => GetDictionaryAsync<TKey, TValue>(connection, commandText, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
 #elif NETSTANDARD2_1
-        public virtual async Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            where TKey : notnull
+            => GetDictionaryAsync<TKey, TValue>(connection, commandText, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#else
+        public virtual Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            where TKey : notnull
+            => GetDictionaryAsync<TKey, TValue?>(connection, commandText, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TValue"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual async Task<IDictionary<TKey, TValue>> GetDictionaryAsync<TKey, TValue>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
+#elif NETSTANDARD2_1
+        public virtual async Task<IDictionary<TKey, TValue>?> GetDictionaryAsync<TKey, TValue>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
             where TKey : notnull
 #else
-        public virtual async Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual async Task<IDictionary<TKey, TValue?>?> GetDictionaryAsync<TKey, TValue>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
             where TKey : notnull
 #endif //NETSTANDARD2_0
         {
@@ -1250,7 +1618,7 @@ namespace Sweety.Common.DataProvider
 
             try
             {
-                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, cancellationToken);
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(connection, CommandBehavior.SingleResult, commandType, commandText, commandParameters, cancellationToken);
                 
                     
                 return await ReadToDictionaryAsync<TKey, TValue>((DbDataReader)reader, cancellationToken);
@@ -1262,21 +1630,43 @@ namespace Sweety.Common.DataProvider
             }
         }
 
-
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual T GetSingle<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+        public virtual T GetSingle<T>(string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters) where T : class
+            => GetSingle<T>(commandText, commandType, (IEnumerable<IDataParameter>)commandParameters);
 #else
-        public virtual T? GetSingle<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+        public virtual T? GetSingle<T>(string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters) where T : class
+            => GetSingle<T>(commandText, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual T GetSingle<T>(string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null) where T : class
+#else
+        public virtual T? GetSingle<T>(string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null) where T : class
 #endif //NETSTANDARD2_0
         {
             IDbCommand cmd = BuildCommand();
-            cmd.CommandText = cmdText;
-            cmd.CommandType = cmdType;
+            cmd.CommandText = commandText;
+            cmd.CommandType = commandType;
 
             try
             {
-                using (var reader = ExecuteReader(cmd, parameters, CommandBehavior.SingleRow | CommandBehavior.CloseConnection))
+                using (var reader = ExecuteReader(cmd, commandParameters, CommandBehavior.SingleRow | CommandBehavior.CloseConnection))
                 {
                     return ReadToModel<T>(reader);
                 }
@@ -1287,10 +1677,36 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual T GetSingle<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+        public virtual T GetSingle<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters) where T : class
+            => GetSingle<T>(transaction, commandText, commandType, (IEnumerable<IDataParameter>)commandParameters);
 #else
-        public virtual T? GetSingle<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+        public virtual T? GetSingle<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters) where T : class
+            => GetSingle<T>(transaction, commandText, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual T GetSingle<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null) where T : class
+#else
+        public virtual T? GetSingle<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null) where T : class
 #endif //NETSTANDARD2_0
         {
 #if NETSTANDARD2_0
@@ -1300,7 +1716,7 @@ namespace Sweety.Common.DataProvider
 #endif
             try
             {
-                using (var reader = ExecuteReader(tran, CommandBehavior.SingleRow, cmdType, cmdText, parameters, out cmd))
+                using (var reader = ExecuteReader(transaction, CommandBehavior.SingleRow, commandType, commandText, commandParameters, out cmd))
                 {
                     return ReadToModel<T>(reader);
                 }
@@ -1311,10 +1727,36 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual T GetSingle<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+        public virtual T GetSingle<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters) where T : class
+            => GetSingle<T>(connection, commandText, commandType, (IEnumerable<IDataParameter>)commandParameters);
 #else
-        public virtual T? GetSingle<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+        public virtual T? GetSingle<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters) where T : class
+            => GetSingle<T>(connection, commandText, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual T GetSingle<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null) where T : class
+#else
+        public virtual T? GetSingle<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null) where T : class
 #endif //NETSTANDARD2_0
         {
 #if NETSTANDARD2_0
@@ -1324,7 +1766,7 @@ namespace Sweety.Common.DataProvider
 #endif
             try
             {
-                using (var reader = ExecuteReader(conn, CommandBehavior.SingleRow, cmdType, cmdText, parameters, out cmd))
+                using (var reader = ExecuteReader(connection, CommandBehavior.SingleRow, commandType, commandText, commandParameters, out cmd))
                 {
                     return ReadToModel<T>(reader);
                 }
@@ -1336,20 +1778,47 @@ namespace Sweety.Common.DataProvider
         }
 
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual T GetSingle<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+        public virtual T GetSingle<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters) where T : class
+            => GetSingle<T>(commandText, ignoreFieldName, customAssignMethod, commandType, (IEnumerable<IDataParameter>)commandParameters);
 #else
-        public virtual T? GetSingle<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+        public virtual T? GetSingle<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters) where T : class
+            => GetSingle<T>(commandText, ignoreFieldName, customAssignMethod, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual T GetSingle<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null) where T : class
+#else
+        public virtual T? GetSingle<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null) where T : class
 #endif //NETSTANDARD2_0
         {
             IDbCommand cmd = BuildCommand();
-            cmd.CommandText = cmdText;
-            cmd.CommandType = cmdType;
+            cmd.CommandText = commandText;
+            cmd.CommandType = commandType;
 
             try
             {
-                using (var reader = ExecuteReader(cmd, parameters, CommandBehavior.SingleRow | CommandBehavior.CloseConnection))
+                using (var reader = ExecuteReader(cmd, commandParameters, CommandBehavior.SingleRow | CommandBehavior.CloseConnection))
                 {
                     return ReadToModel<T>(reader, ignoreFieldName, customAssignMethod);
                 }
@@ -1360,10 +1829,40 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual T GetSingle<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+        public virtual T GetSingle<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters) where T : class
+            => GetSingle<T>(transaction, commandText, ignoreFieldName, customAssignMethod, commandType, (IEnumerable<IDataParameter>)commandParameters);
 #else
-        public virtual T? GetSingle<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+        public virtual T? GetSingle<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters) where T : class
+            => GetSingle<T>(transaction, commandText, ignoreFieldName, customAssignMethod, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual T GetSingle<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null) where T : class
+#else
+        public virtual T? GetSingle<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null) where T : class
 #endif //NETSTANDARD2_0
         {
 #if NETSTANDARD2_0
@@ -1373,7 +1872,7 @@ namespace Sweety.Common.DataProvider
 #endif
             try
             {
-                using (var reader = ExecuteReader(tran, CommandBehavior.SingleRow, cmdType, cmdText, parameters, out cmd))
+                using (var reader = ExecuteReader(transaction, CommandBehavior.SingleRow, commandType, commandText, commandParameters, out cmd))
                 {
                     return ReadToModel<T>(reader, ignoreFieldName, customAssignMethod);
                 }
@@ -1384,10 +1883,41 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual T GetSingle<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+        public virtual T GetSingle<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters) where T : class
+            => GetSingle<T>(connection, commandText, ignoreFieldName, customAssignMethod, commandType, (IEnumerable<IDataParameter>)commandParameters);
 #else
-        public virtual T? GetSingle<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+        public virtual T? GetSingle<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters) where T : class
+            => GetSingle<T>(connection, commandText, ignoreFieldName, customAssignMethod, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual T GetSingle<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null) where T : class
+#else
+        public virtual T? GetSingle<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null) where T : class
 #endif //NETSTANDARD2_0
         {
 #if NETSTANDARD2_0
@@ -1397,7 +1927,7 @@ namespace Sweety.Common.DataProvider
 #endif
             try
             {
-                using (var reader = ExecuteReader(conn, CommandBehavior.SingleRow, cmdType, cmdText, parameters, out cmd))
+                using (var reader = ExecuteReader(connection, CommandBehavior.SingleRow, commandType, commandText, commandParameters, out cmd))
                 {
                     return ReadToModel<T>(reader, ignoreFieldName, customAssignMethod);
                 }
@@ -1409,20 +1939,47 @@ namespace Sweety.Common.DataProvider
         }
 
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual T GetSingle<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+        public virtual T GetSingle<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters) where T : class
+            => GetSingle<T>(commandText, ignoreFieldNames, customAssignMethod, commandType, (IEnumerable<IDataParameter>)commandParameters);
 #else
-        public virtual T? GetSingle<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+        public virtual T? GetSingle<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters) where T : class
+            => GetSingle<T>(commandText, ignoreFieldNames, customAssignMethod, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual T GetSingle<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null) where T : class
+#else
+        public virtual T? GetSingle<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null) where T : class
 #endif //NETSTANDARD2_0
         {
             IDbCommand cmd = BuildCommand();
-            cmd.CommandText = cmdText;
-            cmd.CommandType = cmdType;
+            cmd.CommandText = commandText;
+            cmd.CommandType = commandType;
 
             try
             {
-                using (var reader = ExecuteReader(cmd, parameters, CommandBehavior.SingleRow | CommandBehavior.CloseConnection))
+                using (var reader = ExecuteReader(cmd, commandParameters, CommandBehavior.SingleRow | CommandBehavior.CloseConnection))
                 {
                     return ReadToModel<T>(reader, ignoreFieldNames, customAssignMethod);
                 }
@@ -1433,10 +1990,40 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual T GetSingle<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+        public virtual T GetSingle<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters) where T : class
+            => GetSingle<T>(transaction, commandText, ignoreFieldNames, customAssignMethod, commandType, (IEnumerable<IDataParameter>)commandParameters);
 #else
-        public virtual T? GetSingle<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+        public virtual T? GetSingle<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters) where T : class
+            => GetSingle<T>(transaction, commandText, ignoreFieldNames, customAssignMethod, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual T GetSingle<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null) where T : class
+#else
+        public virtual T? GetSingle<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null) where T : class
 #endif //NETSTANDARD2_0
         {
 #if NETSTANDARD2_0
@@ -1446,7 +2033,7 @@ namespace Sweety.Common.DataProvider
 #endif
             try
             {
-                using (var reader = ExecuteReader(tran, CommandBehavior.SingleRow, cmdType, cmdText, parameters, out cmd))
+                using (var reader = ExecuteReader(transaction, CommandBehavior.SingleRow, commandType, commandText, commandParameters, out cmd))
                 {
                     return ReadToModel<T>(reader, ignoreFieldNames, customAssignMethod);
                 }
@@ -1457,10 +2044,40 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual T GetSingle<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+        public virtual T GetSingle<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters) where T : class
+            => GetSingle<T>(connection, commandText, ignoreFieldNames, customAssignMethod, commandType, (IEnumerable<IDataParameter>)commandParameters);
 #else
-        public virtual T? GetSingle<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : class
+        public virtual T? GetSingle<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters) where T : class
+            => GetSingle<T>(connection, commandText, ignoreFieldNames, customAssignMethod, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual T GetSingle<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null) where T : class
+#else
+        public virtual T? GetSingle<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null) where T : class
 #endif //NETSTANDARD2_0
         {
 #if NETSTANDARD2_0
@@ -1470,7 +2087,7 @@ namespace Sweety.Common.DataProvider
 #endif
             try
             {
-                using (var reader = ExecuteReader(conn, CommandBehavior.SingleRow, cmdType, cmdText, parameters, out cmd))
+                using (var reader = ExecuteReader(connection, CommandBehavior.SingleRow, commandType, commandText, commandParameters, out cmd))
                 {
                     return ReadToModel<T>(reader, ignoreFieldNames, customAssignMethod);
                 }
@@ -1483,19 +2100,45 @@ namespace Sweety.Common.DataProvider
 
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual async Task<T> GetSingleAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
+        public virtual Task<T> GetSingleAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters) where T : class
+            => GetSingleAsync<T>(commandText, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
 #else
-        public virtual async Task<T?> GetSingleAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
+        public virtual Task<T?> GetSingleAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters) where T : class
+            => GetSingleAsync<T>(commandText, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual async Task<T> GetSingleAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null) where T : class
+#else
+        public virtual async Task<T?> GetSingleAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null) where T : class
 #endif //NETSTANDARD2_0
         {
             IDbCommand cmd = BuildCommand();
-            cmd.CommandType = cmdType;
-            cmd.CommandText = cmdText;
+            cmd.CommandType = commandType;
+            cmd.CommandText = commandText;
 
             try
             {
-                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, CommandBehavior.SingleRow | CommandBehavior.CloseConnection, cancellationToken))
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, commandParameters, CommandBehavior.SingleRow | CommandBehavior.CloseConnection, cancellationToken))
                 {
                     return await ReadToModelAsync<T>(reader, cancellationToken);
                 }
@@ -1506,10 +2149,38 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual async Task<T> GetSingleAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
+        public virtual Task<T> GetSingleAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters) where T : class
+            => GetSingleAsync<T>(transaction, commandText, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
 #else
-        public virtual async Task<T?> GetSingleAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
+        public virtual Task<T?> GetSingleAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters) where T : class
+            => GetSingleAsync<T>(transaction, commandText, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual async Task<T> GetSingleAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null) where T : class
+#else
+        public virtual async Task<T?> GetSingleAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null) where T : class
 #endif //NETSTANDARD2_0
         {
 #if NETSTANDARD2_0
@@ -1522,7 +2193,7 @@ namespace Sweety.Common.DataProvider
 
             try
             {
-                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(tran, CommandBehavior.SingleRow, cmdType, cmdText, parameters, cancellationToken);
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(transaction, CommandBehavior.SingleRow, commandType, commandText, commandParameters, cancellationToken);
                     
                 return await ReadToModelAsync<T>((DbDataReader)reader, cancellationToken);
                 
@@ -1534,13 +2205,41 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual async Task<T> GetSingleAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
+        public virtual Task<T> GetSingleAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters) where T : class
+            => GetSingleAsync<T>(connection, commandText, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual Task<T?> GetSingleAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters) where T : class
+            => GetSingleAsync<T>(connection, commandText, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual async Task<T> GetSingleAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null) where T : class
         {
             IDbCommand cmd = null;
             IDataReader reader = null;
 #else
-        public virtual async Task<T?> GetSingleAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
+        public virtual async Task<T?> GetSingleAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null) where T : class
         {
             IDbCommand? cmd = null;
             IDataReader? reader = null;
@@ -1548,7 +2247,7 @@ namespace Sweety.Common.DataProvider
 
             try
             {
-                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(conn, CommandBehavior.SingleRow, cmdType, cmdText, parameters, cancellationToken);    
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(connection, CommandBehavior.SingleRow, commandType, commandText, commandParameters, cancellationToken);    
                 return await ReadToModelAsync<T>((DbDataReader)reader, cancellationToken);
             }
             finally
@@ -1559,21 +2258,49 @@ namespace Sweety.Common.DataProvider
         }
 
 
-
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual async Task<T> GetSingleAsync<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
+        public virtual Task<T> GetSingleAsync<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters) where T : class
+            => GetSingleAsync<T>(commandText, ignoreFieldName, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
 #else
-        public virtual async Task<T?> GetSingleAsync<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
+        public virtual Task<T?> GetSingleAsync<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters) where T : class
+            => GetSingleAsync<T>(commandText, ignoreFieldName, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual async Task<T> GetSingleAsync<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null) where T : class
+#else
+        public virtual async Task<T?> GetSingleAsync<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null) where T : class
 #endif //NETSTANDARD2_0
         {
             IDbCommand cmd = BuildCommand();
-            cmd.CommandType = cmdType;
-            cmd.CommandText = cmdText;
+            cmd.CommandType = commandType;
+            cmd.CommandText = commandText;
 
             try
             {
-                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, CommandBehavior.SingleRow | CommandBehavior.CloseConnection, cancellationToken))
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, commandParameters, CommandBehavior.SingleRow | CommandBehavior.CloseConnection, cancellationToken))
                 {
                     return await ReadToModelAsync<T>(reader, ignoreFieldName, customAssignMethod, cancellationToken);
                 }
@@ -1584,10 +2311,42 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual async Task<T> GetSingleAsync<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
+        public virtual Task<T> GetSingleAsync<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters) where T : class
+            => GetSingleAsync<T>(transaction, commandText, ignoreFieldName, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
 #else
-        public virtual async Task<T?> GetSingleAsync<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
+        public virtual Task<T?> GetSingleAsync<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters) where T : class
+            => GetSingleAsync<T>(transaction, commandText, ignoreFieldName, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual async Task<T> GetSingleAsync<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null) where T : class
+#else
+        public virtual async Task<T?> GetSingleAsync<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null) where T : class
 #endif //NETSTANDARD2_0
         {
 #if NETSTANDARD2_0
@@ -1600,7 +2359,7 @@ namespace Sweety.Common.DataProvider
 
             try
             {
-                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(tran, CommandBehavior.SingleRow, cmdType, cmdText, parameters, cancellationToken);
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(transaction, CommandBehavior.SingleRow, commandType, commandText, commandParameters, cancellationToken);
 
                 return await ReadToModelAsync<T>((DbDataReader)reader, ignoreFieldName, customAssignMethod, cancellationToken);
 
@@ -1612,13 +2371,45 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual async Task<T> GetSingleAsync<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
+        public virtual Task<T> GetSingleAsync<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters) where T : class
+            => GetSingleAsync<T>(connection, commandText, ignoreFieldName, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual Task<T?> GetSingleAsync<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters) where T : class
+            => GetSingleAsync<T>(connection, commandText, ignoreFieldName, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual async Task<T> GetSingleAsync<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null) where T : class
         {
             IDbCommand cmd = null;
             IDataReader reader = null;
 #else
-        public virtual async Task<T?> GetSingleAsync<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
+        public virtual async Task<T?> GetSingleAsync<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null) where T : class
         {
             IDbCommand? cmd = null;
             IDataReader? reader = null;
@@ -1626,7 +2417,7 @@ namespace Sweety.Common.DataProvider
 
             try
             {
-                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(conn, CommandBehavior.SingleRow, cmdType, cmdText, parameters, cancellationToken);
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(connection, CommandBehavior.SingleRow, commandType, commandText, commandParameters, cancellationToken);
                 return await ReadToModelAsync<T>((DbDataReader)reader, ignoreFieldName, customAssignMethod, cancellationToken);
             }
             finally
@@ -1637,21 +2428,48 @@ namespace Sweety.Common.DataProvider
         }
 
 
-
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual async Task<T> GetSingleAsync<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
+        public virtual Task<T> GetSingleAsync<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters) where T : class
+            => GetSingleAsync<T>(commandText, ignoreFieldNames, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
 #else
-        public virtual async Task<T?> GetSingleAsync<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
+        public virtual Task<T?> GetSingleAsync<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters) where T : class
+            => GetSingleAsync<T>(commandText, ignoreFieldNames, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual async Task<T> GetSingleAsync<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null) where T : class
+#else
+        public virtual async Task<T?> GetSingleAsync<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null) where T : class
 #endif //NETSTANDARD2_0
         {
             IDbCommand cmd = BuildCommand();
-            cmd.CommandType = cmdType;
-            cmd.CommandText = cmdText;
+            cmd.CommandType = commandType;
+            cmd.CommandText = commandText;
 
             try
             {
-                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, CommandBehavior.SingleRow | CommandBehavior.CloseConnection, cancellationToken))
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, commandParameters, CommandBehavior.SingleRow | CommandBehavior.CloseConnection, cancellationToken))
                 {
                     return await ReadToModelAsync<T>(reader, ignoreFieldNames, customAssignMethod, cancellationToken);
                 }
@@ -1662,10 +2480,43 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual async Task<T> GetSingleAsync<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
+        public virtual Task<T> GetSingleAsync<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters) where T : class
+            => GetSingleAsync<T>(transaction, commandText, ignoreFieldNames, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
 #else
-        public virtual async Task<T?> GetSingleAsync<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
+        public virtual Task<T?> GetSingleAsync<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters) where T : class
+            => GetSingleAsync<T>(transaction, commandText, ignoreFieldNames, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual async Task<T> GetSingleAsync<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null) where T : class
+#else
+        public virtual async Task<T?> GetSingleAsync<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null) where T : class
 #endif //NETSTANDARD2_0
         {
 #if NETSTANDARD2_0
@@ -1678,7 +2529,7 @@ namespace Sweety.Common.DataProvider
 
             try
             {
-                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(tran, CommandBehavior.SingleRow, cmdType, cmdText, parameters, cancellationToken);
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(transaction, CommandBehavior.SingleRow, commandType, commandText, commandParameters, cancellationToken);
 
                 return await ReadToModelAsync<T>((DbDataReader)reader, ignoreFieldNames, customAssignMethod, cancellationToken);
 
@@ -1690,13 +2541,45 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual async Task<T> GetSingleAsync<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
+        public virtual Task<T> GetSingleAsync<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters) where T : class
+            => GetSingleAsync<T>(connection, commandText, ignoreFieldNames, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual Task<T?> GetSingleAsync<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters) where T : class
+            => GetSingleAsync<T>(connection, commandText, ignoreFieldNames, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual async Task<T> GetSingleAsync<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null) where T : class
         {
             IDbCommand cmd = null;
             IDataReader reader = null;
 #else
-        public virtual async Task<T?> GetSingleAsync<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters) where T : class
+        public virtual async Task<T?> GetSingleAsync<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null) where T : class
         {
             IDbCommand? cmd = null;
             IDataReader? reader = null;
@@ -1704,7 +2587,7 @@ namespace Sweety.Common.DataProvider
 
             try
             {
-                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(conn, CommandBehavior.SingleRow, cmdType, cmdText, parameters, cancellationToken);
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(connection, CommandBehavior.SingleRow, commandType, commandText, commandParameters, cancellationToken);
                 return await ReadToModelAsync<T>((DbDataReader)reader, ignoreFieldNames, customAssignMethod, cancellationToken);
             }
             finally
@@ -1715,15 +2598,45 @@ namespace Sweety.Common.DataProvider
         }
 
 
-        public virtual bool TryGetSingle<T>(ref T structure, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="structure"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual bool TryGetSingle<T>(ref T structure, string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters) where T : struct
+            => TryGetSingle<T>(ref structure, commandText, commandType, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual bool TryGetSingle<T>(ref T structure, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters) where T : struct
+            => TryGetSingle<T>(ref structure, commandText, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="structure"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual bool TryGetSingle<T>(ref T structure, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null) where T : struct
+#else
+        public virtual bool TryGetSingle<T>(ref T structure, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null) where T : struct
+#endif
         {
             IDbCommand cmd = BuildCommand();
-            cmd.CommandText = cmdText;
-            cmd.CommandType = cmdType;
+            cmd.CommandText = commandText;
+            cmd.CommandType = commandType;
 
             try
             {
-                using (var reader = ExecuteReader(cmd, parameters, CommandBehavior.SingleRow | CommandBehavior.CloseConnection))
+                using (var reader = ExecuteReader(cmd, commandParameters, CommandBehavior.SingleRow | CommandBehavior.CloseConnection))
                 {
                     if (reader.Read())
                     {
@@ -1739,7 +2652,39 @@ namespace Sweety.Common.DataProvider
             }
         }
 
-        public virtual bool TryGetSingle<T>(ref T structure, IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="structure"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual bool TryGetSingle<T>(ref T structure, IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters) where T : struct
+            => TryGetSingle<T>(ref structure, transaction, commandText, commandType, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual bool TryGetSingle<T>(ref T structure, IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters) where T : struct
+            => TryGetSingle<T>(ref structure, transaction, commandText, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="structure"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual bool TryGetSingle<T>(ref T structure, IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null) where T : struct
+#else
+        public virtual bool TryGetSingle<T>(ref T structure, IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null) where T : struct
+#endif
         {
 #if NETSTANDARD2_0
             IDbCommand cmd = null;
@@ -1748,7 +2693,7 @@ namespace Sweety.Common.DataProvider
 #endif
             try
             {
-                using (var reader = ExecuteReader(tran, CommandBehavior.SingleRow, cmdType, cmdText, parameters, out cmd))
+                using (var reader = ExecuteReader(transaction, CommandBehavior.SingleRow, commandType, commandText, commandParameters, out cmd))
                 {
                     if (reader.Read())
                     {
@@ -1764,16 +2709,47 @@ namespace Sweety.Common.DataProvider
             }
         }
 
-        public virtual bool TryGetSingle<T>(ref T structure, IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct
-        {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="structure"></param>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
+        public virtual bool TryGetSingle<T>(ref T structure, IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters) where T : struct
+            => TryGetSingle<T>(ref structure, connection, commandText, commandType, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual bool TryGetSingle<T>(ref T structure, IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters) where T : struct
+            => TryGetSingle<T>(ref structure, connection, commandText, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="structure"></param>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual bool TryGetSingle<T>(ref T structure, IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null) where T : struct
+        {
+
             IDbCommand cmd = null;
 #else
+        public virtual bool TryGetSingle<T>(ref T structure, IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null) where T : struct
+        {
             IDbCommand? cmd = null;
 #endif
             try
             {
-                using (var reader = ExecuteReader(conn, CommandBehavior.SingleRow, cmdType, cmdText, parameters, out cmd))
+                using (var reader = ExecuteReader(connection, CommandBehavior.SingleRow, commandType, commandText, commandParameters, out cmd))
                 {
                     if (reader.Read())
                     {
@@ -1789,17 +2765,49 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="structure"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual bool TryGetSingle<T>(ref T structure, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters) where T : struct
+            => TryGetSingle<T>(ref structure, commandText, ignoreFieldName, customAssignMethod, commandType, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual bool TryGetSingle<T>(ref T structure, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters) where T : struct
+            => TryGetSingle<T>(ref structure, commandText, ignoreFieldName, customAssignMethod, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif
 
-
-        public virtual bool TryGetSingle<T>(ref T structure, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="structure"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual bool TryGetSingle<T>(ref T structure, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null) where T : struct
+#else
+        public virtual bool TryGetSingle<T>(ref T structure, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null) where T : struct
+#endif
         {
             IDbCommand cmd = BuildCommand();
-            cmd.CommandText = cmdText;
-            cmd.CommandType = cmdType;
+            cmd.CommandText = commandText;
+            cmd.CommandType = commandType;
 
             try
             {
-                using (var reader = ExecuteReader(cmd, parameters, CommandBehavior.SingleRow | CommandBehavior.CloseConnection))
+                using (var reader = ExecuteReader(cmd, commandParameters, CommandBehavior.SingleRow | CommandBehavior.CloseConnection))
                 {
                     if (reader.Read())
                     {
@@ -1815,16 +2823,50 @@ namespace Sweety.Common.DataProvider
             }
         }
 
-        public virtual bool TryGetSingle<T>(ref T structure, IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct
-        {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="structure"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
+        public virtual bool TryGetSingle<T>(ref T structure, IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters) where T : struct
+            => TryGetSingle<T>(ref structure, transaction, commandText, ignoreFieldName, customAssignMethod, commandType, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual bool TryGetSingle<T>(ref T structure, IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters) where T : struct
+            => TryGetSingle<T>(ref structure, transaction, commandText, ignoreFieldName, customAssignMethod, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="structure"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual bool TryGetSingle<T>(ref T structure, IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null) where T : struct
+        {
             IDbCommand cmd = null;
 #else
+        public virtual bool TryGetSingle<T>(ref T structure, IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null) where T : struct
+        {
             IDbCommand? cmd = null;
 #endif
             try
             {
-                using (var reader = ExecuteReader(tran, CommandBehavior.SingleRow, cmdType, cmdText, parameters, out cmd))
+                using (var reader = ExecuteReader(transaction, CommandBehavior.SingleRow, commandType, commandText, commandParameters, out cmd))
                 {
                     if (reader.Read())
                     {
@@ -1840,16 +2882,50 @@ namespace Sweety.Common.DataProvider
             }
         }
 
-        public virtual bool TryGetSingle<T>(ref T structure, IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct
-        {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="structure"></param>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
+        public virtual bool TryGetSingle<T>(ref T structure, IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters) where T : struct
+            => TryGetSingle<T>(ref structure, connection, commandText, ignoreFieldName, customAssignMethod, commandType, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual bool TryGetSingle<T>(ref T structure, IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters) where T : struct
+            => TryGetSingle<T>(ref structure, connection, commandText, ignoreFieldName, customAssignMethod, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="structure"></param>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual bool TryGetSingle<T>(ref T structure, IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null) where T : struct
+        {
             IDbCommand cmd = null;
 #else
+        public virtual bool TryGetSingle<T>(ref T structure, IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null) where T : struct
+        {
             IDbCommand? cmd = null;
 #endif
             try
             {
-                using (var reader = ExecuteReader(conn, CommandBehavior.SingleRow, cmdType, cmdText, parameters, out cmd))
+                using (var reader = ExecuteReader(connection, CommandBehavior.SingleRow, commandType, commandText, commandParameters, out cmd))
                 {
                     if (reader.Read())
                     {
@@ -1865,17 +2941,49 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="structure"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual bool TryGetSingle<T>(ref T structure, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters) where T : struct
+            => TryGetSingle<T>(ref structure, commandText, ignoreFieldNames, customAssignMethod, commandType, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual bool TryGetSingle<T>(ref T structure, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters) where T : struct
+            => TryGetSingle<T>(ref structure, commandText, ignoreFieldNames, customAssignMethod, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif
 
-
-        public virtual bool TryGetSingle<T>(ref T structure, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="structure"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual bool TryGetSingle<T>(ref T structure, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null) where T : struct
+#else
+        public virtual bool TryGetSingle<T>(ref T structure, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null) where T : struct
+#endif
         {
             IDbCommand cmd = BuildCommand();
-            cmd.CommandText = cmdText;
-            cmd.CommandType = cmdType;
+            cmd.CommandText = commandText;
+            cmd.CommandType = commandType;
 
             try
             {
-                using (var reader = ExecuteReader(cmd, parameters, CommandBehavior.SingleRow | CommandBehavior.CloseConnection))
+                using (var reader = ExecuteReader(cmd, commandParameters, CommandBehavior.SingleRow | CommandBehavior.CloseConnection))
                 {
                     if (reader.Read())
                     {
@@ -1891,16 +2999,50 @@ namespace Sweety.Common.DataProvider
             }
         }
 
-        public virtual bool TryGetSingle<T>(ref T structure, IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct
-        {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="structure"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
+        public virtual bool TryGetSingle<T>(ref T structure, IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters) where T : struct
+            => TryGetSingle<T>(ref structure, transaction, commandText, ignoreFieldNames, customAssignMethod, commandType, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual bool TryGetSingle<T>(ref T structure, IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters) where T : struct
+            => TryGetSingle<T>(ref structure, transaction, commandText, ignoreFieldNames, customAssignMethod, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="structure"></param>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual bool TryGetSingle<T>(ref T structure, IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null) where T : struct
+        {
             IDbCommand cmd = null;
 #else
+        public virtual bool TryGetSingle<T>(ref T structure, IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null) where T : struct
+        {
             IDbCommand? cmd = null;
 #endif
             try
             {
-                using (var reader = ExecuteReader(tran, CommandBehavior.SingleRow, cmdType, cmdText, parameters, out cmd))
+                using (var reader = ExecuteReader(transaction, CommandBehavior.SingleRow, commandType, commandText, commandParameters, out cmd))
                 {
                     if (reader.Read())
                     {
@@ -1916,16 +3058,51 @@ namespace Sweety.Common.DataProvider
             }
         }
 
-        public virtual bool TryGetSingle<T>(ref T structure, IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters) where T : struct
-        {
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="structure"></param>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
+        public virtual bool TryGetSingle<T>(ref T structure, IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters) where T : struct
+            => TryGetSingle<T>(ref structure, connection, commandText, ignoreFieldNames, customAssignMethod, commandType, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual bool TryGetSingle<T>(ref T structure, IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters) where T : struct
+            => TryGetSingle<T>(ref structure, connection, commandText, ignoreFieldNames, customAssignMethod, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="structure"></param>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual bool TryGetSingle<T>(ref T structure, IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null) where T : struct
+        {
             IDbCommand cmd = null;
 #else
+        public virtual bool TryGetSingle<T>(ref T structure, IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null) where T : struct
+        {
             IDbCommand? cmd = null;
 #endif
             try
             {
-                using (var reader = ExecuteReader(conn, CommandBehavior.SingleRow, cmdType, cmdText, parameters, out cmd))
+                using (var reader = ExecuteReader(connection, CommandBehavior.SingleRow, commandType, commandText, commandParameters, out cmd))
                 {
                     if (reader.Read())
                     {
@@ -1941,22 +3118,43 @@ namespace Sweety.Common.DataProvider
             }
         }
 
-
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual IList<T> GetList<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
-        {
+        public virtual IList<T> GetList<T>(string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+            => GetList<T>(commandText, commandType, (IEnumerable<IDataParameter>)commandParameters);
 #else
-        public virtual IList<T>? GetList<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
-        {
+        public virtual IList<T>? GetList<T>(string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+            => GetList<T>(commandText, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
 #endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual IList<T> GetList<T>(string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null)
+#else
+        public virtual IList<T>? GetList<T>(string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
+#endif //NETSTANDARD2_0
+        {
             IDbCommand cmd = BuildCommand();
-            cmd.CommandText = cmdText;
-            cmd.CommandType = cmdType;
+            cmd.CommandText = commandText;
+            cmd.CommandType = commandType;
 
             try
             {
-                using (var reader = ExecuteReader(cmd, parameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection))
+                using (var reader = ExecuteReader(cmd, commandParameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection))
                 {
                     return ReadToList<T>(reader);
                 }
@@ -1967,19 +3165,45 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual IList<T> GetList<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual IList<T> GetList<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+            => GetList<T>(transaction, commandText, commandType, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual IList<T>? GetList<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+            => GetList<T>(transaction, commandText, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual IList<T> GetList<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null)
         {
             IDbCommand cmd = null;
 #else
-        public virtual IList<T>? GetList<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual IList<T>? GetList<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
         {
             IDbCommand? cmd = null;
 #endif //NETSTANDARD2_0
 
             try
             {
-                using (var reader = ExecuteReader(tran, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
+                using (var reader = ExecuteReader(transaction, CommandBehavior.SingleResult, commandType, commandText, commandParameters, out cmd))
                 {
                     return ReadToList<T>(reader);
                 }
@@ -1990,19 +3214,45 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual IList<T> GetList<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual IList<T> GetList<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+            => GetList<T>(connection, commandText, commandType, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual IList<T>? GetList<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+            => GetList<T>(connection, commandText, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual IList<T> GetList<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null)
         {
             IDbCommand cmd = null;
 #else
-        public virtual IList<T>? GetList<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual IList<T>? GetList<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
         {
             IDbCommand? cmd = null;
 #endif //NETSTANDARD2_0
 
             try
             {
-                using (var reader = ExecuteReader(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
+                using (var reader = ExecuteReader(connection, CommandBehavior.SingleResult, commandType, commandText, commandParameters, out cmd))
                 {
                     return ReadToList<T>(reader);
                 }
@@ -2013,20 +3263,47 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual IList<T> GetList<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
-        {
+        public virtual IList<T> GetList<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+            => GetList<T>(commandText, ignoreFieldName, customAssignMethod, commandType, (IEnumerable<IDataParameter>)commandParameters);
 #else
-        public virtual IList<T>? GetList<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
-        {
+        public virtual IList<T>? GetList<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+            => GetList<T>(commandText, ignoreFieldName, customAssignMethod, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
 #endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual IList<T> GetList<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null)
+#else
+        public virtual IList<T>? GetList<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
+#endif //NETSTANDARD2_0
+        {
             IDbCommand cmd = BuildCommand();
-            cmd.CommandText = cmdText;
-            cmd.CommandType = cmdType;
+            cmd.CommandText = commandText;
+            cmd.CommandType = commandType;
 
             try
             {
-                using (var reader = ExecuteReader(cmd, parameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection))
+                using (var reader = ExecuteReader(cmd, commandParameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection))
                 {
                     return ReadToList<T>(reader, ignoreFieldName, customAssignMethod);
                 }
@@ -2037,19 +3314,49 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual IList<T> GetList<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual IList<T> GetList<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+            => GetList<T>(transaction, commandText, ignoreFieldName, customAssignMethod, commandType, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual IList<T>? GetList<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+            => GetList<T>(transaction, commandText, ignoreFieldName, customAssignMethod, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual IList<T> GetList<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null)
         {
             IDbCommand cmd = null;
 #else
-        public virtual IList<T>? GetList<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual IList<T>? GetList<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
         {
             IDbCommand? cmd = null;
 #endif //NETSTANDARD2_0
 
             try
             {
-                using (var reader = ExecuteReader(tran, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
+                using (var reader = ExecuteReader(transaction, CommandBehavior.SingleResult, commandType, commandText, commandParameters, out cmd))
                 {
                     return ReadToList<T>(reader, ignoreFieldName, customAssignMethod);
                 }
@@ -2060,19 +3367,49 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual IList<T> GetList<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual IList<T> GetList<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+            => GetList<T>(connection, commandText, ignoreFieldName, customAssignMethod, commandType, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual IList<T>? GetList<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+            => GetList<T>(connection, commandText, ignoreFieldName, customAssignMethod, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual IList<T> GetList<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null)
         {
             IDbCommand cmd = null;
 #else
-        public virtual IList<T>? GetList<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual IList<T>? GetList<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
         {
             IDbCommand? cmd = null;
 #endif //NETSTANDARD2_0
 
             try
             {
-                using (var reader = ExecuteReader(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
+                using (var reader = ExecuteReader(connection, CommandBehavior.SingleResult, commandType, commandText, commandParameters, out cmd))
                 {
                     return ReadToList<T>(reader, ignoreFieldName, customAssignMethod);
                 }
@@ -2083,20 +3420,47 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual IList<T> GetList<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
-        {
+        public virtual IList<T> GetList<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+            => GetList(commandText, ignoreFieldNames, customAssignMethod, commandType, (IEnumerable<IDataParameter>)commandParameters);
 #else
-        public virtual IList<T>? GetList<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
-        {
+        public virtual IList<T>? GetList<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+            => GetList(commandText, ignoreFieldNames, customAssignMethod, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
 #endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual IList<T> GetList<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null)
+#else
+        public virtual IList<T>? GetList<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
+#endif //NETSTANDARD2_0
+        {
             IDbCommand cmd = BuildCommand();
-            cmd.CommandText = cmdText;
-            cmd.CommandType = cmdType;
+            cmd.CommandText = commandText;
+            cmd.CommandType = commandType;
 
             try
             {
-                using (var reader = ExecuteReader(cmd, parameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection))
+                using (var reader = ExecuteReader(cmd, commandParameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection))
                 {
                     return ReadToList<T>(reader, ignoreFieldNames, customAssignMethod);
                 }
@@ -2107,19 +3471,50 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual IList<T> GetList<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual IList<T> GetList<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+            => GetList<T>(transaction, commandText, ignoreFieldNames, customAssignMethod, commandType, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual IList<T>? GetList<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+            => GetList<T>(transaction, commandText, ignoreFieldNames, customAssignMethod, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual IList<T> GetList<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null)
         {
             IDbCommand cmd = null;
 #else
-        public virtual IList<T>? GetList<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual IList<T>? GetList<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
         {
             IDbCommand? cmd = null;
 #endif //NETSTANDARD2_0
 
             try
             {
-                using (var reader = ExecuteReader(tran, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
+                using (var reader = ExecuteReader(transaction, CommandBehavior.SingleResult, commandType, commandText, commandParameters, out cmd))
                 {
                     return ReadToList<T>(reader, ignoreFieldNames, customAssignMethod);
                 }
@@ -2130,19 +3525,50 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual IList<T> GetList<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual IList<T> GetList<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+            => GetList<T>(connection, commandText, ignoreFieldNames, customAssignMethod, commandType, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual IList<T>? GetList<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+            => GetList<T>(connection, commandText, ignoreFieldNames, customAssignMethod, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual IList<T> GetList<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null)
         {
             IDbCommand cmd = null;
 #else
-        public virtual IList<T>? GetList<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual IList<T>? GetList<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
         {
             IDbCommand? cmd = null;
 #endif //NETSTANDARD2_0
 
             try
             {
-                using (var reader = ExecuteReader(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
+                using (var reader = ExecuteReader(connection, CommandBehavior.SingleResult, commandType, commandText, commandParameters, out cmd))
                 {
                     return ReadToList<T>(reader, ignoreFieldNames, customAssignMethod);
                 }
@@ -2154,20 +3580,45 @@ namespace Sweety.Common.DataProvider
         }
 
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual async Task<IList<T>> GetListAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<IList<T>> GetListAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => GetListAsync<T>(commandText, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
 #else
-        public virtual async Task<IList<T>?> GetListAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<IList<T>?> GetListAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            => GetListAsync<T>(commandText, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual async Task<IList<T>> GetListAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
+#else
+        public virtual async Task<IList<T>?> GetListAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
 #endif //NETSTANDARD2_0
         {
             IDbCommand cmd = BuildCommand();
-            cmd.CommandType = cmdType;
-            cmd.CommandText = cmdText;
+            cmd.CommandType = commandType;
+            cmd.CommandText = commandText;
 
             try
             {
-                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection, cancellationToken))
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, commandParameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection, cancellationToken))
                 {
                     return await ReadToListAsync<T>(reader, cancellationToken);
                 }
@@ -2178,13 +3629,41 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual async Task<IList<T>> GetListAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<IList<T>> GetListAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => GetListAsync<T>(transaction, commandText, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual Task<IList<T>?> GetListAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            => GetListAsync<T>(transaction, commandText, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual async Task<IList<T>> GetListAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
         {
             IDbCommand cmd = null;
             IDataReader reader = null;
 #else
-        public virtual async Task<IList<T>?> GetListAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual async Task<IList<T>?> GetListAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
         {
             IDbCommand? cmd = null;
             IDataReader? reader = null;
@@ -2192,7 +3671,7 @@ namespace Sweety.Common.DataProvider
 
             try
             {
-                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(tran, CommandBehavior.SingleResult, cmdType, cmdText, parameters, cancellationToken);
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(transaction, CommandBehavior.SingleResult, commandType, commandText, commandParameters, cancellationToken);
                 
                 return await ReadToListAsync<T>((DbDataReader)reader, cancellationToken);
             }
@@ -2203,22 +3682,49 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual async Task<IList<T>> GetListAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<IList<T>> GetListAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => GetListAsync<T>(connection, commandText, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual Task<IList<T>?> GetListAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            => GetListAsync<T>(connection, commandText, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual async Task<IList<T>> GetListAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
         {
             IDbCommand cmd = null;
             IDataReader reader = null;
 #else
-        public virtual async Task<IList<T>?> GetListAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual async Task<IList<T>?> GetListAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
         {
             IDbCommand? cmd = null;
             IDataReader? reader = null;
-
 #endif //NETSTANDARD2_0
 
             try
             {
-                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, cancellationToken);
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(connection, CommandBehavior.SingleResult, commandType, commandText, commandParameters, cancellationToken);
                 
                 return await ReadToListAsync<T>((DbDataReader)reader, cancellationToken);
             }
@@ -2229,21 +3735,49 @@ namespace Sweety.Common.DataProvider
             }
         }
 
-
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual async Task<IList<T>> GetListAsync<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<IList<T>> GetListAsync<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => GetListAsync<T>(commandText, ignoreFieldName, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
 #else
-        public virtual async Task<IList<T>?> GetListAsync<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<IList<T>?> GetListAsync<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            => GetListAsync<T>(commandText, ignoreFieldName, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual async Task<IList<T>> GetListAsync<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
+#else
+        public virtual async Task<IList<T>?> GetListAsync<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
 #endif //NETSTANDARD2_0
         {
             IDbCommand cmd = BuildCommand();
-            cmd.CommandType = cmdType;
-            cmd.CommandText = cmdText;
+            cmd.CommandType = commandType;
+            cmd.CommandText = commandText;
 
             try
             {
-                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection, cancellationToken))
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, commandParameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection, cancellationToken))
                 {
                     return await ReadToListAsync<T>(reader, ignoreFieldName, customAssignMethod, cancellationToken);
                 }
@@ -2254,13 +3788,45 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual async Task<IList<T>> GetListAsync<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<IList<T>> GetListAsync<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => GetListAsync<T>(transaction, commandText, ignoreFieldName, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual Task<IList<T>?> GetListAsync<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            => GetListAsync<T>(transaction, commandText, ignoreFieldName, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual async Task<IList<T>> GetListAsync<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
         {
             IDbCommand cmd = null;
             IDataReader reader = null;
 #else
-        public virtual async Task<IList<T>?> GetListAsync<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual async Task<IList<T>?> GetListAsync<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
         {
             IDbCommand? cmd = null;
             IDataReader? reader = null;
@@ -2268,7 +3834,7 @@ namespace Sweety.Common.DataProvider
 
             try
             {
-                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(tran, CommandBehavior.SingleResult, cmdType, cmdText, parameters, cancellationToken);
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(transaction, CommandBehavior.SingleResult, commandType, commandText, commandParameters, cancellationToken);
 
                 return await ReadToListAsync<T>((DbDataReader)reader, ignoreFieldName, customAssignMethod, cancellationToken);
             }
@@ -2279,22 +3845,53 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual async Task<IList<T>> GetListAsync<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<IList<T>> GetListAsync<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => GetListAsync<T>(connection, commandText, ignoreFieldName, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual Task<IList<T>?> GetListAsync<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            => GetListAsync<T>(connection, commandText, ignoreFieldName, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual async Task<IList<T>> GetListAsync<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
         {
             IDbCommand cmd = null;
             IDataReader reader = null;
 #else
-        public virtual async Task<IList<T>?> GetListAsync<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual async Task<IList<T>?> GetListAsync<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
         {
             IDbCommand? cmd = null;
             IDataReader? reader = null;
-
 #endif //NETSTANDARD2_0
 
             try
             {
-                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, cancellationToken);
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(connection, CommandBehavior.SingleResult, commandType, commandText, commandParameters, cancellationToken);
 
                 return await ReadToListAsync<T>((DbDataReader)reader, ignoreFieldName, customAssignMethod, cancellationToken);
             }
@@ -2305,21 +3902,49 @@ namespace Sweety.Common.DataProvider
             }
         }
 
-
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual async Task<IList<T>> GetListAsync<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<IList<T>> GetListAsync<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => GetListAsync<T>(commandText, ignoreFieldNames, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
 #else
-        public virtual async Task<IList<T>?> GetListAsync<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<IList<T>?> GetListAsync<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            => GetListAsync<T>(commandText, ignoreFieldNames, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual async Task<IList<T>> GetListAsync<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
+#else
+        public virtual async Task<IList<T>?> GetListAsync<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
 #endif //NETSTANDARD2_0
         {
             IDbCommand cmd = BuildCommand();
-            cmd.CommandType = cmdType;
-            cmd.CommandText = cmdText;
+            cmd.CommandType = commandType;
+            cmd.CommandText = commandText;
 
             try
             {
-                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection, cancellationToken))
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, commandParameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection, cancellationToken))
                 {
                     return await ReadToListAsync<T>(reader, ignoreFieldNames, customAssignMethod, cancellationToken);
                 }
@@ -2330,13 +3955,46 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual async Task<IList<T>> GetListAsync<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<IList<T>> GetListAsync<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => GetListAsync<T>(transaction, commandText, ignoreFieldNames, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual Task<IList<T>?> GetListAsync<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            => GetListAsync<T>(transaction, commandText, ignoreFieldNames, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual async Task<IList<T>> GetListAsync<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
         {
             IDbCommand cmd = null;
             IDataReader reader = null;
 #else
-        public virtual async Task<IList<T>?> GetListAsync<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual async Task<IList<T>?> GetListAsync<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
         {
             IDbCommand? cmd = null;
             IDataReader? reader = null;
@@ -2344,7 +4002,7 @@ namespace Sweety.Common.DataProvider
 
             try
             {
-                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(tran, CommandBehavior.SingleResult, cmdType, cmdText, parameters, cancellationToken);
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(transaction, CommandBehavior.SingleResult, commandType, commandText, commandParameters, cancellationToken);
 
                 return await ReadToListAsync<T>((DbDataReader)reader, ignoreFieldNames, customAssignMethod, cancellationToken);
             }
@@ -2355,13 +4013,45 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual async Task<IList<T>> GetListAsync<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<IList<T>> GetListAsync<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => GetListAsync<T>(connection, commandText, ignoreFieldNames, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual Task<IList<T>?> GetListAsync<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            => GetListAsync<T>(connection, commandText, ignoreFieldNames, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual async Task<IList<T>> GetListAsync<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
         {
             IDbCommand cmd = null;
             IDataReader reader = null;
 #else
-        public virtual async Task<IList<T>?> GetListAsync<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual async Task<IList<T>?> GetListAsync<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
         {
             IDbCommand? cmd = null;
             IDataReader? reader = null;
@@ -2370,7 +4060,7 @@ namespace Sweety.Common.DataProvider
 
             try
             {
-                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, cancellationToken);
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(connection, CommandBehavior.SingleResult, commandType, commandText, commandParameters, cancellationToken);
 
                 return await ReadToListAsync<T>((DbDataReader)reader, ignoreFieldNames, customAssignMethod, cancellationToken);
             }
@@ -2382,20 +4072,89 @@ namespace Sweety.Common.DataProvider
         }
 
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual ISet<T> GetSet<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual ISet<T> GetSet<T>(string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+        => GetSet<T>(commandText, commandType, (IEnumerable<IDataParameter>)commandParameters);
 #else
-        public virtual ISet<T>? GetSet<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual ISet<T>? GetSet<T>(string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+            => GetSet<T>(commandText, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual ISet<T> GetSet<T>(string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null)
+#else
+        public virtual ISet<T>? GetSet<T>(string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
 #endif //NETSTANDARD2_0
         {
             IDbCommand cmd = BuildCommand();
-            cmd.CommandText = cmdText;
-            cmd.CommandType = cmdType;
+            cmd.CommandText = commandText;
+            cmd.CommandType = commandType;
 
             try
             {
-                using (var reader = ExecuteReader(cmd, parameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection))
+                using (var reader = ExecuteReader(cmd, commandParameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection))
+                {
+                    return ReadToSet<T>(reader);
+                }
+            }
+            finally
+            {
+                cmd?.Parameters.Clear();
+            }
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual ISet<T> GetSet<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+            => GetSet<T>(transaction, commandText, commandType, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual ISet<T>? GetSet<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+            => GetSet<T>(transaction, commandText, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual ISet<T> GetSet<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null)
+        {
+            IDbCommand cmd = null;
+#else
+        public virtual ISet<T>? GetSet<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
+        {
+            IDbCommand? cmd = null;
+#endif //NETSTANDARD2_0
+
+            try
+            {
+                using (var reader = ExecuteReader(transaction, CommandBehavior.SingleResult, commandType, commandText, commandParameters, out cmd))
                 {
                     return ReadToSet<T>(reader);
                 }
@@ -2406,19 +4165,45 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual ISet<T> GetSet<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual ISet<T> GetSet<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+            => GetSet<T>(connection, commandText, commandType, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual ISet<T>? GetSet<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+            => GetSet<T>(connection, commandText, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual ISet<T> GetSet<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null)
         {
             IDbCommand cmd = null;
 #else
-        public virtual ISet<T>? GetSet<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual ISet<T>? GetSet<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
         {
             IDbCommand? cmd = null;
 #endif //NETSTANDARD2_0
 
             try
             {
-                using (var reader = ExecuteReader(tran, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
+                using (var reader = ExecuteReader(connection, CommandBehavior.SingleResult, commandType, commandText, commandParameters, out cmd))
                 {
                     return ReadToSet<T>(reader);
                 }
@@ -2429,44 +4214,48 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual ISet<T> GetSet<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
-        {
-            IDbCommand cmd = null;
+        public virtual ISet<T> GetSet<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+            => GetSet<T>(commandText, ignoreFieldName, customAssignMethod, commandType, (IEnumerable<IDataParameter>)commandParameters);
 #else
-        public virtual ISet<T>? GetSet<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
-        {
-            IDbCommand? cmd = null;
+        public virtual ISet<T>? GetSet<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+            => GetSet<T>(commandText, ignoreFieldName, customAssignMethod, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
 #endif //NETSTANDARD2_0
 
-            try
-            {
-                using (var reader = ExecuteReader(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
-                {
-                    return ReadToSet<T>(reader);
-                }
-            }
-            finally
-            {
-                cmd?.Parameters.Clear();
-            }
-        }
-
-
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual ISet<T> GetSet<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual ISet<T> GetSet<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null)
 #else
-        public virtual ISet<T>? GetSet<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual ISet<T>? GetSet<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
 #endif //NETSTANDARD2_0
         {
             IDbCommand cmd = BuildCommand();
-            cmd.CommandText = cmdText;
-            cmd.CommandType = cmdType;
+            cmd.CommandText = commandText;
+            cmd.CommandType = commandType;
 
             try
             {
-                using (var reader = ExecuteReader(cmd, parameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection))
+                using (var reader = ExecuteReader(cmd, commandParameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection))
                 {
                     return ReadToSet<T>(reader, ignoreFieldName, customAssignMethod);
                 }
@@ -2477,19 +4266,49 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual ISet<T> GetSet<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual ISet<T> GetSet<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+            => GetSet<T>(transaction, commandText, ignoreFieldName, customAssignMethod, commandType, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual ISet<T>? GetSet<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+            => GetSet<T>(transaction, commandText, ignoreFieldName, customAssignMethod, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual ISet<T> GetSet<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null)
         {
             IDbCommand cmd = null;
 #else
-        public virtual ISet<T>? GetSet<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual ISet<T>? GetSet<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
         {
             IDbCommand? cmd = null;
 #endif //NETSTANDARD2_0
 
             try
             {
-                using (var reader = ExecuteReader(tran, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
+                using (var reader = ExecuteReader(transaction, CommandBehavior.SingleResult, commandType, commandText, commandParameters, out cmd))
                 {
                     return ReadToSet<T>(reader, ignoreFieldName, customAssignMethod);
                 }
@@ -2500,19 +4319,49 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual ISet<T> GetSet<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual ISet<T> GetSet<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+            => GetSet<T>(connection, commandText, ignoreFieldName, customAssignMethod, commandType, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual ISet<T>? GetSet<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+            => GetSet<T>(connection, commandText, ignoreFieldName, customAssignMethod, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual ISet<T> GetSet<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null)
         {
             IDbCommand cmd = null;
 #else
-        public virtual ISet<T>? GetSet<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual ISet<T>? GetSet<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
         {
             IDbCommand? cmd = null;
 #endif //NETSTANDARD2_0
 
             try
             {
-                using (var reader = ExecuteReader(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
+                using (var reader = ExecuteReader(connection, CommandBehavior.SingleResult, commandType, commandText, commandParameters, out cmd))
                 {
                     return ReadToSet<T>(reader, ignoreFieldName, customAssignMethod);
                 }
@@ -2524,21 +4373,47 @@ namespace Sweety.Common.DataProvider
         }
 
 
-
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual ISet<T> GetSet<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual ISet<T> GetSet<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+            => GetSet<T>(commandText, ignoreFieldNames, customAssignMethod, commandType, (IEnumerable<IDataParameter>)commandParameters);
 #else
-        public virtual ISet<T>? GetSet<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual ISet<T>? GetSet<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+            => GetSet<T>(commandText, ignoreFieldNames, customAssignMethod, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual ISet<T> GetSet<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null)
+#else
+        public virtual ISet<T>? GetSet<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
 #endif //NETSTANDARD2_0
         {
             IDbCommand cmd = BuildCommand();
-            cmd.CommandText = cmdText;
-            cmd.CommandType = cmdType;
+            cmd.CommandText = commandText;
+            cmd.CommandType = commandType;
 
             try
             {
-                using (var reader = ExecuteReader(cmd, parameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection))
+                using (var reader = ExecuteReader(cmd, commandParameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection))
                 {
                     return ReadToSet<T>(reader, ignoreFieldNames, customAssignMethod);
                 }
@@ -2549,19 +4424,48 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual ISet<T> GetSet<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual ISet<T> GetSet<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+            => GetSet<T>(transaction, commandText, ignoreFieldNames, customAssignMethod, commandType, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual ISet<T>? GetSet<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+            => GetSet<T>(transaction, commandText, ignoreFieldNames, customAssignMethod, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual ISet<T> GetSet<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null)
         {
             IDbCommand cmd = null;
 #else
-        public virtual ISet<T>? GetSet<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual ISet<T>? GetSet<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
         {
             IDbCommand? cmd = null;
 #endif //NETSTANDARD2_0
 
             try
             {
-                using (var reader = ExecuteReader(tran, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
+                using (var reader = ExecuteReader(transaction, CommandBehavior.SingleResult, commandType, commandText, commandParameters, out cmd))
                 {
                     return ReadToSet<T>(reader, ignoreFieldNames, customAssignMethod);
                 }
@@ -2572,19 +4476,48 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual ISet<T> GetSet<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual ISet<T> GetSet<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+            => GetSet<T>(connection, commandText, ignoreFieldNames, customAssignMethod, commandType, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual ISet<T>? GetSet<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+            => GetSet<T>(connection, commandText, ignoreFieldNames, customAssignMethod, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual ISet<T> GetSet<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null)
         {
             IDbCommand cmd = null;
 #else
-        public virtual ISet<T>? GetSet<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual ISet<T>? GetSet<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
         {
             IDbCommand? cmd = null;
 #endif //NETSTANDARD2_0
 
             try
             {
-                using (var reader = ExecuteReader(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
+                using (var reader = ExecuteReader(connection, CommandBehavior.SingleResult, commandType, commandText, commandParameters, out cmd))
                 {
                     return ReadToSet<T>(reader, ignoreFieldNames, customAssignMethod);
                 }
@@ -2595,20 +4528,44 @@ namespace Sweety.Common.DataProvider
             }
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual async Task<ISet<T>> GetSetAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<ISet<T>> GetSetAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => GetSetAsync<T>(commandText, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
 #else
-        public virtual async Task<ISet<T>?> GetSetAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<ISet<T>?> GetSetAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            => GetSetAsync<T>(commandText, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual async Task<ISet<T>> GetSetAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
+#else
+        public virtual async Task<ISet<T>?> GetSetAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
 #endif //NETSTANDARD2_0
         {
             IDbCommand cmd = BuildCommand();
-            cmd.CommandType = cmdType;
-            cmd.CommandText = cmdText;
+            cmd.CommandType = commandType;
+            cmd.CommandText = commandText;
 
             try
             {
-                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection, cancellationToken))
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, commandParameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection, cancellationToken))
                 {
                     return await ReadToSetAsync<T>(reader, cancellationToken);
                 }
@@ -2619,13 +4576,40 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual async Task<ISet<T>> GetSetAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<ISet<T>> GetSetAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => GetSetAsync<T>(transaction, commandText, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual Task<ISet<T>?> GetSetAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            => GetSetAsync<T>(transaction, commandText, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual async Task<ISet<T>> GetSetAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
         {
             IDbCommand cmd = null;
             IDataReader reader = null;
 #else
-        public virtual async Task<ISet<T>?> GetSetAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual async Task<ISet<T>?> GetSetAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
         {
             IDbCommand? cmd = null;
             IDataReader? reader = null;
@@ -2633,7 +4617,7 @@ namespace Sweety.Common.DataProvider
 
             try
             {
-                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(tran, CommandBehavior.SingleResult, cmdType, cmdText, parameters, cancellationToken);
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(transaction, CommandBehavior.SingleResult, commandType, commandText, commandParameters, cancellationToken);
                     
                 return await ReadToSetAsync<T>((DbDataReader)reader, cancellationToken);
             }
@@ -2644,13 +4628,40 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual async Task<ISet<T>> GetSetAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<ISet<T>> GetSetAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => GetSetAsync<T>(connection, commandText, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual Task<ISet<T>?> GetSetAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            => GetSetAsync<T>(connection, commandText, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual async Task<ISet<T>> GetSetAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
         {
             IDbCommand cmd = null;
             IDataReader reader = null;
 #else
-        public virtual async Task<ISet<T>?> GetSetAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual async Task<ISet<T>?> GetSetAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
         {
             IDbCommand? cmd = null;
             IDataReader? reader = null;
@@ -2658,7 +4669,7 @@ namespace Sweety.Common.DataProvider
 
             try
             {
-                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, cancellationToken);
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(connection, CommandBehavior.SingleResult, commandType, commandText, commandParameters, cancellationToken);
                 
                 return await ReadToSetAsync<T>((DbDataReader)reader, cancellationToken);
             }
@@ -2670,20 +4681,48 @@ namespace Sweety.Common.DataProvider
         }
 
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual async Task<ISet<T>> GetSetAsync<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<ISet<T>> GetSetAsync<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => GetSetAsync<T>(commandText, ignoreFieldName, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
 #else
-        public virtual async Task<ISet<T>?> GetSetAsync<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<ISet<T>?> GetSetAsync<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            => GetSetAsync<T>(commandText, ignoreFieldName, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual async Task<ISet<T>> GetSetAsync<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
+#else
+        public virtual async Task<ISet<T>?> GetSetAsync<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
 #endif //NETSTANDARD2_0
         {
             IDbCommand cmd = BuildCommand();
-            cmd.CommandType = cmdType;
-            cmd.CommandText = cmdText;
+            cmd.CommandType = commandType;
+            cmd.CommandText = commandText;
 
             try
             {
-                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection, cancellationToken))
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, commandParameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection, cancellationToken))
                 {
                     return await ReadToSetAsync<T>(reader, ignoreFieldName, customAssignMethod, cancellationToken);
                 }
@@ -2694,13 +4733,45 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual async Task<ISet<T>> GetSetAsync<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<ISet<T>> GetSetAsync<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)        
+            => GetSetAsync<T>(transaction, commandText, ignoreFieldName, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual Task<ISet<T>?> GetSetAsync<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            => GetSetAsync<T>(transaction, commandText, ignoreFieldName, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual async Task<ISet<T>> GetSetAsync<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
         {
             IDbCommand cmd = null;
             IDataReader reader = null;
 #else
-        public virtual async Task<ISet<T>?> GetSetAsync<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual async Task<ISet<T>?> GetSetAsync<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
         {
             IDbCommand? cmd = null;
             IDataReader? reader = null;
@@ -2708,7 +4779,7 @@ namespace Sweety.Common.DataProvider
 
             try
             {
-                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(tran, CommandBehavior.SingleResult, cmdType, cmdText, parameters, cancellationToken);
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(transaction, CommandBehavior.SingleResult, commandType, commandText, commandParameters, cancellationToken);
 
                 return await ReadToSetAsync<T>((DbDataReader)reader, ignoreFieldName, customAssignMethod, cancellationToken);
             }
@@ -2719,13 +4790,45 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual async Task<ISet<T>> GetSetAsync<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<ISet<T>> GetSetAsync<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => GetSetAsync<T>(connection, commandText, ignoreFieldName, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual Task<ISet<T>?> GetSetAsync<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            => GetSetAsync<T>(connection, commandText, ignoreFieldName, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldName"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual async Task<ISet<T>> GetSetAsync<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
         {
             IDbCommand cmd = null;
             IDataReader reader = null;
 #else
-        public virtual async Task<ISet<T>?> GetSetAsync<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual async Task<ISet<T>?> GetSetAsync<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
         {
             IDbCommand? cmd = null;
             IDataReader? reader = null;
@@ -2733,7 +4836,7 @@ namespace Sweety.Common.DataProvider
 
             try
             {
-                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, cancellationToken);
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(connection, CommandBehavior.SingleResult, commandType, commandText, commandParameters, cancellationToken);
 
                 return await ReadToSetAsync<T>((DbDataReader)reader, ignoreFieldName, customAssignMethod, cancellationToken);
             }
@@ -2744,21 +4847,48 @@ namespace Sweety.Common.DataProvider
             }
         }
 
-
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual async Task<ISet<T>> GetSetAsync<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<ISet<T>> GetSetAsync<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => GetSetAsync<T>(commandText, ignoreFieldNames, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
 #else
-        public virtual async Task<ISet<T>?> GetSetAsync<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<ISet<T>?> GetSetAsync<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            => GetSetAsync<T>(commandText, ignoreFieldNames, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual async Task<ISet<T>> GetSetAsync<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
+#else
+        public virtual async Task<ISet<T>?> GetSetAsync<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
 #endif //NETSTANDARD2_0
         {
             IDbCommand cmd = BuildCommand();
-            cmd.CommandType = cmdType;
-            cmd.CommandText = cmdText;
+            cmd.CommandType = commandType;
+            cmd.CommandText = commandText;
 
             try
             {
-                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection, cancellationToken))
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, commandParameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection, cancellationToken))
                 {
                     return await ReadToSetAsync<T>(reader, ignoreFieldNames, customAssignMethod, cancellationToken);
                 }
@@ -2769,13 +4899,45 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual async Task<ISet<T>> GetSetAsync<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<ISet<T>> GetSetAsync<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => GetSetAsync<T>(transaction, commandText, ignoreFieldNames, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual Task<ISet<T>?> GetSetAsync<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            => GetSetAsync<T>(transaction, commandText, ignoreFieldNames, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="transaction"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual async Task<ISet<T>> GetSetAsync<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
         {
             IDbCommand cmd = null;
             IDataReader reader = null;
 #else
-        public virtual async Task<ISet<T>?> GetSetAsync<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual async Task<ISet<T>?> GetSetAsync<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
         {
             IDbCommand? cmd = null;
             IDataReader? reader = null;
@@ -2783,7 +4945,7 @@ namespace Sweety.Common.DataProvider
 
             try
             {
-                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(tran, CommandBehavior.SingleResult, cmdType, cmdText, parameters, cancellationToken);
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(transaction, CommandBehavior.SingleResult, commandType, commandText, commandParameters, cancellationToken);
 
                 return await ReadToSetAsync<T>((DbDataReader)reader, ignoreFieldNames, customAssignMethod, cancellationToken);
             }
@@ -2794,13 +4956,44 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual async Task<ISet<T>> GetSetAsync<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<ISet<T>> GetSetAsync<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => GetSetAsync<T>(connection, commandText, ignoreFieldNames, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual Task<ISet<T>?> GetSetAsync<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            => GetSetAsync<T>(connection, commandText, ignoreFieldNames, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="connection"></param>
+        /// <param name="commandText"></param>
+        /// <param name="ignoreFieldNames"></param>
+        /// <param name="customAssignMethod"></param>
+        /// <param name="commandType"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual async Task<ISet<T>> GetSetAsync<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
         {
             IDbCommand cmd = null;
             IDataReader reader = null;
 #else
-        public virtual async Task<ISet<T>?> GetSetAsync<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual async Task<ISet<T>?> GetSetAsync<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
         {
             IDbCommand? cmd = null;
             IDataReader? reader = null;
@@ -2808,7 +5001,7 @@ namespace Sweety.Common.DataProvider
 
             try
             {
-                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, cancellationToken);
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(connection, CommandBehavior.SingleResult, commandType, commandText, commandParameters, cancellationToken);
 
                 return await ReadToSetAsync<T>((DbDataReader)reader, ignoreFieldNames, customAssignMethod, cancellationToken);
             }
@@ -2819,21 +5012,42 @@ namespace Sweety.Common.DataProvider
             }
         }
 
-
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
 #if NETSTANDARD2_0
-        public virtual ICollection<T> GetCollection<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual ICollection<T> GetCollection<T>(string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+            => GetCollection<T>(commandText, commandType, (IEnumerable<IDataParameter>)commandParameters);
 #else
-        public virtual ICollection<T>? GetCollection<T>(string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual ICollection<T>? GetCollection<T>(string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+            => GetCollection<T>(commandText, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="commandText"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandParameters"></param>
+        /// <returns></returns>
+#if NETSTANDARD2_0
+        public virtual ICollection<T> GetCollection<T>(string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null)
+#else
+        public virtual ICollection<T>? GetCollection<T>(string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
 #endif //NETSTANDARD2_0
         {
             IDbCommand cmd = BuildCommand();
-            cmd.CommandText = cmdText;
-            cmd.CommandType = cmdType;
+            cmd.CommandText = commandText;
+            cmd.CommandType = commandType;
 
             try
             {
-                using (var reader = ExecuteReader(cmd, parameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection))
+                using (var reader = ExecuteReader(cmd, commandParameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection))
                 {
                     return ReadToCollection<T>(reader);
                 }
@@ -2845,18 +5059,26 @@ namespace Sweety.Common.DataProvider
         }
 
 #if NETSTANDARD2_0
-        public virtual ICollection<T> GetCollection<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual ICollection<T> GetCollection<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+            => GetCollection<T>(transaction, commandText, commandType, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual ICollection<T>? GetCollection<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+            => GetCollection<T>(transaction, commandText, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+#if NETSTANDARD2_0
+        public virtual ICollection<T> GetCollection<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null)
         {
             IDbCommand cmd = null;
 #else
-        public virtual ICollection<T>? GetCollection<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual ICollection<T>? GetCollection<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
         {
             IDbCommand? cmd = null;
 #endif //NETSTANDARD2_0
 
             try
             {
-                using (var reader = ExecuteReader(tran, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
+                using (var reader = ExecuteReader(transaction, CommandBehavior.SingleResult, commandType, commandText, commandParameters, out cmd))
                 {
                     return ReadToCollection<T>(reader);
                 }
@@ -2868,18 +5090,26 @@ namespace Sweety.Common.DataProvider
         }
 
 #if NETSTANDARD2_0
-        public virtual ICollection<T> GetCollection<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual ICollection<T> GetCollection<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+            => GetCollection<T>(connection, commandText, commandType, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual ICollection<T>? GetCollection<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+            => GetCollection<T>(connection, commandText, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+#if NETSTANDARD2_0
+        public virtual ICollection<T> GetCollection<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null)
         {
             IDbCommand cmd = null;
 #else
-        public virtual ICollection<T>? GetCollection<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual ICollection<T>? GetCollection<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
         {
             IDbCommand? cmd = null;
 #endif //NETSTANDARD2_0
 
             try
             {
-                using (var reader = ExecuteReader(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
+                using (var reader = ExecuteReader(connection, CommandBehavior.SingleResult, commandType, commandText, commandParameters, out cmd))
                 {
                     return ReadToCollection<T>(reader);
                 }
@@ -2891,21 +5121,27 @@ namespace Sweety.Common.DataProvider
         }
 
 
-
+#if NETSTANDARD2_0
+        public virtual ICollection<T> GetCollection<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+            => GetCollection(commandText, ignoreFieldName, customAssignMethod, commandType, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual ICollection<T>? GetCollection<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+            => GetCollection(commandText, ignoreFieldName, customAssignMethod, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
 
 #if NETSTANDARD2_0
-        public virtual ICollection<T> GetCollection<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual ICollection<T> GetCollection<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null)
 #else
-        public virtual ICollection<T>? GetCollection<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual ICollection<T>? GetCollection<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
 #endif //NETSTANDARD2_0
         {
             IDbCommand cmd = BuildCommand();
-            cmd.CommandText = cmdText;
-            cmd.CommandType = cmdType;
+            cmd.CommandText = commandText;
+            cmd.CommandType = commandType;
 
             try
             {
-                using (var reader = ExecuteReader(cmd, parameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection))
+                using (var reader = ExecuteReader(cmd, commandParameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection))
                 {
                     return ReadToCollection<T>(reader, ignoreFieldName, customAssignMethod);
                 }
@@ -2917,18 +5153,26 @@ namespace Sweety.Common.DataProvider
         }
 
 #if NETSTANDARD2_0
-        public virtual ICollection<T> GetCollection<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual ICollection<T> GetCollection<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+            => GetCollection(transaction, commandText, ignoreFieldName, customAssignMethod, commandType, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual ICollection<T>? GetCollection<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+            => GetCollection(transaction, commandText, ignoreFieldName, customAssignMethod, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+#if NETSTANDARD2_0
+        public virtual ICollection<T> GetCollection<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null)
         {
             IDbCommand cmd = null;
 #else
-        public virtual ICollection<T>? GetCollection<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual ICollection<T>? GetCollection<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
         {
             IDbCommand? cmd = null;
 #endif //NETSTANDARD2_0
 
             try
             {
-                using (var reader = ExecuteReader(tran, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
+                using (var reader = ExecuteReader(transaction, CommandBehavior.SingleResult, commandType, commandText, commandParameters, out cmd))
                 {
                     return ReadToCollection<T>(reader, ignoreFieldName, customAssignMethod);
                 }
@@ -2940,18 +5184,26 @@ namespace Sweety.Common.DataProvider
         }
 
 #if NETSTANDARD2_0
-        public virtual ICollection<T> GetCollection<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual ICollection<T> GetCollection<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+            => GetCollection(connection, commandText, ignoreFieldName, customAssignMethod, commandType, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual ICollection<T>? GetCollection<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+            => GetCollection(connection, commandText, ignoreFieldName, customAssignMethod, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+#if NETSTANDARD2_0
+        public virtual ICollection<T> GetCollection<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null)
         {
             IDbCommand cmd = null;
 #else
-        public virtual ICollection<T>? GetCollection<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual ICollection<T>? GetCollection<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
         {
             IDbCommand? cmd = null;
 #endif //NETSTANDARD2_0
 
             try
             {
-                using (var reader = ExecuteReader(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
+                using (var reader = ExecuteReader(connection, CommandBehavior.SingleResult, commandType, commandText, commandParameters, out cmd))
                 {
                     return ReadToCollection<T>(reader, ignoreFieldName, customAssignMethod);
                 }
@@ -2963,21 +5215,27 @@ namespace Sweety.Common.DataProvider
         }
 
 
-
+#if NETSTANDARD2_0
+        public virtual ICollection<T> GetCollection<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+            => GetCollection(commandText, ignoreFieldNames, customAssignMethod, commandType, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual ICollection<T>? GetCollection<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+            => GetCollection(commandText, ignoreFieldNames, customAssignMethod, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
 
 #if NETSTANDARD2_0
-        public virtual ICollection<T> GetCollection<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual ICollection<T> GetCollection<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null)
 #else
-        public virtual ICollection<T>? GetCollection<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual ICollection<T>? GetCollection<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
 #endif //NETSTANDARD2_0
         {
             IDbCommand cmd = BuildCommand();
-            cmd.CommandText = cmdText;
-            cmd.CommandType = cmdType;
+            cmd.CommandText = commandText;
+            cmd.CommandType = commandType;
 
             try
             {
-                using (var reader = ExecuteReader(cmd, parameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection))
+                using (var reader = ExecuteReader(cmd, commandParameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection))
                 {
                     return ReadToCollection<T>(reader, ignoreFieldNames, customAssignMethod);
                 }
@@ -2989,18 +5247,26 @@ namespace Sweety.Common.DataProvider
         }
 
 #if NETSTANDARD2_0
-        public virtual ICollection<T> GetCollection<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual ICollection<T> GetCollection<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+            => GetCollection(transaction, commandText, ignoreFieldNames, customAssignMethod, commandType, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual ICollection<T>? GetCollection<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+            => GetCollection(transaction, commandText, ignoreFieldNames, customAssignMethod, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+#if NETSTANDARD2_0
+        public virtual ICollection<T> GetCollection<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null)
         {
             IDbCommand cmd = null;
 #else
-        public virtual ICollection<T>? GetCollection<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual ICollection<T>? GetCollection<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
         {
             IDbCommand? cmd = null;
 #endif //NETSTANDARD2_0
 
             try
             {
-                using (var reader = ExecuteReader(tran, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
+                using (var reader = ExecuteReader(transaction, CommandBehavior.SingleResult, commandType, commandText, commandParameters, out cmd))
                 {
                     return ReadToCollection<T>(reader, ignoreFieldNames, customAssignMethod);
                 }
@@ -3012,18 +5278,26 @@ namespace Sweety.Common.DataProvider
         }
 
 #if NETSTANDARD2_0
-        public virtual ICollection<T> GetCollection<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual ICollection<T> GetCollection<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter[] commandParameters)
+            => GetCollection(connection, commandText, ignoreFieldNames, customAssignMethod, commandType, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual ICollection<T>? GetCollection<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, params IDataParameter?[]? commandParameters)
+            => GetCollection(connection, commandText, ignoreFieldNames, customAssignMethod, commandType, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+#if NETSTANDARD2_0
+        public virtual ICollection<T> GetCollection<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter> commandParameters = null)
         {
             IDbCommand cmd = null;
 #else
-        public virtual ICollection<T>? GetCollection<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, params IDataParameter[] parameters)
+        public virtual ICollection<T>? GetCollection<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, IEnumerable<IDataParameter?>? commandParameters = null)
         {
             IDbCommand? cmd = null;
 #endif //NETSTANDARD2_0
 
             try
             {
-                using (var reader = ExecuteReader(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, out cmd))
+                using (var reader = ExecuteReader(connection, CommandBehavior.SingleResult, commandType, commandText, commandParameters, out cmd))
                 {
                     return ReadToCollection<T>(reader, ignoreFieldNames, customAssignMethod);
                 }
@@ -3035,18 +5309,26 @@ namespace Sweety.Common.DataProvider
         }
 
 #if NETSTANDARD2_0
-        public virtual async Task<ICollection<T>> GetCollectionAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<ICollection<T>> GetCollectionAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => GetCollectionAsync<T>(commandText, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
 #else
-        public virtual async Task<ICollection<T>?> GetCollectionAsync<T>(string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<ICollection<T>?> GetCollectionAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            => GetCollectionAsync<T>(commandText, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
+
+#if NETSTANDARD2_0
+        public virtual async Task<ICollection<T>> GetCollectionAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
+#else
+        public virtual async Task<ICollection<T>?> GetCollectionAsync<T>(string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
 #endif //NETSTANDARD2_0
         {
             IDbCommand cmd = BuildCommand();
-            cmd.CommandType = cmdType;
-            cmd.CommandText = cmdText;
+            cmd.CommandType = commandType;
+            cmd.CommandText = commandText;
 
             try
             {
-                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection, cancellationToken))
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, commandParameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection, cancellationToken))
                 {
                     return await ReadToCollectionAsync<T>(reader, cancellationToken);
                 }
@@ -3059,12 +5341,18 @@ namespace Sweety.Common.DataProvider
 
 
 #if NETSTANDARD2_0
-        public virtual async Task<ICollection<T>> GetCollectionAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<ICollection<T>> GetCollectionAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => GetCollectionAsync<T>(transaction, commandText, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
+
+        public virtual async Task<ICollection<T>> GetCollectionAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
         {
             IDbCommand cmd = null;
             IDataReader reader = null;
 #else
-        public virtual async Task<ICollection<T>?> GetCollectionAsync<T>(IDbTransaction tran, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<ICollection<T>?> GetCollectionAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            => GetCollectionAsync<T>(transaction, commandText, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+
+        public virtual async Task<ICollection<T>?> GetCollectionAsync<T>(IDbTransaction transaction, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
         {
             IDbCommand? cmd = null;
             IDataReader? reader = null;
@@ -3072,7 +5360,7 @@ namespace Sweety.Common.DataProvider
 
             try
             {
-                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(tran, CommandBehavior.SingleResult, cmdType, cmdText, parameters, cancellationToken);
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(transaction, CommandBehavior.SingleResult, commandType, commandText, commandParameters, cancellationToken);
                 
                 return await ReadToCollectionAsync<T>((DbDataReader)reader, cancellationToken);
             }
@@ -3084,12 +5372,18 @@ namespace Sweety.Common.DataProvider
         }
 
 #if NETSTANDARD2_0
-        public virtual async Task<ICollection<T>> GetCollectionAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<ICollection<T>> GetCollectionAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => GetCollectionAsync<T>(connection, commandText, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
+
+        public virtual async Task<ICollection<T>> GetCollectionAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
         {
             IDbCommand cmd = null;
             IDataReader reader = null;
 #else
-        public virtual async Task<ICollection<T>?> GetCollectionAsync<T>(IDbConnection conn, string cmdText, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<ICollection<T>?> GetCollectionAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            => GetCollectionAsync<T>(connection, commandText, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+
+        public virtual async Task<ICollection<T>?> GetCollectionAsync<T>(IDbConnection connection, string commandText, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
         {
             IDbCommand? cmd = null;
             IDataReader? reader = null;
@@ -3097,7 +5391,7 @@ namespace Sweety.Common.DataProvider
 
             try
             {
-                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, cancellationToken);
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(connection, CommandBehavior.SingleResult, commandType, commandText, commandParameters, cancellationToken);
                 
                 return await ReadToCollectionAsync<T>((DbDataReader)reader, cancellationToken);
             }
@@ -3108,20 +5402,27 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+#if NETSTANDARD2_0
+        public virtual Task<ICollection<T>> GetCollectionAsync<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => GetCollectionAsync(commandText, ignoreFieldName, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual Task<ICollection<T>?> GetCollectionAsync<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            => GetCollectionAsync(commandText, ignoreFieldName, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
 
 #if NETSTANDARD2_0
-        public virtual async Task<ICollection<T>> GetCollectionAsync<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual async Task<ICollection<T>> GetCollectionAsync<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
 #else
-        public virtual async Task<ICollection<T>?> GetCollectionAsync<T>(string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual async Task<ICollection<T>?> GetCollectionAsync<T>(string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
 #endif //NETSTANDARD2_0
         {
             IDbCommand cmd = BuildCommand();
-            cmd.CommandType = cmdType;
-            cmd.CommandText = cmdText;
+            cmd.CommandType = commandType;
+            cmd.CommandText = commandText;
 
             try
             {
-                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection, cancellationToken))
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, commandParameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection, cancellationToken))
                 {
                     return await ReadToCollectionAsync<T>(reader, ignoreFieldName, customAssignMethod, cancellationToken);
                 }
@@ -3134,12 +5435,18 @@ namespace Sweety.Common.DataProvider
 
 
 #if NETSTANDARD2_0
-        public virtual async Task<ICollection<T>> GetCollectionAsync<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<ICollection<T>> GetCollectionAsync<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => GetCollectionAsync(transaction, commandText, ignoreFieldName, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
+
+        public virtual async Task<ICollection<T>> GetCollectionAsync<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
         {
             IDbCommand cmd = null;
             IDataReader reader = null;
 #else
-        public virtual async Task<ICollection<T>?> GetCollectionAsync<T>(IDbTransaction tran, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<ICollection<T>?> GetCollectionAsync<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            => GetCollectionAsync(transaction, commandText, ignoreFieldName, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+
+        public virtual async Task<ICollection<T>?> GetCollectionAsync<T>(IDbTransaction transaction, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
         {
             IDbCommand? cmd = null;
             IDataReader? reader = null;
@@ -3147,7 +5454,7 @@ namespace Sweety.Common.DataProvider
 
             try
             {
-                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(tran, CommandBehavior.SingleResult, cmdType, cmdText, parameters, cancellationToken);
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(transaction, CommandBehavior.SingleResult, commandType, commandText, commandParameters, cancellationToken);
 
                 return await ReadToCollectionAsync<T>((DbDataReader)reader, ignoreFieldName, customAssignMethod, cancellationToken);
             }
@@ -3159,12 +5466,18 @@ namespace Sweety.Common.DataProvider
         }
 
 #if NETSTANDARD2_0
-        public virtual async Task<ICollection<T>> GetCollectionAsync<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<ICollection<T>> GetCollectionAsync<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => GetCollectionAsync(connection, commandText, ignoreFieldName, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
+
+        public virtual async Task<ICollection<T>> GetCollectionAsync<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
         {
             IDbCommand cmd = null;
             IDataReader reader = null;
 #else
-        public virtual async Task<ICollection<T>?> GetCollectionAsync<T>(IDbConnection conn, string cmdText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<ICollection<T>?> GetCollectionAsync<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            => GetCollectionAsync(connection, commandText, ignoreFieldName, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+
+        public virtual async Task<ICollection<T>?> GetCollectionAsync<T>(IDbConnection connection, string commandText, string ignoreFieldName, RefT1Action<T, IDataReader, int> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
         {
             IDbCommand? cmd = null;
             IDataReader? reader = null;
@@ -3172,7 +5485,7 @@ namespace Sweety.Common.DataProvider
 
             try
             {
-                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, cancellationToken);
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(connection, CommandBehavior.SingleResult, commandType, commandText, commandParameters, cancellationToken);
 
                 return await ReadToCollectionAsync<T>((DbDataReader)reader, ignoreFieldName, customAssignMethod, cancellationToken);
             }
@@ -3183,20 +5496,27 @@ namespace Sweety.Common.DataProvider
             }
         }
 
+#if NETSTANDARD2_0
+        public virtual Task<ICollection<T>> GetCollectionAsync<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => GetCollectionAsync(commandText, ignoreFieldNames, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
+#else
+        public virtual Task<ICollection<T>?> GetCollectionAsync<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            => GetCollectionAsync(commandText, ignoreFieldNames, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+#endif //NETSTANDARD2_0
 
 #if NETSTANDARD2_0
-        public virtual async Task<ICollection<T>> GetCollectionAsync<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual async Task<ICollection<T>> GetCollectionAsync<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
 #else
-        public virtual async Task<ICollection<T>?> GetCollectionAsync<T>(string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual async Task<ICollection<T>?> GetCollectionAsync<T>(string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
 #endif //NETSTANDARD2_0
         {
             IDbCommand cmd = BuildCommand();
-            cmd.CommandType = cmdType;
-            cmd.CommandText = cmdText;
+            cmd.CommandType = commandType;
+            cmd.CommandText = commandText;
 
             try
             {
-                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, parameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection, cancellationToken))
+                using (var reader = (DbDataReader)await ExecuteReaderAsync(cmd, commandParameters, CommandBehavior.SingleResult | CommandBehavior.CloseConnection, cancellationToken))
                 {
                     return await ReadToCollectionAsync<T>(reader, ignoreFieldNames, customAssignMethod, cancellationToken);
                 }
@@ -3209,12 +5529,18 @@ namespace Sweety.Common.DataProvider
 
 
 #if NETSTANDARD2_0
-        public virtual async Task<ICollection<T>> GetCollectionAsync<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<ICollection<T>> GetCollectionAsync<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => GetCollectionAsync(transaction, commandText, ignoreFieldNames, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
+
+        public virtual async Task<ICollection<T>> GetCollectionAsync<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
         {
             IDbCommand cmd = null;
             IDataReader reader = null;
 #else
-        public virtual async Task<ICollection<T>?> GetCollectionAsync<T>(IDbTransaction tran, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<ICollection<T>?> GetCollectionAsync<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            => GetCollectionAsync(transaction, commandText, ignoreFieldNames, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+
+        public virtual async Task<ICollection<T>?> GetCollectionAsync<T>(IDbTransaction transaction, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
         {
             IDbCommand? cmd = null;
             IDataReader? reader = null;
@@ -3222,7 +5548,7 @@ namespace Sweety.Common.DataProvider
 
             try
             {
-                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(tran, CommandBehavior.SingleResult, cmdType, cmdText, parameters, cancellationToken);
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(transaction, CommandBehavior.SingleResult, commandType, commandText, commandParameters, cancellationToken);
 
                 return await ReadToCollectionAsync<T>((DbDataReader)reader, ignoreFieldNames, customAssignMethod, cancellationToken);
             }
@@ -3234,12 +5560,18 @@ namespace Sweety.Common.DataProvider
         }
 
 #if NETSTANDARD2_0
-        public virtual async Task<ICollection<T>> GetCollectionAsync<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<ICollection<T>> GetCollectionAsync<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] commandParameters)
+            => GetCollectionAsync(connection, commandText, ignoreFieldNames, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter>)commandParameters);
+
+        public virtual async Task<ICollection<T>> GetCollectionAsync<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null)
         {
             IDbCommand cmd = null;
             IDataReader reader = null;
 #else
-        public virtual async Task<ICollection<T>?> GetCollectionAsync<T>(IDbConnection conn, string cmdText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType cmdType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter[] parameters)
+        public virtual Task<ICollection<T>?> GetCollectionAsync<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, params IDataParameter?[]? commandParameters)
+            => GetCollectionAsync(connection, commandText, ignoreFieldNames, customAssignMethod, commandType, cancellationToken, (IEnumerable<IDataParameter?>?)commandParameters);
+
+        public virtual async Task<ICollection<T>?> GetCollectionAsync<T>(IDbConnection connection, string commandText, HashSet<string> ignoreFieldNames, RefT1Action<T, IDataReader> customAssignMethod, CommandType commandType = CommandType.Text, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null)
         {
             IDbCommand? cmd = null;
             IDataReader? reader = null;
@@ -3247,7 +5579,7 @@ namespace Sweety.Common.DataProvider
 
             try
             {
-                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(conn, CommandBehavior.SingleResult, cmdType, cmdText, parameters, cancellationToken);
+                (reader, cmd) = await ExecuteReaderAndGetCommandAsync(connection, CommandBehavior.SingleResult, commandType, commandText, commandParameters, cancellationToken);
 
                 return await ReadToCollectionAsync<T>((DbDataReader)reader, ignoreFieldNames, customAssignMethod, cancellationToken);
             }
@@ -3257,70 +5589,65 @@ namespace Sweety.Common.DataProvider
                 reader?.Dispose();
             }
         }
-        #endregion IRelationalDBUtility interface implementation.
+#endregion IRelationalDBUtility interface implementation.
 
 
 
-
-        /// <summary>
-        /// 执行指定 T-SQL 命令。
-        /// </summary>
-        /// <param name="connection">一个有效的数据库连接对象</param>
-        /// <param name="transaction">一个有效的事务,或者为<c>null</c></param>
-        /// <param name="commandType">命令类型 (存储过程,命令文本或其它)</param>
-        /// <param name="commandText">存储过程名或T-SQL语句</param>
-        /// <param name="commandParameters">参数数组,如果没有参数则为<c>null</c></param>
-        /// <returns>返回受影响的记录数</returns>
-#if NETSTANDARD2_0
-        protected abstract int ExecuteNonQuery(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters);
-#else
-        protected abstract int ExecuteNonQuery(IDbConnection? connection, IDbTransaction? transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters);
-#endif //NETSTANDARD2_0
-        /// <summary>
-        /// 异步执行指定 T-SQL 命令。
-        /// </summary>
-        /// <param name="connection">一个有效的数据库连接对象</param>
-        /// <param name="transaction">一个有效的事务,或者为<c>null</c></param>
-        /// <param name="commandType">命令类型 (存储过程,命令文本或其它)</param>
-        /// <param name="commandText">存储过程名或T-SQL语句</param>
-        /// <param name="commandParameters">参数数组,如果没有参数则为<c>null</c></param>
-        /// <param name="cancellationToken">通知任务取消的令牌。</param>
-        /// <returns>返回受影响的记录数</returns>
-#if NETSTANDARD2_0
-        protected abstract Task<int> ExecuteNonQueryAsync(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, CancellationToken cancellationToken = default);
-#else
-        protected abstract ValueTask<int> ExecuteNonQueryAsync(IDbConnection? connection, IDbTransaction? transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, CancellationToken cancellationToken = default);
-#endif
 
         /// <summary>
         /// 执行指定 T-SQL 命令，返回结果集中的第一行第一列的数据。
         /// </summary>
-        /// <param name="connection">一个有效的数据库连接对象</param>
         /// <param name="transaction">一个有效的事务,或者为<c>null</c></param>
-        /// <param name="commandType">命令类型 (存储过程,命令文本或其它)</param>
         /// <param name="commandText">存储过程名或T-SQL语句</param>
+        /// <param name="commandType">命令类型 (存储过程,命令文本或其它)</param>
         /// <param name="commandParameters">参数数组,如果没有参数则为<c>null</c></param>
         /// <returns>返回结果集中的第一行第一列的数据。</returns>
 #if NETSTANDARD2_0
-        protected abstract object ExecuteScalar(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters);
+        protected abstract object ExecuteScalar(IDbTransaction transaction, string commandText, CommandType commandType, IEnumerable<IDataParameter> commandParameters);
 #else
-        protected abstract object? ExecuteScalar(IDbConnection? connection, IDbTransaction? transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters);
-#endif //NETSTANDARD2_0
+        protected abstract object? ExecuteScalar(IDbTransaction transaction, string commandText, CommandType commandType, IEnumerable<IDataParameter?>? commandParameters);
+#endif
+        /// <summary>
+        /// 执行指定 T-SQL 命令，返回结果集中的第一行第一列的数据。
+        /// </summary>
+        /// <param name="connection">一个有效的数据库连接对象</param>
+        /// <param name="commandText">存储过程名或T-SQL语句</param>
+        /// <param name="commandType">命令类型 (存储过程,命令文本或其它)</param>
+        /// <param name="commandParameters">参数数组,如果没有参数则为<c>null</c></param>
+        /// <returns>返回结果集中的第一行第一列的数据。</returns>
+#if NETSTANDARD2_0
+        protected abstract object ExecuteScalar(IDbConnection connection, string commandText, CommandType commandType, IEnumerable<IDataParameter> commandParameters);
+#else
+        protected abstract object? ExecuteScalar(IDbConnection connection, string commandText, CommandType commandType, IEnumerable<IDataParameter?>? commandParameters);
+#endif
         /// <summary>
         /// 异步执行指定 T-SQL 命令，返回结果集中的第一行第一列的数据。
         /// </summary>
-        /// <param name="connection">一个有效的数据库连接对象</param>
         /// <param name="transaction">一个有效的事务,或者为<c>null</c></param>
-        /// <param name="commandType">命令类型 (存储过程,命令文本或其它)</param>
         /// <param name="commandText">存储过程名或T-SQL语句</param>
+        /// <param name="commandType">命令类型 (存储过程,命令文本或其它)</param>
         /// <param name="commandParameters">参数数组,如果没有参数则为<c>null</c></param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <returns>返回结果集中的第一行第一列的数据。</returns>
 #if NETSTANDARD2_0
-        protected abstract Task<object> ExecuteScalarAsync(IDbConnection connection, IDbTransaction transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, CancellationToken cancellationToken = default);
+        protected abstract Task<object> ExecuteScalarAsync(IDbTransaction transaction, string commandText, CommandType commandType, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null);
 #else
-        protected abstract Task<object?> ExecuteScalarAsync(IDbConnection? connection, IDbTransaction? transaction, CommandType commandType, string commandText, IDataParameter[] commandParameters, CancellationToken cancellationToken = default);
-#endif //NETSTANDARD2_0
+        protected abstract Task<object?> ExecuteScalarAsync(IDbTransaction transaction, string commandText, CommandType commandType, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null);
+#endif
+        /// <summary>
+        /// 异步执行指定 T-SQL 命令，返回结果集中的第一行第一列的数据。
+        /// </summary>
+        /// <param name="connection">一个有效的数据库连接对象</param>
+        /// <param name="commandText">存储过程名或T-SQL语句</param>
+        /// <param name="commandType">命令类型 (存储过程,命令文本或其它)</param>
+        /// <param name="commandParameters">参数数组,如果没有参数则为<c>null</c></param>
+        /// <param name="cancellationToken">通知任务取消的令牌。</param>
+        /// <returns>返回结果集中的第一行第一列的数据。</returns>
+#if NETSTANDARD2_0
+        protected abstract Task<object> ExecuteScalarAsync(IDbConnection connection, string commandText, CommandType commandType, CancellationToken cancellationToken = default, IEnumerable<IDataParameter> commandParameters = null);
+#else
+        protected abstract Task<object?> ExecuteScalarAsync(IDbConnection connection, string commandText, CommandType commandType, CancellationToken cancellationToken = default, IEnumerable<IDataParameter?>? commandParameters = null);
+#endif
 
 
         /// <summary>
@@ -3331,10 +5658,28 @@ namespace Sweety.Common.DataProvider
         /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
         /// <returns>返回包含结果集的数据读取器</returns>
 #if NETSTANDARD2_0
-        protected abstract IDataReader ExecuteReader(IDbCommand command, IDataParameter[] commandParameters, CommandBehavior commandBehavior);
+        protected abstract IDataReader ExecuteReader(IDbCommand command, IEnumerable<IDataParameter> commandParameters, CommandBehavior commandBehavior);
 #else
-        protected abstract IDataReader ExecuteReader(IDbCommand command, IDataParameter[] commandParameters, CommandBehavior commandBehavior);
-#endif //NETSTANDARD2_0
+        protected abstract IDataReader ExecuteReader(IDbCommand command, IEnumerable<IDataParameter?>? commandParameters, CommandBehavior commandBehavior);
+#endif
+
+        /// <summary>
+        /// 执行指定 T-SQL 命令，返回结果集的数据读取器。
+        /// </summary>
+        /// <remarks>
+        /// 这个方法是不能获取输出参数，如果要获取输出参数的值请使用 <see cref="ExecuteReader(IDbCommand, IEnumerable{IDataParameter?}?, CommandBehavior)"/>或 <see cref="ExecuteReader(IDbTransaction, CommandBehavior, CommandType, string, IEnumerable{IDataParameter?}?, out IDbCommand)"/>方法。
+        /// </remarks>
+        /// <param name="transaction">一个有效的事务。</param>
+        /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
+        /// <param name="commandType">命令类型 (存储过程,命令文本或其它)</param>
+        /// <param name="commandText">存储过程名或T-SQL语句</param>
+        /// <param name="commandParameters">参数数组,如果没有参数则为<c>null</c></param>
+        /// <returns>返回包含结果集的数据读取器</returns>
+#if NETSTANDARD2_0
+        protected abstract IDataReader ExecuteReader(IDbTransaction transaction, CommandBehavior commandBehavior, CommandType commandType, string commandText, IEnumerable<IDataParameter> commandParameters);
+#else
+        protected abstract IDataReader ExecuteReader(IDbTransaction transaction, CommandBehavior commandBehavior, CommandType commandType, string commandText, IEnumerable<IDataParameter?>? commandParameters);
+#endif
         /// <summary>
         /// 执行指定 T-SQL 命令，返回结果集的数据读取器。
         /// </summary>
@@ -3347,20 +5692,26 @@ namespace Sweety.Common.DataProvider
         /// <param name="commandText">存储过程名或T-SQL语句</param>
         /// <param name="commandParameters">参数数组,如果没有参数则为<c>null</c></param>
         /// <returns>返回包含结果集的数据读取器</returns>
-        protected abstract IDataReader ExecuteReader(IDbConnection connection, CommandBehavior commandBehavior, CommandType commandType, string commandText, IDataParameter[] commandParameters);
+#if NETSTANDARD2_0
+        protected abstract IDataReader ExecuteReader(IDbConnection connection, CommandBehavior commandBehavior, CommandType commandType, string commandText, IEnumerable<IDataParameter> commandParameters);
+#else
+        protected abstract IDataReader ExecuteReader(IDbConnection connection, CommandBehavior commandBehavior, CommandType commandType, string commandText, IEnumerable<IDataParameter?>? commandParameters);
+#endif
         /// <summary>
         /// 执行指定 T-SQL 命令，返回结果集的数据读取器。
         /// </summary>
-        /// <remarks>
-        /// 这个方法是不能获取输出参数，如果要获取输出参数的值请使用 <see cref="ExecuteReader(IDbCommand, IDataParameter[], CommandBehavior)"/>或 <see cref="ExecuteReader(IDbTransaction, CommandBehavior, CommandType, string, IDataParameter[], out IDbCommand)"/>方法。
-        /// </remarks>
         /// <param name="transaction">一个有效的事务。</param>
         /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
         /// <param name="commandType">命令类型 (存储过程,命令文本或其它)</param>
         /// <param name="commandText">存储过程名或T-SQL语句</param>
         /// <param name="commandParameters">参数数组,如果没有参数则为<c>null</c></param>
+        /// <param name="command">返回执行命令的对象。用于在存储过程使用输出变量时，关闭 <see cref="IDataReader"/>对象，输出参数被赋值后清除参数，达到参数对象重复使用的目的。</param>
         /// <returns>返回包含结果集的数据读取器</returns>
-        protected abstract IDataReader ExecuteReader(IDbTransaction transaction, CommandBehavior commandBehavior, CommandType commandType, string commandText, IDataParameter[] commandParameters);
+#if NETSTANDARD2_0
+        protected abstract IDataReader ExecuteReader(IDbTransaction transaction, CommandBehavior commandBehavior, CommandType commandType, string commandText, IEnumerable<IDataParameter> commandParameters, out IDbCommand command);
+#else
+        protected abstract IDataReader ExecuteReader(IDbTransaction transaction, CommandBehavior commandBehavior, CommandType commandType, string commandText, IEnumerable<IDataParameter?>? commandParameters, out IDbCommand command);
+#endif
         /// <summary>
         /// 执行指定 T-SQL 命令，返回结果集的数据读取器。
         /// </summary>
@@ -3371,18 +5722,11 @@ namespace Sweety.Common.DataProvider
         /// <param name="commandParameters">参数数组,如果没有参数则为<c>null</c></param>
         /// <param name="command">返回执行命令的对象。用于在存储过程使用输出变量时，关闭 <see cref="IDataReader"/>对象，输出参数被赋值后清除参数，达到参数对象重复使用的目的。</param>
         /// <returns>返回包含结果集的数据读取器</returns>
-        protected abstract IDataReader ExecuteReader(IDbConnection connection, CommandBehavior commandBehavior, CommandType commandType, string commandText, IDataParameter[] commandParameters, out IDbCommand command);
-        /// <summary>
-        /// 执行指定 T-SQL 命令，返回结果集的数据读取器。
-        /// </summary>
-        /// <param name="transaction">一个有效的事务。</param>
-        /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
-        /// <param name="commandType">命令类型 (存储过程,命令文本或其它)</param>
-        /// <param name="commandText">存储过程名或T-SQL语句</param>
-        /// <param name="commandParameters">参数数组,如果没有参数则为<c>null</c></param>
-        /// <param name="command">返回执行命令的对象。用于在存储过程使用输出变量时，关闭 <see cref="IDataReader"/>对象，输出参数被赋值后清除参数，达到参数对象重复使用的目的。</param>
-        /// <returns>返回包含结果集的数据读取器</returns>
-        protected abstract IDataReader ExecuteReader(IDbTransaction transaction, CommandBehavior commandBehavior, CommandType commandType, string commandText, IDataParameter[] commandParameters, out IDbCommand command);
+#if NETSTANDARD2_0
+        protected abstract IDataReader ExecuteReader(IDbConnection connection, CommandBehavior commandBehavior, CommandType commandType, string commandText, IEnumerable<IDataParameter> commandParameters, out IDbCommand command);
+#else
+        protected abstract IDataReader ExecuteReader(IDbConnection connection, CommandBehavior commandBehavior, CommandType commandType, string commandText, IEnumerable<IDataParameter?>? commandParameters, out IDbCommand command);
+#endif
         /// <summary>
         /// 异步执行指定 T-SQL 命令，返回结果集的数据读取器。
         /// </summary>
@@ -3391,7 +5735,11 @@ namespace Sweety.Common.DataProvider
         /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <returns>返回包含结果集的数据读取器</returns>
-        protected abstract Task<IDataReader> ExecuteReaderAsync(IDbCommand command, IDataParameter[] commandParameters, CommandBehavior commandBehavior, CancellationToken cancellationToken = default);
+#if NETSTANDARD2_0
+        protected abstract Task<IDataReader> ExecuteReaderAsync(IDbCommand command, IEnumerable<IDataParameter> commandParameters, CommandBehavior commandBehavior, CancellationToken cancellationToken = default);
+#else
+        protected abstract Task<IDataReader> ExecuteReaderAsync(IDbCommand command, IEnumerable<IDataParameter?>? commandParameters, CommandBehavior commandBehavior, CancellationToken cancellationToken = default);
+#endif
         /// <summary>
         /// 异步执行指定 T-SQL 命令，返回结果集的数据读取器。
         /// </summary>
@@ -3405,7 +5753,11 @@ namespace Sweety.Common.DataProvider
         /// <param name="commandParameters">参数数组,如果没有参数则为<c>null</c></param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <returns>返回包含结果集的数据读取器</returns>
-        protected abstract Task<IDataReader> ExecuteReaderAsync(IDbConnection connection, CommandBehavior commandBehavior, CommandType commandType, string commandText, IDataParameter[] commandParameters, CancellationToken cancellationToken = default);
+#if NETSTANDARD2_0
+        protected abstract Task<IDataReader> ExecuteReaderAsync(IDbConnection connection, CommandBehavior commandBehavior, CommandType commandType, string commandText, IEnumerable<IDataParameter> commandParameters, CancellationToken cancellationToken = default);
+#else
+        protected abstract Task<IDataReader> ExecuteReaderAsync(IDbConnection connection, CommandBehavior commandBehavior, CommandType commandType, string commandText, IEnumerable<IDataParameter?>? commandParameters, CancellationToken cancellationToken = default);
+#endif
         /// <summary>
         /// 异步执行指定 T-SQL 命令，返回结果集的数据读取器。
         /// </summary>
@@ -3419,7 +5771,11 @@ namespace Sweety.Common.DataProvider
         /// <param name="commandParameters">参数数组,如果没有参数则为<c>null</c></param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <returns>返回包含结果集的数据读取器</returns>
-        protected abstract Task<IDataReader> ExecuteReaderAsync(IDbTransaction transaction, CommandBehavior commandBehavior, CommandType commandType, string commandText, IDataParameter[] commandParameters, CancellationToken cancellationToken = default);
+#if NETSTANDARD2_0
+        protected abstract Task<IDataReader> ExecuteReaderAsync(IDbTransaction transaction, CommandBehavior commandBehavior, CommandType commandType, string commandText, IEnumerable<IDataParameter> commandParameters, CancellationToken cancellationToken = default);
+#else
+        protected abstract Task<IDataReader> ExecuteReaderAsync(IDbTransaction transaction, CommandBehavior commandBehavior, CommandType commandType, string commandText, IEnumerable<IDataParameter?>? commandParameters, CancellationToken cancellationToken = default);
+#endif
 
         /// <summary>
         /// 异步执行指定 T-SQL 命令，返回结果集的数据读取器。
@@ -3431,7 +5787,11 @@ namespace Sweety.Common.DataProvider
         /// <param name="commandParameters">参数数组,如果没有参数则为<c>null</c></param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <returns>返回包含结果集的数据读取器和返回执行命令的对象。用于在存储过程使用输出变量时，关闭 <see cref="IDataReader"/>对象，输出参数被赋值后清除参数，达到参数对象重复使用的目的。</returns>
-        protected abstract Task<(IDataReader, IDbCommand)> ExecuteReaderAndGetCommandAsync(IDbConnection connection, CommandBehavior commandBehavior, CommandType commandType, string commandText, IDataParameter[] commandParameters, CancellationToken cancellationToken);
+#if NETSTANDARD2_0
+        protected abstract Task<(IDataReader, IDbCommand)> ExecuteReaderAndGetCommandAsync(IDbConnection connection, CommandBehavior commandBehavior, CommandType commandType, string commandText, IEnumerable<IDataParameter> commandParameters, CancellationToken cancellationToken);
+#else
+        protected abstract Task<(IDataReader, IDbCommand)> ExecuteReaderAndGetCommandAsync(IDbConnection connection, CommandBehavior commandBehavior, CommandType commandType, string commandText, IEnumerable<IDataParameter?>? commandParameters, CancellationToken cancellationToken);
+#endif
         /// <summary>
         /// 异步执行指定 T-SQL 命令，返回结果集的数据读取器。
         /// </summary>
@@ -3442,7 +5802,11 @@ namespace Sweety.Common.DataProvider
         /// <param name="commandParameters">参数数组,如果没有参数则为<c>null</c></param>
         /// <param name="cancellationToken">通知任务取消的令牌。</param>
         /// <returns>返回包含结果集的数据读取器和返回执行命令的对象。用于在存储过程使用输出变量时，关闭 <see cref="IDataReader"/>对象，输出参数被赋值后清除参数，达到参数对象重复使用的目的。</returns>
-        protected abstract Task<(IDataReader, IDbCommand)> ExecuteReaderAndGetCommandAsync(IDbTransaction transaction, CommandBehavior commandBehavior, CommandType commandType, string commandText, IDataParameter[] commandParameters, CancellationToken cancellationToken);
+#if NETSTANDARD2_0
+        protected abstract Task<(IDataReader, IDbCommand)> ExecuteReaderAndGetCommandAsync(IDbTransaction transaction, CommandBehavior commandBehavior, CommandType commandType, string commandText, IEnumerable<IDataParameter> commandParameters, CancellationToken cancellationToken);
+#else
+        protected abstract Task<(IDataReader, IDbCommand)> ExecuteReaderAndGetCommandAsync(IDbTransaction transaction, CommandBehavior commandBehavior, CommandType commandType, string commandText, IEnumerable<IDataParameter?>? commandParameters, CancellationToken cancellationToken);
+#endif
 
 
 
@@ -3456,7 +5820,9 @@ namespace Sweety.Common.DataProvider
         /// <param name="obj"><see cref="IDbCommand.ExecuteScalar"/>方法返回的值。</param>
         /// <returns>返回转换成目标类型的值或默认值。</returns>
 #if NET5_0_OR_GREATER
-        protected virtual T? ObjectToScalar<T>(object obj)
+        protected virtual T? ObjectToScalar<T>(object? obj)
+#elif NETSTANDARD2_1
+        protected virtual T ObjectToScalar<T>(object? obj)
 #else
         protected virtual T ObjectToScalar<T>(object obj)
 #endif //NET5_0_OR_GREATER

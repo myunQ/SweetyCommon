@@ -45,6 +45,19 @@ namespace Sweety.Common.Extensions
         /// </summary>
         public static readonly DateTime UNIX_MIN_TIME = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
+
+
+        /// <summary>
+        /// 表示精确到1毫秒的当前日期时间的 <c>Unix</c> 时间戳。
+        /// </summary>
+        public static long NowUnixTimestampAccuracy1Millisecond
+        {
+            get
+            {
+                return DateTime.UtcNow.Subtract(UNIX_MIN_TIME).Ticks / TimeSpan.TicksPerMillisecond;
+            }
+        }
+
         /// <summary>
         /// 表示当前日期时间的 <c>Unix</c> 时间戳。
         /// </summary>
@@ -79,19 +92,36 @@ namespace Sweety.Common.Extensions
         }
 
         /// <summary>
-        /// 获取 <paramref name="datetime"/> 参数的 <c>Unix</c> 时间戳。
+        /// 获取 <paramref name="datetime"/> 表示的 <c>Unix</c> 时间戳，精确到100纳秒。
         /// </summary>
         /// <param name="datetime">日期时间，如果日期时间早于。</param>
         /// <returns><c>UTC</c> 时间1970年1月1日零点整 与 <paramref name="datetime"/> 参数表示的日期时间相差的秒数。</returns>
-        public static long UnixTimestamp(this DateTime datetime)
+        public static long UnixTimestampAccuracy100Nanoseconds(this DateTime datetime)
         {
             if (datetime.Kind != DateTimeKind.Utc)
             {
-                return datetime.ToUniversalTime().Subtract(UNIX_MIN_TIME).Ticks / TimeSpan.TicksPerSecond;
+                return datetime.ToUniversalTime().Subtract(UNIX_MIN_TIME).Ticks;
             }
 
-            return datetime.Subtract(UNIX_MIN_TIME).Ticks / TimeSpan.TicksPerSecond;
+            return datetime.Subtract(UNIX_MIN_TIME).Ticks;
         }
+
+        /// <summary>
+        /// 获取 <paramref name="datetime"/> 表示的 <c>Unix</c> 时间戳，精确到1毫秒。
+        /// </summary>
+        /// <param name="datetime">日期时间，如果日期时间早于。</param>
+        /// <returns><c>UTC</c> 时间1970年1月1日零点整 与 <paramref name="datetime"/> 参数表示的日期时间相差的毫秒数。</returns>
+        public static long UnixTimestampAccuracy1Millisecond(this DateTime datetime)
+            => UnixTimestampAccuracy100Nanoseconds(datetime) / TimeSpan.TicksPerMillisecond;
+
+        /// <summary>
+        /// 获取 <paramref name="datetime"/> 参数的 <c>Unix</c> 时间戳。
+        /// </summary>
+        /// <param name="datetime">日期时间，如果日期时间早于。</param>
+        /// <returns><c>UTC</c> 时间1970年1月1日零点整 与 <paramref name="datetime"/> 参数表示的日期时间相差的纳秒数。</returns>
+        public static long UnixTimestamp(this DateTime datetime)
+            => UnixTimestampAccuracy100Nanoseconds(datetime) / TimeSpan.TicksPerSecond;
+        
 
         /// <summary>
         /// 获取 <paramref name="datetime"/> 参数的 <c>Unix</c> 时间戳。
