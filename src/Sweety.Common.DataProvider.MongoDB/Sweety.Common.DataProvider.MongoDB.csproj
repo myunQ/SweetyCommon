@@ -13,6 +13,6 @@
     <ProjectReference Include="..\Sweety.Common\Sweety.Common.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="MongoDB.Driver" Version="2.11.6" />
+    <PackageReference Include="MongoDB.Driver" Version="2.19.0" />
   </ItemGroup>
 </Project>
