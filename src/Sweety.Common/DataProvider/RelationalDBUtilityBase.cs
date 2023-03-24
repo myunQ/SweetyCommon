@@ -1,4 +1,4 @@
-﻿/* * * * * * * * * * * * * * * * * * * * *
+/* * * * * * * * * * * * * * * * * * * * *
  * Creator: Mingyun Qin
  * E-Mail: myun_18@126.com
  * Description:
@@ -25,6 +25,7 @@ namespace Sweety.Common.DataProvider
     using System.Text;
 
     using Sweety.Common.Converter;
+    using Sweety.Common.Extensions;
 
 
     /// <summary>
@@ -578,6 +579,55 @@ namespace Sweety.Common.DataProvider
         }
 
 
+
+        public virtual string[] GetSqlInExpressions(IEnumerable<byte[]> commandParameters)
+        {
+            return GetSqlInExpressions(commandParameters, out _);
+        }
+
+        public virtual string[] GetSqlInExpressions(IEnumerable<byte[]> commandParameters, out int parameterCount)
+        {
+            parameterCount = commandParameters.Count();
+
+            int arrLength = parameterCount / SqlInParameterMaximumLength;
+
+            if (parameterCount % SqlInParameterMaximumLength != 0)
+            {
+                arrLength++;
+            }
+
+            int i = 1;
+            int arrIndex = 0;
+            string[] result = new string[arrLength];
+            StringBuilder strBuilder = new StringBuilder(1024);
+
+            foreach (byte[] bytes in commandParameters)
+            {
+                strBuilder.Append("0x")
+                    .Append(bytes.ToHEX());
+
+                if (i >= SqlInParameterMaximumLength)
+                {
+                    result[arrIndex++] = strBuilder.ToString();
+                    strBuilder.Clear();
+                    i = 1;
+                    continue;
+                }
+
+                i++;
+                strBuilder.Append(',');
+            }
+
+            if (i > 1)
+            {
+                strBuilder.Length -= 1;
+                result[arrIndex] = strBuilder.ToString();
+                strBuilder.Clear();
+            }
+
+            return result;
+        }
+
         public virtual string[] GetSqlInExpressions(IEnumerable<string> commandParameters)
         {
             return GetSqlInExpressions(commandParameters, out _);
@@ -649,7 +699,7 @@ namespace Sweety.Common.DataProvider
             string[] result = new string[arrLength];
             StringBuilder strBuilder = new StringBuilder(1024);
             Type tType = typeof(T);
-            bool needQuotes = tType == typeof(Guid) || tType == typeof(DateTime);
+            bool needQuotes = tType == ValueTypeConstants.GuidType || tType == ValueTypeConstants.DateTimeType;
 
             foreach (var p in commandParameters)
             {
@@ -4114,7 +4164,7 @@ namespace Sweety.Common.DataProvider
             }
             finally
             {
-                cmd?.Parameters.Clear();
+                cmd.Parameters.Clear();
             }
         }
         /// <summary>
@@ -4262,7 +4312,7 @@ namespace Sweety.Common.DataProvider
             }
             finally
             {
-                cmd?.Parameters.Clear();
+                cmd.Parameters.Clear();
             }
         }
 
@@ -4420,7 +4470,7 @@ namespace Sweety.Common.DataProvider
             }
             finally
             {
-                cmd?.Parameters.Clear();
+                cmd.Parameters.Clear();
             }
         }
 
@@ -5054,7 +5104,7 @@ namespace Sweety.Common.DataProvider
             }
             finally
             {
-                cmd?.Parameters.Clear();
+                cmd.Parameters.Clear();
             }
         }
 
@@ -5148,7 +5198,7 @@ namespace Sweety.Common.DataProvider
             }
             finally
             {
-                cmd?.Parameters.Clear();
+                cmd.Parameters.Clear();
             }
         }
 
@@ -5242,7 +5292,7 @@ namespace Sweety.Common.DataProvider
             }
             finally
             {
-                cmd?.Parameters.Clear();
+                cmd.Parameters.Clear();
             }
         }
 
@@ -5684,7 +5734,7 @@ namespace Sweety.Common.DataProvider
         /// 执行指定 T-SQL 命令，返回结果集的数据读取器。
         /// </summary>
         /// <remarks>
-        /// 这个方法是不能获取输出参数，如果要获取输出参数的值请使用 <see cref="ExecuteReader(IDbCommand, IDataParameter[], CommandBehavior)"/>或 <see cref="ExecuteReader(IDbConnection, CommandBehavior, CommandType, string, IDataParameter[], out IDbCommand)"/>方法。
+        /// 这个方法是不能获取输出参数，如果要获取输出参数的值请使用 <see cref="ExecuteReader(IDbCommand, IEnumerable{IDataParameter?}?, CommandBehavior)"/>或 <see cref="ExecuteReader(IDbConnection, CommandBehavior, CommandType, string, IEnumerable{IDataParameter?}?, out IDbCommand)"/>方法。
         /// </remarks>
         /// <param name="connection">一个有效的数据库连接对象。</param>
         /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
@@ -5744,7 +5794,7 @@ namespace Sweety.Common.DataProvider
         /// 异步执行指定 T-SQL 命令，返回结果集的数据读取器。
         /// </summary>
         /// <remarks>
-        /// 这个方法是不能获取输出参数，如果要获取输出参数的值请使用 <see cref="ExecuteReaderAsync(IDbCommand, IDataParameter[], CommandBehavior, CancellationToken)"/>或 <see cref="ExecuteReaderAndGetCommandAsync(IDbConnection, CommandBehavior, CommandType, string, IDataParameter[], CancellationToken)"/>方法。
+        /// 这个方法是不能获取输出参数，如果要获取输出参数的值请使用 <see cref="ExecuteReaderAsync(IDbCommand, IEnumerable{IDataParameter?}?, CommandBehavior, CancellationToken)"/>或 <see cref="ExecuteReaderAndGetCommandAsync(IDbConnection, CommandBehavior, CommandType, string, IEnumerable{IDataParameter?}?, CancellationToken)"/>方法。
         /// </remarks>
         /// <param name="connection">一个有效的数据库连接对象。</param>
         /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
@@ -5762,7 +5812,7 @@ namespace Sweety.Common.DataProvider
         /// 异步执行指定 T-SQL 命令，返回结果集的数据读取器。
         /// </summary>
         /// <remarks>
-        /// 这个方法是不能获取输出参数，如果要获取输出参数的值请使用 <see cref="ExecuteReaderAsync(IDbCommand, IDataParameter[], CommandBehavior, CancellationToken)"/>或 <see cref="ExecuteReaderAndGetCommandAsync(IDbTransaction, CommandBehavior, CommandType, string, IDataParameter[], CancellationToken)"/>方法。
+        /// 这个方法是不能获取输出参数，如果要获取输出参数的值请使用 <see cref="ExecuteReaderAsync(IDbCommand, IEnumerable{IDataParameter?}?, CommandBehavior, CancellationToken)"/>或 <see cref="ExecuteReaderAndGetCommandAsync(IDbTransaction, CommandBehavior, CommandType, string, IEnumerable{IDataParameter?}?, CancellationToken)"/>方法。
         /// </remarks>
         /// <param name="transaction">一个有效的事务。</param>
         /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
@@ -6862,7 +6912,7 @@ namespace Sweety.Common.DataProvider
             Type t = typeof(T);
             TypeCode typeCode = Type.GetTypeCode(t);
             //struct 类型的 t.IsValueType 等于 true，typeCode 等于 TypeCode.Object。
-            if ((t.IsValueType && typeCode != TypeCode.Object) || typeCode == TypeCode.String || t == typeof(Guid))
+            if ((t.IsValueType && typeCode != TypeCode.Object) || typeCode == TypeCode.String || t == ValueTypeConstants.GuidType)
             {
                 //T defaultValue = default;
                 do
@@ -6934,7 +6984,7 @@ namespace Sweety.Common.DataProvider
             Type t = typeof(T);
             TypeCode typeCode = Type.GetTypeCode(t);
             //struct 类型的 t.IsValueType 等于 true，typeCode 等于 TypeCode.Object。
-            if ((t.IsValueType && typeCode != TypeCode.Object) || typeCode == TypeCode.String || t == typeof(Guid))
+            if ((t.IsValueType && typeCode != TypeCode.Object) || typeCode == TypeCode.String || t == ValueTypeConstants.GuidType)
             {
                 //此方法不支持简单的值类型。
                 throw new NotSupportedException();
@@ -6989,7 +7039,7 @@ namespace Sweety.Common.DataProvider
             Type t = typeof(T);
             TypeCode typeCode = Type.GetTypeCode(t);
             //struct 类型的 t.IsValueType 等于 true，typeCode 等于 TypeCode.Object。
-            if ((t.IsValueType && typeCode != TypeCode.Object) || typeCode == TypeCode.String || t == typeof(Guid))
+            if ((t.IsValueType && typeCode != TypeCode.Object) || typeCode == TypeCode.String || t == ValueTypeConstants.GuidType)
             {
                 //此方法不支持简单的值类型。
                 throw new NotSupportedException();

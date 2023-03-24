@@ -1,4 +1,4 @@
-﻿/* * * * * * * * * * * * * * * * * * * * *
+/* * * * * * * * * * * * * * * * * * * * *
  * Creator: Mingyun Qin
  * E-Mail: myun_18@126.com
  * Description:
@@ -104,6 +104,17 @@ namespace Sweety.Common
         /// 表示<see cref="DateTimeOffset"/>类型。
         /// </summary>
         public readonly static Type DateTimeOffsetType = typeof(DateTimeOffset);
+
+#if NET6_0_OR_GREATER
+        /// <summary>
+        /// 表示<see cref="DateOnly"/>类型。
+        /// </summary>
+        public readonly static Type DateOnlyType = typeof(DateOnly);
+        /// <summary>
+        /// 表示<see cref="TimeOnly"/>类型。
+        /// </summary>
+        public readonly static Type TimeOnlyType = typeof(TimeOnly);
+#endif
 
         /// <summary>
         /// 表示<see cref="Guid"/>类型。

@@ -1,9 +1,12 @@
-﻿using System;
+using System;
 using System.Buffers;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
-
+using System.Diagnostics;
+using System.IO;
+using System.Reflection;
+using System.Text;
 
 namespace Sweety.Common.DataProvider
 {
@@ -77,9 +80,22 @@ namespace Sweety.Common.DataProvider
         }
 
         /// <summary>
-        /// SQL参数的数量。
+        /// 获取 SQL参数的数量。
+        /// 设置该属性时，值只能小于当前的值。
         /// </summary>
-        public int Length => _length;
+        /// <remarks>
+        /// 属性修改器只是为了方便在多个SQL语句中可以重用前几个参数（通过修改器来修剪参数，而不是<see cref="Reset"/>后在重新添加）。
+        /// </remarks>
+        public int Length
+        {
+            get => _length;
+            set
+            {
+                if (_length < value || 0 > value) throw new IndexOutOfRangeException();
+
+                _length = value;
+            }
+        }
 
         /// <summary>
         /// 获取或设置指定索引处的元素。
@@ -189,7 +205,7 @@ namespace Sweety.Common.DataProvider
 
 
         /// <summary>
-        /// 添加SQL参数对象到<see cref="Parameters"/>属性返回的数组中。
+        /// 添加SQL参数对象。
         /// </summary>
         /// <param name="parameterName">参数名称。</param>
         /// <param name="value">参数值。</param>
@@ -225,7 +241,7 @@ namespace Sweety.Common.DataProvider
             => Add(parameterName, value, field.parameterType, field.size, direction);
 
         /// <summary>
-        /// 添加SQL参数对象到<see cref="Parameters"/>属性返回的数组中。
+        /// 添加SQL参数对象。
         /// </summary>
         /// <param name="parameterName">参数名称。</param>
         /// <param name="value">参数值。</param>
@@ -317,6 +333,123 @@ namespace Sweety.Common.DataProvider
         public void Dispose()
         {
             RecoverOriginalElement();
+
+            //Type type = _paramArray[0].GetType();
+            //var field = type.GetField("_parent", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+            //if (field != null)
+            //{
+            //    for (int i = 0; i < _length; i++)
+            //    {
+            //        object value = field.GetValue(_paramArray[i]);
+            //        if (value == null) continue;
+
+            //        StringBuilder stringBuilder = new StringBuilder();
+            //        stringBuilder.Append("SqlParament的_parent属性的值是一个类型为")
+            //            .Append(value.ToString())
+            //            .Append("的对象（HashCode:")
+            //            .Append(value.GetHashCode())
+            //            .AppendLine(")");
+            //        for (int x = 0; x < _length; x++)
+            //        {
+            //            field.SetValue(_paramArray[i], null);
+
+            //            stringBuilder.Append("参数")
+            //                .Append(x)
+            //                .AppendLine()
+            //                .Append("\tParameterName\t:\t\t")
+            //                .AppendLine(_paramArray[x].ParameterName)
+            //                .Append("\tDbType\t\t:\t\t")
+            //                .AppendLine(_paramArray[x].DbType.ToString())
+            //                .Append("\tSize\t\t:\t\t")
+            //                .Append(_paramArray[x].Size)
+            //                .AppendLine()
+            //                .Append("\tDirection\t:\t\t")
+            //                .AppendLine(_paramArray[x].Direction.ToString())
+            //                .Append("\tValue\t\t:\t\t")
+            //                .AppendLine(_paramArray[x].Value.ToString());
+            //        }
+
+                    /* 在IIS环境运行的结果得知，该方法并不是在 using(...){... 这里 } 或这里被调用，而是由线程回收时或者垃圾收集器调用（具体哪里调用不知道，反正调用堆栈跟踪不到业务系统的调用堆栈）。
+                    StackTrace st = new StackTrace(skipFrames: 1, fNeedFileInfo: true);
+                    StackFrame[] sfArray = st.GetFrames();
+
+                    stringBuilder.AppendLine()
+                        .AppendLine("【调用栈】")
+                        .AppendLine();
+
+                    foreach (var r in sfArray)
+                    {
+                        var method = (MethodInfo)r.GetMethod();
+                        var methodParameters = method.GetParameters();
+
+                        stringBuilder
+                            .Append(method.ReturnType.FullName)
+                            .Append(' ')
+                            .Append(method.DeclaringType.FullName)
+                            .Append('.')
+                            .Append(method.Name);
+
+                        if (method.IsGenericMethod)
+                        {
+                            stringBuilder.Append('<');
+                            foreach (var gt in method.GetGenericArguments())
+                            {
+                                stringBuilder.Append(gt.Name)
+                                    .Append(", ");
+                            }
+                            stringBuilder.Length -= 2;
+                            stringBuilder.Append('>');
+                        }
+
+                        if (methodParameters?.Length > 0)
+                        {
+                            stringBuilder.Append('(');
+                            foreach (var mp in methodParameters)
+                            {
+                                if (mp.IsOut) stringBuilder.Append("out ");
+                                if (mp.IsIn) stringBuilder.Append("in ");
+                                if (mp.IsRetval) stringBuilder.Append("ref ");
+
+
+                                stringBuilder.Append(mp.ParameterType.FullName)
+                                    .Append(' ')
+                                    .Append(mp.Name);
+
+                                if (mp.HasDefaultValue)
+                                {
+                                    stringBuilder.Append(" = ")
+                                        .Append(mp.DefaultValue);
+                                }
+
+                                stringBuilder.Append(", ");
+                            }
+                            stringBuilder.Length -= 2;
+                            stringBuilder.Append(')')
+                                .AppendLine();
+                        }
+                        else
+                        {
+                            stringBuilder.AppendLine("()");
+                        }
+                    }
+                    */
+
+            //        string logFile = Path.Combine(AppContext.BaseDirectory, "App_Data");
+            //        if (!Directory.Exists(logFile))
+            //        {
+            //            Directory.CreateDirectory(logFile);
+            //        }
+
+            //        using (StreamWriter streamWriter = new StreamWriter(Path.Combine(logFile, Path.GetRandomFileName() + ".log"), false, Encoding.UTF8))
+            //        {
+            //            streamWriter.Write(stringBuilder.ToString());
+            //            streamWriter.Flush();
+            //        }
+            //        break;
+
+            //    }
+            //}
 
 #if NETSTANDARD2_0
             ArrayPool<T>.Shared.Return(_paramArray);

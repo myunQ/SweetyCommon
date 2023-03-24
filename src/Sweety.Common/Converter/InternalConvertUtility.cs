@@ -1,4 +1,4 @@
-﻿/* * * * * * * * * * * * * * * * * * * * *
+/* * * * * * * * * * * * * * * * * * * * *
  * Creator: Mingyun Qin
  * E-Mail: myun_18@126.com
  * Description:
@@ -75,6 +75,20 @@ namespace Sweety.Common.Converter
             {
                 return value.ToString();
             }
+
+#if NET6_0_OR_GREATER
+            // DateTime 转 DateOnly。
+            if (conversionType == ValueTypeConstants.DateOnlyType && valueType == ValueTypeConstants.DateTimeType)
+            {
+                return DateOnly.FromDateTime((DateTime)value);
+            }
+
+            // TimeSpan 转 TimeOnly。
+            if (conversionType == ValueTypeConstants.TimeOnlyType && valueType == ValueTypeConstants.TimeSpanType)
+            {
+                return TimeOnly.FromTimeSpan((TimeSpan)value);
+            }
+#endif
 
             //字符串IP地址转换成 System.Net.IPAddress 类型
             if (conversionType == ReferenceTypeConstants.IPAddressType)

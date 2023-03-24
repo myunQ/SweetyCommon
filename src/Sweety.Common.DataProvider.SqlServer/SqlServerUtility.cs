@@ -1,4 +1,4 @@
-﻿/* * * * * * * * * * * * * * * * * * * * *
+/* * * * * * * * * * * * * * * * * * * * *
  * Creator: Mingyun Qin
  * E-Mail: myun_18@126.com
  * Description:
@@ -1278,6 +1278,7 @@ namespace Sweety.Common.DataProvider.SqlServer
         /// <remarks>
         /// 这个方法是不能获取输出参数，如果要获取输出参数的值请使用<see cref="ExecuteReader(IDbCommand, IEnumerable{IDataParameter?}?, CommandBehavior)"/>或<see cref="ExecuteReader(IDbTransaction, CommandBehavior, CommandType, string, IEnumerable{IDataParameter?}?, out IDbCommand)"/>方法。
         /// </remarks>
+        /// <param name="exec">执行SQL命令的方法。</param>
         /// <param name="transaction">一个有效的事务,或者为<c>null</c>。</param>
         /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
         /// <param name="commandType">命令类型 (存储过程,命令文本或其它)</param>
@@ -1313,6 +1314,7 @@ namespace Sweety.Common.DataProvider.SqlServer
         /// <remarks>
         /// 这个方法是不能获取输出参数，如果要获取输出参数的值请使用<see cref="ExecuteReader(IDbCommand, IEnumerable{IDataParameter?}?, CommandBehavior)"/>或<see cref="ExecuteReader(IDbConnection, CommandBehavior, CommandType, string, IEnumerable{IDataParameter?}?, out IDbCommand)"/>方法。
         /// </remarks>
+        /// <param name="exec">执行SQL命令的方法。</param>
         /// <param name="connection">一个有效的数据库连接对象</param>
         /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
         /// <param name="commandType">命令类型 (存储过程,命令文本或其它)</param>
@@ -1357,6 +1359,7 @@ namespace Sweety.Common.DataProvider.SqlServer
         /// <remarks>
         /// 这个方法是不能获取输出参数，如果要获取输出参数的值请使用<see cref="ExecuteReaderAsync(IDbCommand, IEnumerable{IDataParameter?}?, CommandBehavior, CancellationToken)"/>或<see cref="ExecuteReaderAndGetCommandAsync(IDbTransaction, CommandBehavior, CommandType, string, IEnumerable{IDataParameter?}?, CancellationToken)"/>方法。
         /// </remarks>
+        /// <param name="execAsync">执行SQL命令的方法。</param>
         /// <param name="transaction">一个有效的事务或<c>null</c>。</param>
         /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
         /// <param name="commandType">命令类型 (存储过程，文本命令或其它)。</param>
@@ -1394,6 +1397,7 @@ namespace Sweety.Common.DataProvider.SqlServer
         /// <remarks>
         /// 这个方法是不能获取输出参数，如果要获取输出参数的值请使用<see cref="ExecuteReaderAsync(IDbCommand, IEnumerable{IDataParameter?}?, CommandBehavior, CancellationToken)"/>或<see cref="ExecuteReaderAndGetCommandAsync(IDbConnection, CommandBehavior, CommandType, string, IEnumerable{IDataParameter?}?, CancellationToken)"/>方法。
         /// </remarks>
+        /// <param name="execAsync">执行SQL命名的方法。</param>
         /// <param name="connection">一个有效的数据库连接对象。</param>
         /// <param name="commandBehavior">传入<see cref="IDbCommand.ExecuteReader(CommandBehavior)"/>方法的参数。</param>
         /// <param name="commandType">命令类型 (存储过程，文本命令或其它)。</param>

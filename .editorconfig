@@ -1,0 +1,41 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+# Unix-style newlines with a newline ending every file
+[*]
+end_of_line = lf
+insert_final_newline = false
+trim_trailing_whitespace = true
+charset = utf-8
+indent_style = space
+indent_size = 4
+
+[*.{json,yml,csproj,props,targets}]
+indent_size = 2
+
+[*.cs]
+# Prefer "var" everywhere
+csharp_style_var_for_built_in_types                   = false : suggestion
+csharp_style_var_when_type_is_apparent                = true : suggestion
+csharp_style_var_elsewhere                            = true : suggestion
+
+# see https://learn.microsoft.com/zh-cn/dotnet/fundamentals/code-analysis/style-rules/csharp-formatting-options
+csharp_new_line_before_open_brace                     = all
+csharp_new_line_before_else                           = true
+csharp_new_line_before_catch                          = true
+csharp_new_line_before_finally                        = true
+csharp_new_line_before_members_in_object_initializers = true
+csharp_new_line_before_members_in_anonymous_types     = true
+
+# Sort using and Import directives with System.* appearing first
+dotnet_sort_system_directives_first                        = true
+
+# Avoid "this." if not necessary. see https://learn.microsoft.com/zh-cn/dotnet/fundamentals/code-analysis/style-rules/ide0003-ide0009
+dotnet_style_qualification_for_field                       = false : suggestion
+dotnet_style_qualification_for_property                    = false : suggestion
+dotnet_style_qualification_for_method                      = false : suggestion
+dotnet_style_qualification_for_event                       = false : suggestion
+
+# more see https://learn.microsoft.com/zh-cn/dotnet/fundamentals/code-analysis/style-rules/

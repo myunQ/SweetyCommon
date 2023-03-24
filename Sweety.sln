@@ -1,4 +1,4 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32519.379
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -31,6 +31,12 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sweety.Common.DataProvider.SQLite", "src\Sweety.Common.DataProvider.SQLite\Sweety.Common.DataProvider.SQLite.csproj", "{5CBB1011-C2D3-4391-9714-CB1E1D01958F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sweety.Common.DataProvider.PostgreSQL.Tests", "test\Sweety.Common.DataProvider.PostgreSQL.Tests\Sweety.Common.DataProvider.PostgreSQL.Tests.csproj", "{E396B937-2B6E-4AC4-8193-0B46681F58CF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "解决方案项", "解决方案项", "{061A9981-D266-49A1-90AB-43FB8E04A53E}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

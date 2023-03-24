@@ -1,4 +1,4 @@
-﻿/* * * * * * * * * * * * * * * * * * * * *
+/* * * * * * * * * * * * * * * * * * * * *
  * Creator: Mingyun Qin
  * E-Mail: myun_18@126.com
  * Description:
@@ -257,6 +257,20 @@ namespace Sweety.Common.DataProvider
 #else
         string GetSqlInExpressions(ulong bitFields, ulong[]? values, out int parameterCount);
 #endif
+
+        /// <summary>
+        /// 将参数集合转换成多组SQL条件IN里的二进制类型表达式。
+        /// </summary>
+        /// <param name="parameters">参数集合。</param>
+        /// <returns>SQL条件IN的表达式数组，每个元素不包括任何SQL关键字及括号。</returns>
+        string[] GetSqlInExpressions(IEnumerable<byte[]> parameters);
+        /// <summary>
+        /// 将参数集合转换成多组SQL条件IN里的二进制类型表达式。
+        /// </summary>
+        /// <param name="parameters">参数集合。</param>
+        /// <param name="parameterCount">返回参数总数。</param>
+        /// <returns>SQL条件IN的表达式数组，每个元素不包括任何SQL关键字及括号。</returns>
+        string[] GetSqlInExpressions(IEnumerable<byte[]> parameters, out int parameterCount);
 
         /// <summary>
         /// 将参数集合转换成多组SQL条件IN里的表达式，同时会对每个元素进行安全处理。

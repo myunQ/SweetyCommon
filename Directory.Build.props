@@ -1,0 +1,34 @@
+<Project>
+  <PropertyGroup>
+    <TargetFrameworks>net6.0;netstandard2.1;netstandard2.0</TargetFrameworks>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <VersionPrefix>1.0.4</VersionPrefix>
+    <VersionSuffix>alpha</VersionSuffix>
+    <Authors>Mingyun Qin</Authors>
+    <Copyright>Mingyun Qin</Copyright>
+    <Owners>Mingyun Qin</Owners>
+    <AssemblyVersion>$(VersionPrefix).*</AssemblyVersion>
+	  <GenerateAssemblyFileVersionAttribute>False</GenerateAssemblyFileVersionAttribute>
+	  <Deterministic>False</Deterministic>
+	  <Version>$(VersionPrefix)-$(VersionSuffix)</Version>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <AssemblyOriginatorKeyFile>..\..\SweetySignKeyPair.snk</AssemblyOriginatorKeyFile>
+	  <SignAssembly>True</SignAssembly>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' != 'netstandard2.0' ">
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType></DebugType>
+	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+</Project>

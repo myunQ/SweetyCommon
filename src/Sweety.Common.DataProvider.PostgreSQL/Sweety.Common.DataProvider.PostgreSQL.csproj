@@ -1,49 +1,20 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	<VersionPrefix>1.0.0</VersionPrefix>
-	<VersionSuffix>alpha</VersionSuffix>
-    <TargetFrameworks>net6.0;netstandard2.1;netstandard2.0</TargetFrameworks>
-    
-    <Authors>Mingyun Qin</Authors>
-    <Copyright>Mingyun Qin</Copyright>
-    <Owners>Mingyun Qin</Owners>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-	<Description>- PostgreSQL 操作类。</Description>
+	  <Description>- PostgreSQL 操作类。</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-	<PackageProjectUrl>https://github.com/myunq/sweetycommon</PackageProjectUrl>
+	  <PackageProjectUrl>https://github.com/myunq/sweetycommon</PackageProjectUrl>
     <RepositoryUrl>https://github.com/myunq/sweetycommon</RepositoryUrl>
-	<RepositoryType>git</RepositoryType>
+	  <RepositoryType>git</RepositoryType>
     <PackageReleaseNotes>- 移除了 BuildTransaction() 及 BuildTransactionAsync() 方法。
 - 随着Sweety.Common完成了对关系型数据库操作的大量修改。</PackageReleaseNotes>
-	<PackageReadmeFile>README.md</PackageReadmeFile>
-	<AssemblyOriginatorKeyFile>..\..\SweetySignKeyPair.snk</AssemblyOriginatorKeyFile>
-	<SignAssembly>True</SignAssembly>
-	<PackageTags>sweety</PackageTags>
-	<AssemblyVersion>$(VersionPrefix).*</AssemblyVersion>
-	<GenerateAssemblyFileVersionAttribute>False</GenerateAssemblyFileVersionAttribute>
-	<Deterministic>False</Deterministic>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' != 'netstandard2.0' ">
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
-	
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType></DebugType>
-	<GenerateDocumentationFile>True</GenerateDocumentationFile>
+	  <PackageTags>sweety</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Npgsql" Version="7.0.1" />
+    <PackageReference Include="Npgsql" Version="7.0.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Sweety.Common\Sweety.Common.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="README.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
   </ItemGroup>
 </Project>

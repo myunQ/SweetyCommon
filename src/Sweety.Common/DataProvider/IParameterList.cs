@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 
@@ -12,7 +12,7 @@ namespace Sweety.Common.DataProvider
         /// <summary>
         /// 获取参数总数。
         /// </summary>
-        int Length { get; }
+        int Length { get; set; }
         /// <summary>
         /// 获取或设置指定索引处的元素。
         /// </summary>
