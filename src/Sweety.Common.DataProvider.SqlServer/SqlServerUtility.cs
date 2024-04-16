@@ -513,7 +513,9 @@ namespace Sweety.Common.DataProvider.SqlServer
                 if (p.SqlDbType != type) p.SqlDbType = type;
                 if (p.Size != size) p.Size = size;
                 if (p.Direction != direction) p.Direction = direction;
-
+                if (p.Precision != default) p.Precision = default;
+                if (p.Scale != default) p.Scale = default;
+                
                 p.ParameterName = parameterName;
                 p.Value = value ?? DBNull.Value;
             }
