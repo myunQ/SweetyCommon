@@ -1,19 +1,10 @@
-﻿/* * * * * * * * * * * * * * * * * * * * *
+/* * * * * * * * * * * * * * * * * * * * *
  * Creator: Mingyun Qin
  * E-Mail: myun_18@126.com
  * Description:
  * 
  *      DateTime 类型扩展。
  * 
- * Members Index:
- *      static class DateTimeExtensions
- *          DateTime UNIX_MIN_TIME
- *          DateTime FirstDayOfMonth(this DateTime datetime)
- *          DateTime LastDayOfMonth(this DateTime datetime)
- *          long NowUnixTimestamp { get; }
- *          long UnixTimestamp(this DateTime datetime)
- *          long UnixTimestamp(this DateTime datetime, long offsetSeconds)
- *          long UnixTimestamp(this DateTime datetime, TimeSpan offsetTime)
  *      
  * * * * * * * * * * * * * * * * * * * * */
 
@@ -21,6 +12,7 @@
 namespace Sweety.Common.Extensions
 {
     using System;
+    using System.Globalization;
 
 
     /// <summary>
@@ -151,13 +143,16 @@ namespace Sweety.Common.Extensions
         /// <param name="date">日期。</param>
         /// <returns>月份所属季度。取值范围：1、2、3、4。其中 1 表示第一季度，以此类推。</returns>
         public static int GetQuarter(this DateTime date)
-        {
-            var q = date.Month / 3f;
-            int result = Convert.ToInt32(q);
+            => (int)Math.Ceiling(date.Month / 3D);
 
-            if (q > result) result++;
 
-            return result;
-        }
+
+        /// <summary>
+        /// 获取指定日期是今年的第几周。
+        /// </summary>
+        /// <param name="date">日期。</param>
+        /// <returns>返回<paramref name="date"/>是今年的第几周。</returns>
+        public static int GetWeekOfYear(this DateTime date)
+            => CultureInfo.CurrentCulture.Calendar.GetWeekOfYear((date.Kind == DateTimeKind.Utc ? date.ToLocalTime() : date), CultureInfo.CurrentCulture.DateTimeFormat.CalendarWeekRule, CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek);
     }
 }

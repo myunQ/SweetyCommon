@@ -1,4 +1,4 @@
-﻿/* * * * * * * * * * * * * * * * * * * * *
+/* * * * * * * * * * * * * * * * * * * * *
  * Creator: Mingyun Qin
  * E-Mail: myun_18@126.com
  * Description:
@@ -81,7 +81,7 @@ namespace Sweety.Common.Cryptography
         {
             if (chars == null) throw new ArgumentNullException(nameof(chars));
 
-            return _hash.ComputeHash(Encoding.Unicode.GetBytes(chars));
+            return _hash.ComputeHash(Encoding.UTF8.GetBytes(chars));
         }
 
         public byte[] GetHash(char[] chars, int start)
@@ -89,7 +89,7 @@ namespace Sweety.Common.Cryptography
             if (chars == null) throw new ArgumentNullException(nameof(chars));
             if (start < 0 || start >= chars.Length) throw new ArgumentOutOfRangeException(nameof(start));
 
-            return _hash.ComputeHash(Encoding.Unicode.GetBytes(chars, start, chars.Length - start));
+            return _hash.ComputeHash(Encoding.UTF8.GetBytes(chars, start, chars.Length - start));
         }
 
         public byte[] GetHash(char[] chars, int offset, int count)
@@ -98,7 +98,7 @@ namespace Sweety.Common.Cryptography
             if (offset < 0 || offset >= chars.Length) throw new ArgumentOutOfRangeException(nameof(offset));
             if (count < 1 || (offset + count) > chars.Length) throw new ArgumentOutOfRangeException(nameof(count));
 
-            return _hash.ComputeHash(Encoding.Unicode.GetBytes(chars, offset, count));
+            return _hash.ComputeHash(Encoding.UTF8.GetBytes(chars, offset, count));
         }
 
 
@@ -134,7 +134,7 @@ namespace Sweety.Common.Cryptography
         {
             if (str == null) throw new ArgumentNullException(nameof(str));
 
-            return _hash.ComputeHash(Encoding.Unicode.GetBytes(str));
+            return _hash.ComputeHash(Encoding.UTF8.GetBytes(str));
         }
 
         public byte[] GetHash(string str, int start)
@@ -144,9 +144,9 @@ namespace Sweety.Common.Cryptography
             if (start < 0 || start >= str.Length) throw new ArgumentOutOfRangeException(nameof(start));
 
 #if NETSTANDARD2_0
-            return _hash.ComputeHash(Encoding.Unicode.GetBytes(str.ToCharArray(), start, str.Length - start));
+            return _hash.ComputeHash(Encoding.UTF8.GetBytes(str.ToCharArray(), start, str.Length - start));
 #else
-            return _hash.ComputeHash(Encoding.Unicode.GetBytes(str, start, str.Length - start));
+            return _hash.ComputeHash(Encoding.UTF8.GetBytes(str, start, str.Length - start));
 #endif
         }
 
@@ -157,9 +157,9 @@ namespace Sweety.Common.Cryptography
             if (count < 1 || (offset + count) > str.Length) throw new ArgumentOutOfRangeException(nameof(count));
 
 #if NETSTANDARD2_0
-            return _hash.ComputeHash(Encoding.Unicode.GetBytes(str.ToCharArray(), offset, count));
+            return _hash.ComputeHash(Encoding.UTF8.GetBytes(str.ToCharArray(), offset, count));
 #else
-            return _hash.ComputeHash(Encoding.Unicode.GetBytes(str, offset, count));
+            return _hash.ComputeHash(Encoding.UTF8.GetBytes(str, offset, count));
 #endif
         }
 
