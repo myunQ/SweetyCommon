@@ -1,4 +1,4 @@
-﻿/* * * * * * * * * * * * * * * * * * * * *
+/* * * * * * * * * * * * * * * * * * * * *
  * Creator: Mingyun Qin
  * E-Mail: myun_18@126.com
  * Description:
@@ -53,20 +53,20 @@ namespace Sweety.Common.Cryptography
         /// <summary>
         /// 获取指定字符数组的哈希值。
         /// </summary>
-        /// <param name="chars">要计算哈希值的字符数组。将使用 <c>UTF-16</c> 对这些字符进行编码。</param>
+        /// <param name="chars">要计算哈希值的字符数组。将使用 <c>UTF-8</c> 对这些字符进行编码。</param>
         /// <returns><paramref name="chars"/> 的哈希值。</returns>
         byte[] GetHash(char[] chars);
         /// <summary>
         /// 获取指定字符数组的哈希值。
         /// </summary>
-        /// <param name="chars">要计算哈希值的数据。将使用 <c>UTF-16</c> 对这些字符进行编码。</param>
+        /// <param name="chars">要计算哈希值的数据。将使用 <c>UTF-8</c> 对这些字符进行编码。</param>
         /// <param name="start">从此索引处开始计算哈希值。</param>
         /// <returns><paramref name="chars"/> 的哈希值。</returns>
         byte[] GetHash(char[] chars, int start);
         /// <summary>
         /// 获取指定字符数组的哈希值。
         /// </summary>
-        /// <param name="chars">要计算哈希值的数据。将使用 <c>UTF-16</c> 对这些字符进行编码。</param>
+        /// <param name="chars">要计算哈希值的数据。将使用 <c>UTF-8</c> 对这些字符进行编码。</param>
         /// <param name="offset"><paramref name="chars"/> 中的偏移量，从该位置开始对计算哈希值。</param>
         /// <param name="count"><paramref name="chars"/> 中计算哈希值的字符数。</param>
         /// <returns><paramref name="chars"/> 的哈希值。</returns>
@@ -100,20 +100,20 @@ namespace Sweety.Common.Cryptography
         /// <summary>
         /// 获取指定字符串的哈希值。
         /// </summary>
-        /// <param name="str">要计算哈希值的字符串。将使用 <c>UTF-16</c> 对字符串进行编码。</param>
+        /// <param name="str">要计算哈希值的字符串。将使用 <c>UTF-8</c> 对字符串进行编码。</param>
         /// <returns><paramref name="str"/> 的哈希值。</returns>
         byte[] GetHash(string str);
         /// <summary>
         /// 获取指定字符串的哈希值。
         /// </summary>
-        /// <param name="str">要计算哈希值的字符串。将使用 <c>UTF-16</c> 对字符串进行编码。</param>
+        /// <param name="str">要计算哈希值的字符串。将使用 <c>UTF-8</c> 对字符串进行编码。</param>
         /// <param name="start">从此索引开始计算哈希值。</param>
         /// <returns><paramref name="str"/> 的哈希值。</returns>
         byte[] GetHash(string str, int start);
         /// <summary>
         /// 获取指定字符串的哈希值。
         /// </summary>
-        /// <param name="str">要计算哈希值的字符串。将使用 <c>UTF-16</c> 对字符串进行编码。</param>
+        /// <param name="str">要计算哈希值的字符串。将使用 <c>UTF-8</c> 对字符串进行编码。</param>
         /// <param name="offset"><paramref name="str"/> 中的偏移量，从该位置开始对计算哈希值。</param>
         /// <param name="count"><paramref name="str"/> 中计算哈希值的字符数。</param>
         /// <returns><paramref name="str"/> 的哈希值。</returns>

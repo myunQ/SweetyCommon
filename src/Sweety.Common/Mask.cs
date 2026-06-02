@@ -1,4 +1,4 @@
-﻿/* * * * * * * * * * * * * * * * * * * * *
+/* * * * * * * * * * * * * * * * * * * * *
  * Creator: Mingyun Qin
  * E-Mail: myun_18@126.com
  * Description:
@@ -97,7 +97,7 @@ namespace Sweety.Common
         /// 将字符串从指定字符索引位置开始向右的n个字符替换成“*”星号。
         /// </summary>
         /// <param name="str">要进行掩码处理的字符串。</param>
-        /// <param name="startIndex">字符索引位置。</param>
+        /// <param name="startIndex">开始用“*”号替换的字符索引位置。</param>
         /// <param name="length">要替换为星号的字符数量，如果数量超过了字符串本身的长度则会将 <paramref name="startIndex"/> 之后的所有字符替换为星号，而不是增加 <paramref name="length"/> 个星号。</param>
         /// <returns>替换后的字符串。返回的字符串长度等于传入的字符串长度。</returns>
         public static string Custom(string str, int startIndex, int length)
@@ -110,7 +110,7 @@ namespace Sweety.Common
         /// </summary>
         /// <param name="str">要进行掩码处理的字符串。</param>
         /// <param name="maskChar">掩码字符。</param>
-        /// <param name="startIndex">字符索引位置。</param>
+        /// <param name="startIndex">开始用<paramref name="maskChar"/>替换的字符索引位置。</param>
         /// <param name="length">要替换为掩码字符的字符数量，如果数量超过了字符串本身的长度则会将 <paramref name="startIndex"/> 之后的所有字符替换为掩码字符，而不是增加 <paramref name="length"/> 个掩码字符。</param>
         /// <returns>替换后的字符串。返回的字符串长度等于传入的字符串长度。</returns>
         public static string Custom(string str, char maskChar, int startIndex, int length)

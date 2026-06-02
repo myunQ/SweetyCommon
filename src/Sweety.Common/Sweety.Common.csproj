@@ -8,13 +8,8 @@
     <PackageProjectUrl>https://github.com/myunq/sweetycommon</PackageProjectUrl>
     <RepositoryUrl>https://github.com/myunq/sweetycommon</RepositoryUrl>
 	  <RepositoryType>git</RepositoryType>
-    <PackageReleaseNotes>- 对数据库操作进行了大量的修改。</PackageReleaseNotes>
+    <PackageReleaseNotes>- 计算字符串哈希值时使用的默认字符集从Unicode变更为UTF-8。</PackageReleaseNotes>
 	  <PackageTags>sweety</PackageTags>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType></DebugType>
-    <DocumentationFile>bin\Release\netstandard2.0\Sweety.Common.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -51,6 +46,6 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <PackageReference Include="System.Buffers" Version="4.5.1" />
+    <PackageReference Include="System.Buffers" Version="4.6.0" />
   </ItemGroup>
 </Project>
