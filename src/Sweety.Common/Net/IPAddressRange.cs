@@ -1,4 +1,4 @@
-﻿/* * * * * * * * * * * * * * * * * * * * *
+/* * * * * * * * * * * * * * * * * * * * *
  * Creator: Mingyun Qin
  * E-Mail: myun_18@126.com
  * Description:
@@ -13,8 +13,11 @@
 
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Numerics;
 
 namespace Sweety.Common.Net
 {
@@ -25,11 +28,10 @@ namespace Sweety.Common.Net
     {
         byte[] _start;
         byte[] _end;
+        uint? _ipv4Count = null;
+        BigInteger? _count = null;
 
-        /// <summary>
-        /// 初始化 Myun.Common.Net.IPAddressRange 类的新实例。
-        /// </summary>
-        private IPAddressRange() { }
+
         /// <summary>
         /// 初始化 Myun.Common.Net.IPAddressRange 类的新实例。
         /// </summary>
@@ -45,7 +47,7 @@ namespace Sweety.Common.Net
                 throw new ArgumentException("起始IP地址“" + startIP + "”无效。", CanOutputException.DefaultInstance);
             }
 
-            this.Start = ip;
+            Start = ip;
 
             if (startIP != endIP)
             {
@@ -54,11 +56,11 @@ namespace Sweety.Common.Net
                     throw new ArgumentException("结束IP地址“" + endIP + "”无效。", CanOutputException.DefaultInstance);
                 }
 
-                if (ip.AddressFamily != this.Start.AddressFamily) throw new ArgumentException("起始IP与结束IP版本不同。", CanOutputException.DefaultInstance);
+                if (ip.AddressFamily != Start.AddressFamily) throw new ArgumentException("起始IP与结束IP版本不同。", CanOutputException.DefaultInstance);
             }
 
-            this.End = ip;
-            this.Initialize();
+            End = ip;
+            Initialize();
         }
         /// <summary>
         /// 初始化 Myun.Common.Net.IPAddressRange 类的新实例。
@@ -67,21 +69,21 @@ namespace Sweety.Common.Net
         /// <param name="end">结束IP地址，支持IPv4、IPv6两种格式</param>
         public IPAddressRange(IPAddress start, IPAddress end)
         {
-            this.Start = start ?? throw new ArgumentNullException("起始IP地址不能为 null。", CanOutputException.DefaultInstance);
+            Start = start ?? throw new ArgumentNullException("起始IP地址不能为 null。", CanOutputException.DefaultInstance);
 
             if (end == null) throw new ArgumentNullException("结束IP地址不能为 null。", CanOutputException.DefaultInstance);
 
-            // 从执行效率触发 IPv4 使用 Equals() 比较，IPv6 使用 GetHashCode() 比较。
+            // 从执行效率出发 IPv4 使用 Equals() 比较，IPv6 使用 GetHashCode() 比较。
             if ((start.AddressFamily == AddressFamily.InterNetwork && start.Equals(end)) || (start.AddressFamily == AddressFamily.InterNetworkV6 && start.GetHashCode() == end.GetHashCode()))
             {
-                this.End = start;
+                End = start;
             }
             else
             {
                 if (start.AddressFamily != end.AddressFamily) throw new ArgumentException("起始IP与结束IP版本不同。", CanOutputException.DefaultInstance);
-                this.End = end;
+                End = end;
             }
-            this.Initialize();
+            Initialize();
         }
 
         /// <summary>
@@ -93,6 +95,112 @@ namespace Sweety.Common.Net
         /// </summary>
         public IPAddress End { get; private set; }
 
+        
+        /// <summary>
+        /// 获取 IP v4 地址的数量，如果不是IP v4 地址则返回<see cref="uint.MinValue"/>。
+        /// </summary>
+        public uint IPv4Count
+        {
+            get
+            {
+                if (!_ipv4Count.HasValue)
+                {
+                    if (Start.AddressFamily != AddressFamily.InterNetwork)
+                    {
+                        _ipv4Count = uint.MinValue;
+                    }
+                    else
+                    {
+                        _ipv4Count = BitConverter.ToUInt32(_end, 0) - BitConverter.ToUInt32(_start, 0) + 1U;
+                    }
+                }
+                
+                return _ipv4Count.Value;
+            }
+        }
+
+        /// <summary>
+        /// 获取IP地址范围包含的IP地址数量。
+        /// </summary>
+        public BigInteger Count
+        {
+            get
+            {
+                if (!_count.HasValue)
+                {
+                    _count = BytesToBigInteger(_end) - BytesToBigInteger(_start) + 1;
+                }
+
+                return _count.Value;
+            }
+        }
+
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+        private static BigInteger BytesToBigInteger(ReadOnlySpan<byte> bytes)
+        {
+            Span<byte> buf = stackalloc byte[bytes.Length + 1];
+            bytes.CopyTo(buf[1..]);
+            if (BitConverter.IsLittleEndian)
+            {
+                buf.Reverse();
+            }
+
+            return new BigInteger(buf);
+        }
+#else
+        private static BigInteger BytesToBigInteger(byte[] bytes)
+        {
+            byte[] buf = new byte[bytes.Length + 1];
+            bytes.CopyTo(buf, 1);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(buf);
+            }
+
+            return new BigInteger(buf);
+        }
+#endif
+
+
+        /// <summary>
+        /// 生成一个列表，列表中按顺序包含从<see cref="Start"/>（含）至 <see cref="End"/>（含）的每一个IP地址。
+        /// </summary>
+        /// <returns>返回按顺序包含从<see cref="Start"/>（含）至 <see cref="End"/>（含）的所有IP的列表。</returns>
+        public IList<IPAddress> GenerateList()
+        {
+#if NETSTANDARD2_0
+            var current = (byte[])_start.Clone();
+#else
+            Span<byte> current = stackalloc byte[_start.Length];
+            _start.AsSpan().CopyTo(current);
+#endif
+
+            IList<IPAddress> list = new List<IPAddress>();
+            while (true)
+            {
+                list.Add(new IPAddress(current));
+
+                // 判断是否到达终点
+                if (current.SequenceEqual<byte>(_end))
+                {
+                    return list;
+                }
+
+
+                for (int i = current.Length - 1; i >= 0; i--)
+                {
+                    if (current[i] == 255)
+                        current[i] = 0;
+                    else
+                    {
+                        current[i]++;
+                        break;
+                    }
+                }
+            }
+        }
+
+
         /// <summary>
         /// 判断IP地址是否在范围内，支持IPv4、IPv6。
         /// </summary>
@@ -103,9 +211,9 @@ namespace Sweety.Common.Net
             if (ip == null)
                 throw new ArgumentNullException("请传入IP地址。", CanOutputException.DefaultInstance);
 
-            if (ip.AddressFamily != this.Start.AddressFamily) return false;
+            if (ip.AddressFamily != Start.AddressFamily) throw new ArgumentException("IP版本不一致。", nameof(ip));
 
-            return this.InRange(ip.GetAddressBytes());
+            return InRange(ip.GetAddressBytes());
         }
 
         /// <summary>
@@ -123,8 +231,9 @@ namespace Sweety.Common.Net
                 throw new ArgumentException(ip + "不是一个有效的IP地址。", CanOutputException.DefaultInstance);
             }
 
-            return this.InRange(ipvalue);
+            return InRange(ipvalue);
         }
+
         /// <summary>
         /// 判断IP地址是否在范围内，支持IPv4、IPv6。
         /// </summary>
@@ -172,16 +281,15 @@ namespace Sweety.Common.Net
         /// </summary>
         private void Initialize()
         {
-            _start = this.Start.GetAddressBytes();
-            if (Object.ReferenceEquals(this.Start, this.End))
+            _start = Start.GetAddressBytes();
+            if (Object.ReferenceEquals(Start, End))
             {
                 _end = _start;
                 return;
             }
-            _end = this.End.GetAddressBytes();
+            _end = End.GetAddressBytes();
 
-            int length = _start.Length;
-            for (int i = 0; i < length; i++)
+            for (int i = 0; i < _start.Length; i++)
             {
                 if (_start[i] < _end[i])
                 {
@@ -193,6 +301,51 @@ namespace Sweety.Common.Net
                 }
                 throw new ArgumentException("起始IP地址大于结束IP地址。", CanOutputException.DefaultInstance);
             }
+        }
+
+        public class Enumerator
+        {
+            IPAddressRange _range;
+            IPAddress _current = IPAddress.None;
+            byte[] _currentBytes = Array.Empty<byte>();
+
+            public Enumerator(IPAddressRange range)
+            {
+                _range = range;
+            }
+
+            public bool MoveNext()
+            {
+                if (_currentBytes.Length == 0)
+                {
+                    _currentBytes = (byte[])_range._start.Clone();
+                }
+                else
+                {
+                    // 判断是否到达终点
+                    if (_currentBytes.SequenceEqual<byte>(_range._end))
+                    {
+                        _current = IPAddress.None;
+                        return false;
+                    }
+
+                    for (int i = _currentBytes.Length - 1; i >= 0; i--)
+                    {
+                        if (_currentBytes[i] == 255)
+                            _currentBytes[i] = 0;
+                        else
+                        {
+                            _currentBytes[i]++;
+                            break;
+                        }
+                    }
+                }
+
+                _current = new IPAddress(_currentBytes);
+                return true;
+            }
+
+            public IPAddress Current => _current;
         }
     }
 }
