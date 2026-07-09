@@ -165,9 +165,16 @@ namespace Sweety.Common.Net
         /// <summary>
         /// 生成一个列表，列表中按顺序包含从<see cref="Start"/>（含）至 <see cref="End"/>（含）的每一个IP地址。
         /// </summary>
+        /// <param name="maxAllowCount">如果<see cref="Count"/>大于此值将抛出异常。</param>
         /// <returns>返回按顺序包含从<see cref="Start"/>（含）至 <see cref="End"/>（含）的所有IP的列表。</returns>
-        public IList<IPAddress> GenerateList()
+        /// <exception cref="InvalidOperationException">当IP范围内的IP数量超过<paramref name="maxAllowCount"/>时抛出此异常。</exception>
+        public IList<IPAddress> GenerateList(int maxAllowCount = 256)
         {
+            if (Count > maxAllowCount)
+            {
+                throw new InvalidOperationException($"IP区间总量{Count}超过最大允许上限{maxAllowCount}。");
+            }
+
 #if NETSTANDARD2_0
             var current = (byte[])_start.Clone();
 #else
