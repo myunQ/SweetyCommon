@@ -160,9 +160,10 @@ namespace Sweety.Common.DataProvider.SqlServer
         public async Task<SqlConnection> BuildSqlConnectionAndOpenAsync()
         {
             var conn = BuildSqlConnection();
-
-            await conn.OpenAsync();
-
+            //异步bug https://github.com/dotnet/SqlClient/issues/601
+            //await conn.OpenAsync();
+            conn.Open();
+            await Task.CompletedTask;
             return conn;
         }
         /// <summary>
@@ -173,8 +174,10 @@ namespace Sweety.Common.DataProvider.SqlServer
         public async Task<SqlConnection> BuildSqlConnectionAndOpenAsync(string connectionString)
         {
             var conn = BuildSqlConnection(connectionString);
-
-            await conn.OpenAsync();
+            //异步bug https://github.com/dotnet/SqlClient/issues/601
+            //await conn.OpenAsync();
+            conn.Open();
+            await Task.CompletedTask;
 
             return conn;
         }
@@ -186,9 +189,10 @@ namespace Sweety.Common.DataProvider.SqlServer
         public async Task<SqlConnection> BuildSqlConnectionAndOpenAsync(CancellationToken cancellationToken = default)
         {
             var conn = BuildSqlConnection();
-
-            await conn.OpenAsync(cancellationToken);
-
+            //异步bug https://github.com/dotnet/SqlClient/issues/601
+            //await conn.OpenAsync(cancellationToken);
+            conn.Open();
+            await Task.CompletedTask;
             return conn;
         }
         /// <summary>
@@ -200,8 +204,10 @@ namespace Sweety.Common.DataProvider.SqlServer
         public async Task<SqlConnection> BuildSqlConnectionAndOpenAsync(string connectionString, CancellationToken cancellationToken = default)
         {
             var conn = BuildSqlConnection(connectionString);
-
-            await conn.OpenAsync(cancellationToken);
+            //异步bug https://github.com/dotnet/SqlClient/issues/601
+            //await conn.OpenAsync(cancellationToken);
+            conn.Open();
+            await Task.CompletedTask;
 
             return conn;
         }
@@ -872,11 +878,11 @@ namespace Sweety.Common.DataProvider.SqlServer
                 
                 if (mustCloseConnection)
                 {
-                    var openTask = cmd.Connection.OpenAsync(cancellationToken);
-
+                    //var openTask = cmd.Connection.OpenAsync(cancellationToken);
+                    cmd.Connection.Open();
                     if ((commandBehavior & CommandBehavior.CloseConnection) != CommandBehavior.CloseConnection) commandBehavior |= CommandBehavior.CloseConnection;
 
-                    await openTask;
+                    //await openTask;
                 }
 
 
@@ -1136,8 +1142,9 @@ namespace Sweety.Common.DataProvider.SqlServer
             }
             else
             {
-                await command.Connection.OpenAsync(cancellationToken);
-
+                //await command.Connection.OpenAsync(cancellationToken);
+                command.Connection.Open();
+                await Task.CompletedTask;
                 return true;
             }
         }

@@ -9,7 +9,9 @@
     <ProjectReference Include="..\Sweety.Common\Sweety.Common.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="EnyimMemcachedCore" Version="3.2.4" />
+    <PackageReference Include="EnyimMemcachedCore" Version="3.2.4" Condition="'$(TargetFramework)' != 'netstandard2.0'" />
+    <PackageReference Include="EnyimMemcachedCore" Version="2.6.6" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
+    <PackageReference Include="EnyimMemcachedCore" Version="2.6.6" Condition="'$(TargetFramework)' == 'netstandard2.1'" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 </Project>
